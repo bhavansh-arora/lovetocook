@@ -27,7 +27,13 @@ A premium, multi-page website for **Love to Cook**, the cook school, bakery and 
 - Gift vouchers, bakery pre-orders and class seats all go through one bag
 - Private-class planner that shows an estimate as guests choose options
 - SEO: per-page titles and descriptions, LocalBusiness/Bakery JSON-LD, and Event JSON-LD for every class date
-- Motion: preloader, page-transition curtain, Lenis smooth scroll, GSAP split-text reveals, scroll-scrubbed text, a velocity-reactive marquee, a pinned horizontal gallery, magnetic buttons, a custom cursor and voucher tilt
+- 3D experience:
+  - a draggable carousel of Sam's bakes in the hero, with drifting flour dust that moves away from the pointer
+  - a pinned "Butter. Fold. Repeat." scene where an isometric dough stack laminates from 3 to 9 to 27 layers as you scroll
+  - a class preview card that flips in 3D beside the upcoming-classes list
+  - a curved 3D gallery that shows every photo uncropped
+  - pointer-tilt cards with glare, 3D headline line-flips, depth parallax on inner-page heroes, and a marquee that leans with scroll speed
+- Motion: preloader, page-transition curtain, Lenis smooth scroll, scroll-scrubbed text, magnetic buttons, a custom cursor and voucher tilt
 - Accessibility: skip link, focus styles, ARIA on controls, `prefers-reduced-motion` support, and content that stays visible if JavaScript fails
 - Responsive at every width (checked at 390, 834 and 1440px), with a sticky mobile booking bar
 
@@ -39,7 +45,7 @@ src/pages/      page bodies with a <!--meta {...}--> header
 assets/css/     main.css (design tokens and all components)
 assets/js/      data.js (ALL editable content), site.js (UI), motion.js (animation)
 assets/vendor/  GSAP 3.12.5, ScrollTrigger, Lenis 1.1.13 (self-hosted)
-assets/img/     Sam's real photos, logo variants, favicon, OG image
+assets/img/     Sam's real photos (bakes upscaled 4x with EDSR from the site collage), logo variants, favicon, OG image
 build.py        stitches partials and pages into the root *.html files
 ```
 
@@ -63,8 +69,9 @@ python3 -m http.server 8000
 1. Replace the sample dates, prices, seats and bakery items in `data.js` with real ones, or generate them from the Square Catalog/Bookings API.
 2. Switch `CONFIG.DEMO_MODE` to `false` in `site.js` and connect the Square Web Payments SDK in the payment step.
 3. Set `CONFIG.FORM_ENDPOINT` (Formspree, Netlify Forms or your own API) for the contact, enquiry, waitlist and newsletter forms.
-4. Replace the sample testimonials with real Google or Instagram reviews.
-5. Confirm the bakery collection days and times, and the cancellation policy wording.
-6. Deploy as a static site (Netlify, Vercel, Cloudflare Pages or GitHub Pages) and point lovetocook.uk at it, with redirects from the old Square URLs.
+4. Ask Sam for her original, full-resolution bake photos. The current ones are upscaled crops of a single 1536px collage.
+5. Replace the sample testimonials with real Google or Instagram reviews.
+6. Confirm the bakery collection days and times, and the cancellation policy wording.
+7. Deploy as a static site (Netlify, Vercel, Cloudflare Pages or GitHub Pages) and point lovetocook.uk at it, with redirects from the old Square URLs.
 
 Site by [Code Bunny](https://web.codebunny.net/).

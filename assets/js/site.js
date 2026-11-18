@@ -218,12 +218,12 @@
   /* ---------- Upcoming rows (home) ---------- */
   function rowHTML(s) {
     const c = s.course, left = seatsLeft(s);
-    return `<article class="row-class" data-hover-img="${c.image}">
-      <div class="row-class__date"><b>${String(s.d.getDate()).padStart(2, "0")}</b><span>${monShort(s.d)}<br>${dayShort(s.d)}</span></div>
-      <div><span class="label" style="color:var(--caramel)">${catLabel(c.category)}</span>
-        <h3 class="row-class__title" style="margin-top:8px"><a href="class.html?c=${c.id}&s=${s.id}">${esc(c.title)}</a></h3>
-        <div class="row-class__meta"><span>${icon("clock")}${s.start}–${s.end}</span><span>${icon("level")}${c.level}</span><span>${icon("users")}Max ${c.capacity}</span></div></div>
-      <div class="row-class__seats">${seatsHTML(s, c.capacity)}</div>
+    return `<article class="row-class" data-sid="${s.id}">
+      <div class="row-class__date"><b>${String(s.d.getDate()).padStart(2, "0")}</b><span>${monShort(s.d)} · ${dayShort(s.d)}</span></div>
+      <div class="row-class__info"><span class="label" style="color:var(--caramel)">${catLabel(c.category)}</span>
+        <h3 class="row-class__title"><a href="class.html?c=${c.id}&s=${s.id}">${esc(c.title)}</a></h3>
+        <div class="row-class__meta"><span>${icon("clock")}${s.start}–${s.end}</span><span>${icon("level")}${c.level}</span><span>${icon("users")}Max ${c.capacity}</span></div>
+        <div class="row-class__seats">${seatsHTML(s, c.capacity)}</div></div>
       <div class="row-class__price">${money(c.price)}<small>per person</small></div>
       <div class="row-class__cta">${left ? `<button class="btn btn--sm" type="button" data-quick-book="${s.id}">Book ${arrowIcon()}</button>` : `<button class="btn btn--sm btn--ghost" type="button" data-waitlist="${s.id}">Waitlist ${arrowIcon()}</button>`}</div>
     </article>`;
@@ -236,26 +236,53 @@
     const draw = (cat) => {
       const list = allSessions().filter((s) => cat === "all" || s.course.category === cat).slice(0, limit);
       wrap.innerHTML = list.length ? list.map(rowHTML).join("") : `<p class="row-empty">New dates coming soon. Join the list below for first dibs.</p>`;
-      bindHoverImg();
+      if (list[0]) preview.show(list[0].id, true);
       window.ScrollTrigger && ScrollTrigger.refresh();
     };
     chips.forEach((ch) => ch.addEventListener("click", () => { chips.forEach((c) => c.setAttribute("aria-pressed", String(c === ch))); draw(ch.dataset.upFilter); }));
+    const pick = (e) => { const r = e.target.closest(".row-class"); if (r) preview.show(r.dataset.sid); };
+    wrap.addEventListener("mouseover", pick);
+    wrap.addEventListener("focusin", pick);
     draw("all");
   }
 
-  /* Hover image that follows the cursor on list rows */
-  function bindHoverImg() {
-    const hi = $(".hover-img");
-    if (!hi || !matchMedia("(hover:hover) and (min-width:1001px)").matches) return;
-    const img = $("img", hi);
-    let x = 0, y = 0, cx = 0, cy = 0, raf;
-    const loop = () => { cx += (x - cx) * 0.14; cy += (y - cy) * 0.14; hi.style.transform = ""; hi.style.left = cx + 24 + "px"; hi.style.top = cy - 180 + "px"; raf = requestAnimationFrame(loop); };
-    $$("[data-hover-img]").forEach((row) => {
-      row.addEventListener("mouseenter", (e) => { img.src = row.dataset.hoverImg; x = cx = e.clientX; y = cy = e.clientY; hi.classList.add("is-on"); cancelAnimationFrame(raf); loop(); });
-      row.addEventListener("mousemove", (e) => { x = e.clientX; y = e.clientY; });
-      row.addEventListener("mouseleave", () => { hi.classList.remove("is-on"); setTimeout(() => cancelAnimationFrame(raf), 400); });
-    });
-  }
+  /* 3D preview card beside the list: flips to the hovered class, never covers the text */
+  const preview = (() => {
+    const card = $("[data-upv]");
+    if (!card) return { show() {} };
+    const el = (k) => $(`[data-upv-${k}]`, card);
+    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    D.courses.forEach((c) => { const i = new Image(); i.src = c.image; });
+    let current = null, busy = false, queued = null;
+    const fill = (s) => {
+      const img = el("img");
+      img.src = s.course.image;
+      img.style.objectPosition = s.course.imagePos || "center";
+      el("day").textContent = String(s.d.getDate()).padStart(2, "0");
+      el("mon").textContent = `${monShort(s.d)} · ${dayShort(s.d)}`;
+      el("cat").textContent = catLabel(s.course.category);
+      el("title").textContent = s.course.title;
+      el("seats").innerHTML = seatsHTML(s, s.course.capacity);
+    };
+    const show = (sid, instant) => {
+      if (sid === current) return;
+      if (busy) { queued = sid; return; }
+      const s = findSession(sid);
+      if (!s) return;
+      current = sid;
+      $$(".row-class").forEach((r) => r.classList.toggle("is-active", r.dataset.sid === sid));
+      if (instant || reduceMotion || !card.animate) { fill(s); return; }
+      busy = true;
+      card.animate([{ transform: "rotateY(0deg)" }, { transform: "rotateY(-90deg) scale(.96)" }], { duration: 230, easing: "cubic-bezier(.55,0,1,.45)", fill: "forwards" }).onfinish = () => {
+        fill(s);
+        card.animate([{ transform: "rotateY(90deg) scale(.96)" }, { transform: "rotateY(0deg)" }], { duration: 620, easing: "cubic-bezier(.22,1,.36,1)", fill: "forwards" }).onfinish = () => {
+          busy = false;
+          if (queued && queued !== current) { const q = queued; queued = null; show(q); } else queued = null;
+        };
+      };
+    };
+    return { show };
+  })();
 
   /* ---------- Classes catalogue ---------- */
   function cardHTML(s, others = []) {

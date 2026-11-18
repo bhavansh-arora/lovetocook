@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Inter+Tight:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="assets/css/main.css?v=202611180814">
+<link rel="stylesheet" href="assets/css/main.css?v=202611181043">
 <script>
   (function (h) {
     h.classList.remove("no-js"); h.classList.add("js");
@@ -94,7 +94,6 @@
 </div>
 <div class="curtain" aria-hidden="true"></div>
 <div class="cursor" aria-hidden="true"><div class="cursor__dot"></div><div class="cursor__label"></div></div>
-<div class="hover-img" aria-hidden="true"><img src="assets/img/croissants.jpg" alt=""></div>
 
 <header class="header" id="top">
   <div class="container header__inner">
@@ -140,6 +139,7 @@
 
 <!-- ============ HERO ============ -->
 <section class="hero">
+  <canvas class="flour" data-flour aria-hidden="true"></canvas>
   <div class="container">
     <div class="hero__top" data-hero-fade>
       <span class="label"><span class="dot-live"></span>Now booking · Winter 2026–27</span>
@@ -169,16 +169,23 @@
             <span class="badge-core">8</span>
           </div>
         </div>
-        <div class="hero__portrait" data-hero-pop><img src="assets/img/sam-square.jpg" alt="Sam Heeney-Governo"></div>
-        <div class="hero__stage" data-hero-media data-hero-cycle data-cursor="Classes">
-          <a href="classes.html" aria-label="See all classes" style="position:absolute;inset:0;z-index:2"></a>
-          <img src="assets/img/croissants.jpg" alt="A tray of laminated butter croissants" data-cap="Croissant & Viennoiserie">
-          <img src="assets/img/fig-pastry.jpg" alt="Fig and frangipane laminated pastry" data-cap="Laminated showstoppers">
-          <img src="assets/img/sourdough.jpg" alt="Scored sourdough loaves" data-cap="Sourdough from scratch">
-          <img src="assets/img/fruit-danish.jpg" alt="Berry Danish pastries" data-cap="Danish & seasonal fruit">
-          <div class="hero__stage-meta">
-            <div><span class="cap" data-hero-cap>Croissant & Viennoiserie</span><div class="hero__progress"><i></i><i></i><i></i><i></i></div></div>
-            <span class="idx" data-hero-idx>01 / 04</span>
+        <div class="ring3d" data-ring data-hero-media data-cursor="Drag">
+          <div class="ring3d__floor" aria-hidden="true"></div>
+          <div class="ring3d__tilt">
+            <div class="ring3d__spin">
+              <a class="ring3d__card" style="--i:0" href="class.html?c=croissant" data-cap="Croissants" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/croissants.jpg" alt="Croissants" style="" draggable="false"><span>Croissants</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo-cream.png" alt="" draggable="false"></span></a>
+              <a class="ring3d__card" style="--i:1" href="class.html?c=laminated" data-cap="Fig supreme" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/fig-pastry.jpg" alt="Fig supreme" style="" draggable="false"><span>Fig supreme</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo-cream.png" alt="" draggable="false"></span></a>
+              <a class="ring3d__card" style="--i:2" href="class.html?c=sourdough" data-cap="Sourdough" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/sourdough.jpg" alt="Sourdough" style="" draggable="false"><span>Sourdough</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo-cream.png" alt="" draggable="false"></span></a>
+              <a class="ring3d__card" style="--i:3" href="class.html?c=danish" data-cap="Berry Danish" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/fruit-danish.jpg" alt="Berry Danish" style="" draggable="false"><span>Berry Danish</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo-cream.png" alt="" draggable="false"></span></a>
+              <a class="ring3d__card" style="--i:4" href="class.html?c=choux" data-cap="Craquelin choux" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/sam.jpg" alt="Craquelin choux" style="object-position:50% 28%" draggable="false"><span>Craquelin choux</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo-cream.png" alt="" draggable="false"></span></a>
+              <a class="ring3d__card" style="--i:5" href="class.html?c=festive" data-cap="Tarte au chocolat" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/chocolate-tart.jpg" alt="Tarte au chocolat" style="" draggable="false"><span>Tarte au chocolat</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo-cream.png" alt="" draggable="false"></span></a>
+              <a class="ring3d__card" style="--i:6" href="class.html?c=focaccia" data-cap="Focaccia" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/focaccia.jpg" alt="Focaccia" style="" draggable="false"><span>Focaccia</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo-cream.png" alt="" draggable="false"></span></a>
+              <a class="ring3d__card" style="--i:7" href="class.html?c=croissant" data-cap="Almond croissants" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/almond-croissant.jpg" alt="Almond croissants" style="" draggable="false"><span>Almond croissants</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo-cream.png" alt="" draggable="false"></span></a>
+            </div>
+          </div>
+          <div class="ring3d__meta">
+            <span class="cap"><em data-ring-cap>Croissants</em></span>
+            <span class="label hint"><svg viewBox="0 0 34 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M5 7h24M9 3 5 7l4 4M25 3l4 4-4 4"/></svg>Drag to spin · <span class="idx" data-ring-idx>01 / 08</span></span>
           </div>
         </div>
       </div>
@@ -219,6 +226,65 @@
   </div>
 </section>
 
+<!-- ============ THE CRAFT: 27 LAYERS ============ -->
+<section class="lam theme-dark" data-lam data-header-dark>
+  <div class="lam__pin">
+    <div class="container">
+      <div class="lam__grid">
+        <div class="lam__copy">
+          <span class="eyebrow label"><span class="num">(✺)</span><span class="dash"></span>The craft, in 3D</span>
+          <h2 class="h2" data-split>Butter. Fold. <em>Repeat.</em></h2>
+          <div class="lam__steps">
+            <div class="lam__step is-active"><span class="label">Step 01 · Lock-in</span><h3>A cold slab of butter</h3><p>French butter wrapped in a soft détrempe dough. Three layers: dough, butter, dough.</p></div>
+            <div class="lam__step"><span class="label">Step 02 · First fold</span><h3>Roll, fold in three</h3><p>Every letter fold triples the layers. Temperature is everything: too warm and the butter melts in.</p></div>
+            <div class="lam__step"><span class="label">Step 03 · Rest &amp; roll</span><h3>Nine thin sheets</h3><p>Rest, chill, roll again. The dough relaxes and the butter stays in perfect, unbroken sheets.</p></div>
+            <div class="lam__step"><span class="label">Step 04 · Second fold</span><h3>Twenty-seven layers</h3><p>In the oven, steam lifts every layer apart. That's the shatter, the honeycomb and the sound of a proper croissant.</p></div>
+          </div>
+          <div class="btn-row"><a class="btn btn--butter" href="class.html?c=croissant">Learn it in the Croissant Masterclass <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a></div>
+          <div class="lam__dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="lam__stage" aria-hidden="true">
+          <div class="lam__count"><b data-lam-count>3</b><span class="label">layers of butter &amp; dough</span></div>
+          <div class="lam__iso">
+            <div class="lam__stack">
+              <div class="lam__shadow"></div>
+              <div class="lam__sheet"></div>
+              <div class="lam__sheet is-butter"></div>
+              <div class="lam__sheet"></div>
+              <div class="lam__sheet is-butter"></div>
+              <div class="lam__sheet"></div>
+              <div class="lam__sheet is-butter"></div>
+              <div class="lam__sheet"></div>
+              <div class="lam__sheet is-butter"></div>
+              <div class="lam__sheet"></div>
+              <div class="lam__sheet is-butter"></div>
+              <div class="lam__sheet"></div>
+              <div class="lam__sheet is-butter"></div>
+              <div class="lam__sheet"></div>
+              <div class="lam__sheet is-butter"></div>
+              <div class="lam__sheet"></div>
+              <div class="lam__sheet is-butter"></div>
+              <div class="lam__sheet"></div>
+              <div class="lam__sheet is-butter"></div>
+              <div class="lam__sheet"></div>
+              <div class="lam__sheet is-butter"></div>
+              <div class="lam__sheet"></div>
+              <div class="lam__sheet is-butter"></div>
+              <div class="lam__sheet"></div>
+              <div class="lam__sheet is-butter"></div>
+              <div class="lam__sheet"></div>
+              <div class="lam__sheet is-butter"></div>
+              <div class="lam__sheet"></div>
+            </div>
+          </div>
+          <figure class="lam__photo"><img src="assets/img/croissants.jpg" alt="" loading="lazy"><figcaption>The result</figcaption></figure>
+        </div>
+      </div>
+      <div class="lam__progress"><span></span></div>
+    </div>
+  </div>
+</section>
+
 <!-- ============ 02 THREE WAYS ============ -->
 <section class="section theme-paper">
   <div class="container">
@@ -230,7 +296,7 @@
       <div class="sec-head__aside" data-reveal><p>Whether you want to master lamination, celebrate with friends or just collect a box of croissants, there's a way in for you.</p></div>
     </div>
     <div class="paths">
-      <a class="path" href="classes.html" data-reveal data-cursor="Book">
+      <a class="path" href="classes.html" data-reveal data-tilt3d data-cursor="Book">
         <div class="path__media"><span class="path__num">01</span><img src="assets/img/almond-croissant.jpg" alt="Almond croissants" loading="lazy"></div>
         <div class="path__body">
           <span class="label" style="color:var(--caramel)">From <span data-from-price>£68</span> pp</span>
@@ -239,7 +305,7 @@
           <div class="path__foot"><span class="label"><span data-count-sessions>20</span> dates open</span><span class="path__arrow"><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></div>
         </div>
       </a>
-      <a class="path" href="private.html" data-reveal data-cursor="Enquire">
+      <a class="path" href="private.html" data-reveal data-tilt3d data-cursor="Enquire">
         <div class="path__media"><span class="path__num">02</span><img src="assets/img/sam.jpg" alt="Sam teaching choux pastry" loading="lazy" style="object-position:50% 30%"></div>
         <div class="path__body">
           <span class="label" style="color:var(--caramel)">Your date, your menu</span>
@@ -248,7 +314,7 @@
           <div class="path__foot"><span class="label">1–8 guests</span><span class="path__arrow"><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></div>
         </div>
       </a>
-      <a class="path" href="bakery.html" data-reveal data-cursor="Order">
+      <a class="path" href="bakery.html" data-reveal data-tilt3d data-cursor="Order">
         <div class="path__media"><span class="path__num">03</span><img src="assets/img/plum-danish.jpg" alt="Poached plum Danish" loading="lazy"></div>
         <div class="path__body">
           <span class="label" style="color:var(--caramel)">Pre-order &amp; collect</span>
@@ -280,7 +346,17 @@
       </div>
       <span class="label muted">Prices per person · all ingredients included</span>
     </div>
-    <div class="rows" data-upcoming data-limit="6"></div>
+    <div class="upcoming">
+      <aside class="upv" aria-hidden="true">
+        <div class="upv__card" data-upv>
+          <img src="assets/img/croissants.jpg" alt="" data-upv-img>
+          <span class="upv__date"><b data-upv-day>28</b><small data-upv-mon>Nov · Sat</small></span>
+          <div class="upv__body"><span class="label" data-upv-cat>Pâtisserie</span><b data-upv-title>Croissant &amp; Viennoiserie Masterclass</b><span data-upv-seats></span></div>
+        </div>
+        <p class="upv__hint label">Hover a class to preview it</p>
+      </aside>
+      <div class="upcoming__list"><div class="rows" data-upcoming data-limit="6"></div></div>
+    </div>
   </div>
 </section>
 
@@ -293,15 +369,18 @@
     </div>
     <p class="muted" style="max-width:34ch" data-reveal>Every bake below is taught in a class. Real photos from the Love to Cook kitchen.</p>
   </div>
-  <div class="hgal__track">
-    <div class="hgal__intro"><p class="lead">Scroll through the counter. Each one comes with a class, a recipe and a box to take home.</p><a class="btn btn--light" href="classes.html">All classes <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a></div>
-    <figure class="hgal__item"><div class="media"><img src="assets/img/croissants.jpg" alt="Butter croissants" loading="lazy"></div><figcaption class="hgal__cap"><h3>Butter croissants</h3><a href="class.html?c=croissant">Croissant Masterclass →</a></figcaption></figure>
-    <figure class="hgal__item"><div class="media"><img src="assets/img/fig-pastry.jpg" alt="Fig supreme" loading="lazy"></div><figcaption class="hgal__cap"><h3>Fig &amp; frangipane supreme</h3><a href="class.html?c=laminated">Showstoppers →</a></figcaption></figure>
-    <figure class="hgal__item"><div class="media"><img src="assets/img/crumb.jpg" alt="Open sourdough crumb" loading="lazy"></div><figcaption class="hgal__cap"><h3>Open-crumb sourdough</h3><a href="class.html?c=sourdough">Sourdough →</a></figcaption></figure>
-    <figure class="hgal__item"><div class="media"><img src="assets/img/fruit-danish.jpg" alt="Berry Danish" loading="lazy"></div><figcaption class="hgal__cap"><h3>Berry crème pât Danish</h3><a href="class.html?c=danish">Danish →</a></figcaption></figure>
-    <figure class="hgal__item"><div class="media"><img src="assets/img/chocolate-tart.jpg" alt="Chocolate tart" loading="lazy"></div><figcaption class="hgal__cap"><h3>Tarte au chocolat</h3><a href="class.html?c=festive">Festive Chocolate →</a></figcaption></figure>
-    <figure class="hgal__item"><div class="media"><img src="assets/img/focaccia.jpg" alt="Focaccia" loading="lazy"></div><figcaption class="hgal__cap"><h3>Rosemary focaccia</h3><a href="class.html?c=focaccia">Focaccia Night →</a></figcaption></figure>
-    <figure class="hgal__item"><div class="media"><img src="assets/img/almond-croissant.jpg" alt="Almond croissants" loading="lazy"></div><figcaption class="hgal__cap"><h3>Almond croissants</h3><a href="class.html?c=croissant">Croissant Masterclass →</a></figcaption></figure>
+  <div class="hgal__viewport">
+    <div class="hgal__track">
+      <div class="hgal__intro"><p class="lead">Scroll through the counter. Each one comes with a class, a recipe and a box to take home.</p><a class="btn btn--light" href="classes.html">All classes <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a></div>
+      <figure class="hgal__item"><div class="media" style="--ar:430 / 275"><img src="assets/img/croissants.jpg" alt="Butter croissants" loading="lazy"></div><figcaption class="hgal__cap"><h3>Butter croissants</h3><a href="class.html?c=croissant">Croissant Masterclass →</a></figcaption></figure>
+      <figure class="hgal__item"><div class="media" style="--ar:360 / 275"><img src="assets/img/fig-pastry.jpg" alt="Fig & frangipane supreme" loading="lazy"></div><figcaption class="hgal__cap"><h3>Fig &amp; frangipane supreme</h3><a href="class.html?c=laminated">Showstoppers →</a></figcaption></figure>
+      <figure class="hgal__item"><div class="media" style="--ar:350 / 365"><img src="assets/img/crumb.jpg" alt="Open-crumb sourdough" loading="lazy"></div><figcaption class="hgal__cap"><h3>Open-crumb sourdough</h3><a href="class.html?c=sourdough">Sourdough →</a></figcaption></figure>
+      <figure class="hgal__item"><div class="media" style="--ar:350 / 225"><img src="assets/img/plum-danish.jpg" alt="Poached plum Danish" loading="lazy"></div><figcaption class="hgal__cap"><h3>Poached plum Danish</h3><a href="class.html?c=danish">Danish →</a></figcaption></figure>
+      <figure class="hgal__item"><div class="media" style="--ar:435 / 335"><img src="assets/img/chocolate-tart.jpg" alt="Tarte au chocolat" loading="lazy"></div><figcaption class="hgal__cap"><h3>Tarte au chocolat</h3><a href="class.html?c=festive">Festive Chocolate →</a></figcaption></figure>
+      <figure class="hgal__item"><div class="media" style="--ar:390 / 330"><img src="assets/img/almond-croissant.jpg" alt="Almond croissants" loading="lazy"></div><figcaption class="hgal__cap"><h3>Almond croissants</h3><a href="class.html?c=croissant">Croissant Masterclass →</a></figcaption></figure>
+      <figure class="hgal__item"><div class="media" style="--ar:670 / 365"><img src="assets/img/focaccia.jpg" alt="Rosemary focaccia" loading="lazy"></div><figcaption class="hgal__cap"><h3>Rosemary focaccia</h3><a href="class.html?c=focaccia">Focaccia Night →</a></figcaption></figure>
+      <figure class="hgal__item"><div class="media" style="--ar:470 / 260"><img src="assets/img/sourdough.jpg" alt="Country loaves" loading="lazy"></div><figcaption class="hgal__cap"><h3>Country loaves</h3><a href="class.html?c=sourdough">Sourdough →</a></figcaption></figure>
+    </div>
   </div>
   <div class="container"><div class="hgal__progress"><span></span></div></div>
 </section>
@@ -530,8 +609,8 @@
 <script src="assets/vendor/gsap.min.js" defer></script>
 <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
 <script src="assets/vendor/lenis.min.js" defer></script>
-<script src="assets/js/data.js?v=202611180814" defer></script>
-<script src="assets/js/site.js?v=202611180814" defer></script>
-<script src="assets/js/motion.js?v=202611180814" defer></script>
+<script src="assets/js/data.js?v=202611181043" defer></script>
+<script src="assets/js/site.js?v=202611181043" defer></script>
+<script src="assets/js/motion.js?v=202611181043" defer></script>
 </body>
 </html>
