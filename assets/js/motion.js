@@ -215,7 +215,7 @@
     return $$(".split-line > span", el);
   }
   // lines flip up out of the baseline in 3D
-  const lineIn = { yPercent: 105, rotationX: -78, opacity: 0, duration: 1.4, stagger: 0.09 };
+  const lineIn = { yPercent: 120, rotationX: -78, opacity: 0, duration: 1.4, stagger: 0.09 };
 
   /* ---------- Intro / preloader ---------- */
   const loader = $(".loader");
@@ -228,6 +228,10 @@
     const has = (s) => document.querySelector(s);
     if (has("[data-hero-fade]")) tl.from("[data-hero-fade]", { y: 30, opacity: 0, duration: 1.2, stagger: 0.08 }, 0.35);
     if (has("[data-ring]")) tl.from("[data-ring] .ring3d__tilt", { rotationX: -70, y: 120, scale: 0.6, opacity: 0, duration: 2.2, ease: "expo.out" }, 0.15);
+    if (has("[data-deck]")) {
+      tl.from("[data-deck] .deck__face", { y: 180, rotationX: 55, rotationZ: (i) => [-14, 12, 0][i % 3], opacity: 0, duration: 1.9, stagger: 0.12, ease: "expo.out" }, 0.2);
+      if (has("[data-deck] .deck__chip")) tl.from("[data-deck] .deck__chip", { y: 40, scale: 0.85, opacity: 0, duration: 1.2, ease: "back.out(1.4)" }, 0.9);
+    }
     $$("[data-hero-media]:not([data-ring])").forEach((m, k) => tl.from(m, { rotationX: 38, y: 90, opacity: 0, transformPerspective: 1200, transformOrigin: "50% 100%", duration: 1.8, clearProps: "opacity,rotationX,y,transformPerspective" }, 0.15 + k * 0.1));
     if (has("[data-hero-pop]")) tl.from("[data-hero-pop]", { scale: 0, rotate: -40, duration: 1.2, stagger: 0.1, ease: "back.out(1.6)" }, 0.9);
     return tl;
@@ -367,11 +371,15 @@
     let lastN = -1, lastStep = -1;
     const render = () => {
       const n = st.n, thick = S * 0.34, gap = thick / Math.max(1, n - 1), spread = 1 + st.ex * 1.9;
+      const t = Math.max(2, gap * 0.92);
       for (let i = 0; i < sheets.length; i++) {
         const vis = clamp(n - i, 0, 1);
-        const z = Math.min(i, n - 1) * gap * spread - thick * 0.5;
-        sheets[i].style.opacity = vis.toFixed(3);
-        sheets[i].style.transform = `translateZ(${z.toFixed(1)}px)`;
+        const z = Math.min(i, n - 1) * gap * spread - thick * 0.5 - t * 0.5;
+        const el = sheets[i];
+        el.style.setProperty("--o", vis.toFixed(3));
+        el.style.setProperty("--t", t.toFixed(2) + "px");
+        el.style.transform = `translateZ(${z.toFixed(1)}px)`;
+        el.style.visibility = vis > 0.01 ? "visible" : "hidden";
       }
       stack.style.transform = `rotateX(${st.rx}deg) rotateZ(${st.rz}deg)`;
       const shown = Math.round(n);
@@ -477,21 +485,24 @@
     new MutationObserver(() => $$(TILT).forEach(bind)).observe($("main") || document.body, { childList: true, subtree: true });
   }
 
-  /* ---------- Inner page heroes: photos drift in depth with the pointer ---------- */
-  function depth() {
-    if (!finePointer) return;
-    $$(".page-hero__strip").forEach((strip) => {
-      const host = strip.closest("section");
-      const media = $$(".media", strip);
-      const depths = [1, 1.9, 1.4];
+  /* ---------- Inner page heroes: the photo deck turns with the pointer and fans open ---------- */
+  function decks() {
+    $$("[data-deck]").forEach((deck) => {
+      const inner = $(".deck__inner", deck);
+      const chip = $(".deck__chip", deck);
+      if (!finePointer) return;
+      const host = deck.closest("section");
       host.addEventListener("mousemove", (e) => {
         const px = e.clientX / window.innerWidth - 0.5, py = e.clientY / window.innerHeight - 0.5;
-        media.forEach((m, i) => {
-          const d = depths[i] || 1;
-          gsap.to(m, { rotationY: px * 9 * d, rotationX: -py * 7 * d, x: px * 16 * d, y: py * 12 * d, duration: 1.2, ease: "power3", overwrite: "auto" });
-        });
+        gsap.to(inner, { rotationY: px * 18, rotationX: -py * 12, duration: 1.2, ease: "power3", overwrite: "auto" });
+        if (chip) gsap.to(chip, { x: px * -26, y: py * -18, duration: 1.2, ease: "power3", overwrite: "auto" });
       });
-      host.addEventListener("mouseleave", () => gsap.to(media, { rotationY: 0, rotationX: 0, x: 0, y: 0, duration: 1.4, ease: "power3" }));
+      host.addEventListener("mouseleave", () => {
+        gsap.to(inner, { rotationY: 0, rotationX: 0, duration: 1.4, ease: "power3" });
+        if (chip) gsap.to(chip, { x: 0, y: 0, duration: 1.4, ease: "power3" });
+      });
+      deck.addEventListener("mouseenter", () => deck.classList.add("is-open"));
+      deck.addEventListener("mouseleave", () => deck.classList.remove("is-open"));
     });
   }
 
@@ -554,7 +565,7 @@
     hgallery();
     steps();
     tilt3d();
-    depth();
+    decks();
     magnetic();
     cursor();
     voucher();

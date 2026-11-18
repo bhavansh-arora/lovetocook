@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Inter+Tight:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="assets/css/main.css?v=202611181043">
+<link rel="stylesheet" href="assets/css/main.css?v=202611181505">
 <script>
   (function (h) {
     h.classList.remove("no-js"); h.classList.add("js");
@@ -138,25 +138,22 @@
 
 
 <section class="page-hero">
-  <div class="container">
-    <nav class="page-hero__crumbs label" aria-label="Breadcrumb" data-hero-fade><a href="index.html">Home</a><svg aria-hidden="true"><use href="#i-arrow"/></svg><span>Classes &amp; Events</span></nav>
-    <span class="eyebrow label" data-hero-fade><span class="num">(01)</span><span class="dash"></span>Classes &amp; Events</span>
-    <h1 class="h1" style="margin-top:clamp(20px,2.4vw,32px)"><span data-hero-split style="display:block">Hands-on. <em>Small.</em></span><span data-hero-split style="display:block">Seriously good.</span></h1>
-    <div class="page-hero__grid">
-      <div class="page-hero__lead">
+  <div class="container page-hero__wrap">
+    <div class="page-hero__text">
+        <nav class="page-hero__crumbs label" aria-label="Breadcrumb" data-hero-fade><a href="index.html">Home</a><svg aria-hidden="true"><use href="#i-arrow"/></svg><span>Classes &amp; Events</span></nav>
+        <span class="eyebrow label" data-hero-fade><span class="num">(01)</span><span class="dash"></span>Classes &amp; Events</span>
+        <h1 class="h1"><span data-hero-split style="display:block">Hands-on. <em>Small.</em></span><span data-hero-split style="display:block">Seriously good.</span></h1>
         <p class="lead lead--wide" data-hero-fade>Hands-on sessions in cuisine and pâtisserie, designed to be engaging, confidence-building, creative and fun. Class sizes are limited to 8 people.</p>
         <div class="btn-row" data-hero-fade><a class="btn" href="#catalogue">See all dates <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a><a class="btn btn--ghost btn--plain" href="private.html">Book privately</a></div>
-      </div>
-      <div class="page-hero__meta" data-hero-fade>
-        <div><b data-count-sessions>20</b><span>dates open now</span></div>
-        <div><b>8</b><span>max per class</span></div>
-        <div><b data-from-price>£68</b><span>from, per person</span></div>
-      </div>
+        <div class="page-hero__stats" data-hero-fade><div><b data-count-sessions>21</b><span>dates open now</span></div><div><b>8</b><span>max per class</span></div><div><b data-from-price>£68</b><span>from, per person</span></div></div>
     </div>
-    <div class="page-hero__strip">
-      <div class="media" data-hero-media><img src="assets/img/croissants.jpg" alt="Croissants" data-parallax="6"></div>
-      <div class="media" data-hero-media><img src="assets/img/sam.jpg" alt="Sam with craquelin choux" style="object-position:50% 25%"></div>
-      <div class="media" data-hero-media><img src="assets/img/crumb.jpg" alt="Sourdough crumb"></div>
+    <div class="page-hero__deck" data-deck aria-hidden="true">
+      <div class="deck__inner">
+          <div class="deck__card"><div class="deck__face"><img src="assets/img/crumb.jpg" alt=""></div></div>
+          <div class="deck__card"><div class="deck__face"><img src="assets/img/croissants.jpg" alt=""></div></div>
+          <div class="deck__card"><div class="deck__face"><img src="assets/img/sam.jpg" alt="" style="object-position:50% 25%"></div></div>
+      </div>
+      <a class="next-card deck__chip" data-next-class href="classes.html" aria-label="Next available class"></a>
     </div>
   </div>
 </section>
@@ -333,8 +330,8 @@
 <script src="assets/vendor/gsap.min.js" defer></script>
 <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
 <script src="assets/vendor/lenis.min.js" defer></script>
-<script src="assets/js/data.js?v=202611181043" defer></script>
-<script src="assets/js/site.js?v=202611181043" defer></script>
-<script src="assets/js/motion.js?v=202611181043" defer></script>
+<script src="assets/js/data.js?v=202611181505" defer></script>
+<script src="assets/js/site.js?v=202611181505" defer></script>
+<script src="assets/js/motion.js?v=202611181505" defer></script>
 </body>
 </html>

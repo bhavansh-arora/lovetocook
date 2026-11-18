@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Inter+Tight:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="assets/css/main.css?v=202611181043">
+<link rel="stylesheet" href="assets/css/main.css?v=202611181505">
 <script>
   (function (h) {
     h.classList.remove("no-js"); h.classList.add("js");
@@ -138,25 +138,22 @@
 
 
 <section class="page-hero">
-  <div class="container">
-    <nav class="page-hero__crumbs label" aria-label="Breadcrumb" data-hero-fade><a href="index.html">Home</a><svg aria-hidden="true"><use href="#i-arrow"/></svg><span>Bakery</span></nav>
-    <span class="eyebrow label" data-hero-fade><span class="num">(01)</span><span class="dash"></span>Bakery &amp; Pâtisserie</span>
-    <h1 class="h1" style="margin-top:clamp(20px,2.4vw,32px)"><span data-hero-split style="display:block">Small batch.</span><span data-hero-split style="display:block"><em>Big</em> flavour.</span></h1>
-    <div class="page-hero__grid">
-      <div class="page-hero__lead">
+  <div class="container page-hero__wrap">
+    <div class="page-hero__text">
+        <nav class="page-hero__crumbs label" aria-label="Breadcrumb" data-hero-fade><a href="index.html">Home</a><svg aria-hidden="true"><use href="#i-arrow"/></svg><span>Bakery</span></nav>
+        <span class="eyebrow label" data-hero-fade><span class="num">(01)</span><span class="dash"></span>Bakery &amp; Pâtisserie</span>
+        <h1 class="h1"><span data-hero-split style="display:block">Small batch.</span><span data-hero-split style="display:block"><em>Big</em> flavour.</span></h1>
         <p class="lead lead--wide" data-hero-fade>Naturally-leavened bread, laminated viennoiserie and pâtisserie, baked in small batches by an award-winning artisan baker. Pre-order online, collect warm from King Street.</p>
-        <div class="btn-row" data-hero-fade><a class="btn" href="#menu">Order now <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a></div>
-      </div>
-      <div class="page-hero__meta" data-hero-fade>
-        <div><b>48h</b><span>sourdough ferment</span></div>
-        <div><b>27</b><span>layers in a croissant</span></div>
-        <div><b>0</b><span>shortcuts</span></div>
-      </div>
+        <div class="btn-row" data-hero-fade><a class="btn" href="#menu">Order now <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a><a class="btn btn--ghost btn--plain" href="class.html?c=sourdough">Learn to bake it</a></div>
+        <div class="page-hero__stats" data-hero-fade><div><b>48h</b><span>sourdough ferment</span></div><div><b>27</b><span>layers in a croissant</span></div><div><b>0</b><span>shortcuts</span></div></div>
     </div>
-    <div class="page-hero__strip">
-      <div class="media" data-hero-media><img src="assets/img/sourdough.jpg" alt="Sourdough loaves" data-parallax="6"></div>
-      <div class="media" data-hero-media><img src="assets/img/almond-croissant.jpg" alt="Almond croissants"></div>
-      <div class="media" data-hero-media><img src="assets/img/chocolate-tart.jpg" alt="Chocolate tart"></div>
+    <div class="page-hero__deck" data-deck aria-hidden="true">
+      <div class="deck__inner">
+          <div class="deck__card"><div class="deck__face"><img src="assets/img/sourdough.jpg" alt=""></div></div>
+          <div class="deck__card"><div class="deck__face"><img src="assets/img/chocolate-tart.jpg" alt=""></div></div>
+          <div class="deck__card"><div class="deck__face"><img src="assets/img/almond-croissant.jpg" alt=""></div></div>
+      </div>
+      <div class="deck__chip deck__chip--info"><span class="feature__ic"><svg aria-hidden="true"><use href="#i-clock"/></svg></span><div><b>Order by Wed, 6pm</b><small>Collect Fri &amp; Sat · 16 King Street</small></div></div>
     </div>
   </div>
 </section>
@@ -325,8 +322,8 @@
 <script src="assets/vendor/gsap.min.js" defer></script>
 <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
 <script src="assets/vendor/lenis.min.js" defer></script>
-<script src="assets/js/data.js?v=202611181043" defer></script>
-<script src="assets/js/site.js?v=202611181043" defer></script>
-<script src="assets/js/motion.js?v=202611181043" defer></script>
+<script src="assets/js/data.js?v=202611181505" defer></script>
+<script src="assets/js/site.js?v=202611181505" defer></script>
+<script src="assets/js/motion.js?v=202611181505" defer></script>
 </body>
 </html>

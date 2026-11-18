@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Inter+Tight:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="assets/css/main.css?v=202611181043">
+<link rel="stylesheet" href="assets/css/main.css?v=202611181505">
 <script>
   (function (h) {
     h.classList.remove("no-js"); h.classList.add("js");
@@ -138,24 +138,27 @@
 
 
 <section class="page-hero">
-  <div class="container">
-    <nav class="page-hero__crumbs label" aria-label="Breadcrumb" data-hero-fade><a href="index.html">Home</a><svg aria-hidden="true"><use href="#i-arrow"/></svg><span>Gift Vouchers</span></nav>
-    <span class="eyebrow label" data-hero-fade><span class="num">(01)</span><span class="dash"></span>Gift vouchers</span>
-    <h1 class="h1" style="margin-top:clamp(20px,2.4vw,32px)"><span data-hero-split style="display:block">Give the gift</span><span data-hero-split style="display:block">of <em>butter.</em></span></h1>
-    <div class="page-hero__grid">
-      <div class="page-hero__lead">
+  <div class="container page-hero__wrap">
+    <div class="page-hero__text">
+        <nav class="page-hero__crumbs label" aria-label="Breadcrumb" data-hero-fade><a href="index.html">Home</a><svg aria-hidden="true"><use href="#i-arrow"/></svg><span>Gift Vouchers</span></nav>
+        <span class="eyebrow label" data-hero-fade><span class="num">(01)</span><span class="dash"></span>Gift vouchers</span>
+        <h1 class="h1"><span data-hero-split style="display:block">Give the gift</span><span data-hero-split style="display:block">of <em>butter.</em></span></h1>
         <p class="lead lead--wide" data-hero-fade>A day at the bench, a box of croissants, a skill for life. Design a voucher in a minute and we'll deliver it beautifully, today or on the big day.</p>
+        <div class="btn-row" data-hero-fade><a class="btn" href="#builder">Design a voucher <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a><a class="btn btn--ghost btn--plain" href="classes.html">See classes</a></div>
+        <div class="page-hero__stats" data-hero-fade><div><b>12</b><span>months validity</span></div><div><b>Any</b><span>class or bake</span></div><div><b>Instant</b><span>email delivery</span></div></div>
+    </div>
+    <div class="page-hero__deck page-hero__deck--wide" data-deck aria-hidden="true">
+      <div class="deck__inner">
+          <div class="deck__card"><div class="deck__face deck__face--voucher"><div class="voucher"><svg class="voucher__whisk" viewBox="0 0 64 64" aria-hidden="true"><use href="#i-whisk"/></svg><div class="voucher__top"><img src="assets/img/logo-cream.png" alt=""><span class="label" style="color:var(--butter)">Gift voucher</span></div><div class="voucher__amount">£50</div><div class="voucher__bottom"><div class="voucher__to"><b>For Dad</b><i>Sourdough Sunday, on me.</i></div><div class="voucher__code">LTC · 2026</div></div></div></div></div>
+          <div class="deck__card"><div class="deck__face deck__face--voucher"><div class="voucher"><svg class="voucher__whisk" viewBox="0 0 64 64" aria-hidden="true"><use href="#i-whisk"/></svg><div class="voucher__top"><img src="assets/img/logo-cream.png" alt=""><span class="label" style="color:var(--butter)">Gift voucher</span></div><div class="voucher__amount">£150</div><div class="voucher__bottom"><div class="voucher__to"><b>For Mum</b><i>Happy birthday! Croissants are on you now x</i></div><div class="voucher__code">LTC · 2026</div></div></div></div></div>
+          <div class="deck__card"><div class="deck__face deck__face--voucher"><div class="voucher"><svg class="voucher__whisk" viewBox="0 0 64 64" aria-hidden="true"><use href="#i-whisk"/></svg><div class="voucher__top"><img src="assets/img/logo-cream.png" alt=""><span class="label" style="color:var(--butter)">Gift voucher</span></div><div class="voucher__amount">£75</div><div class="voucher__bottom"><div class="voucher__to"><b>For Ellie</b><i>A day of baking, on me.</i></div><div class="voucher__code">LTC · 2026</div></div></div></div></div>
       </div>
-      <div class="page-hero__meta" data-hero-fade>
-        <div><b>12</b><span>months validity</span></div>
-        <div><b>Any</b><span>class or bake</span></div>
-        <div><b>Instant</b><span>email delivery</span></div>
-      </div>
+      
     </div>
   </div>
 </section>
 
-<section class="section section--flush-top">
+<section class="section section--flush-top" id="builder">
   <div class="container gift-builder" data-gift>
     <div class="gift-builder__form" data-reveal>
       <fieldset>
@@ -316,8 +319,8 @@
 <script src="assets/vendor/gsap.min.js" defer></script>
 <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
 <script src="assets/vendor/lenis.min.js" defer></script>
-<script src="assets/js/data.js?v=202611181043" defer></script>
-<script src="assets/js/site.js?v=202611181043" defer></script>
-<script src="assets/js/motion.js?v=202611181043" defer></script>
+<script src="assets/js/data.js?v=202611181505" defer></script>
+<script src="assets/js/site.js?v=202611181505" defer></script>
+<script src="assets/js/motion.js?v=202611181505" defer></script>
 </body>
 </html>
