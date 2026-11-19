@@ -243,7 +243,11 @@
 
   function heroIn() {
     const tl = gsap.timeline({ defaults: { ease } });
-    $$("[data-hero-split]").forEach((el, k) => tl.from(splitLines(el), lineIn, k * 0.08));
+    $$("[data-hero-split]").forEach((el, k) => {
+      splitLines(el);
+      const chars = splitChars(el);
+      tl.from(chars, { yPercent: 115, rotation: 6, opacity: 0, filter: "blur(12px)", duration: 1.15, stagger: 0.022, ease: "expo.out", clearProps: "transform,opacity,filter" }, k * 0.12);
+    });
     const has = (s) => document.querySelector(s);
     if (has("[data-hero-fade]")) tl.from("[data-hero-fade]", { y: 30, opacity: 0, duration: 1.2, stagger: 0.08 }, 0.35);
     if (has("[data-ring]")) {
@@ -642,7 +646,90 @@
   function footerMega() {
     const m = $(".footer__mega");
     if (!m) return;
-    gsap.from(m, { yPercent: 50, rotationX: -60, transformPerspective: 1200, transformOrigin: "50% 100%", opacity: 0, duration: 1.8, ease, scrollTrigger: { trigger: m, start: "top 98%", once: true } });
+    const chars = splitChars(m);
+    gsap.from(chars, { yPercent: 105, rotation: 8, opacity: 0, stagger: 0.06, ease: "power3.out", scrollTrigger: { trigger: m, start: "top bottom", end: "bottom bottom", scrub: 0.8 } });
+  }
+
+  /* ---------- Letters: wrap each character (inside any line or em) so it can move on its own ---------- */
+  function splitChars(root) {
+    const out = [];
+    const walk = (node) => {
+      Array.from(node.childNodes).forEach((n) => {
+        if (n.nodeType === 3) {
+          const frag = document.createDocumentFragment();
+          for (const ch of n.textContent) {
+            if (/\s/.test(ch)) { frag.appendChild(document.createTextNode(ch)); continue; }
+            const s = document.createElement("span");
+            s.className = "ch";
+            s.textContent = ch;
+            frag.appendChild(s);
+            out.push(s);
+          }
+          n.replaceWith(frag);
+        } else if (n.nodeType === 1 && n.tagName !== "SVG" && n.tagName !== "IMG" && !n.classList.contains("swash")) walk(n);
+      });
+    };
+    walk(root);
+    return out;
+  }
+
+  /* ---------- Hand-drawn flourish under each heading's italic word ---------- */
+  function swashes() {
+    const paths = ["M3 13 C 42 5, 92 3, 132 8 S 184 15, 197 6", "M2 9 C 50 15, 104 4, 150 9 S 190 12, 198 7", "M4 12 C 36 7, 70 13, 112 8 S 176 4, 196 10"];
+    $$(".h1 em, .h2 em, .display em").forEach((em, i) => {
+      if ($(".swash", em)) return;
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("class", "swash");
+      svg.setAttribute("viewBox", "0 0 200 20");
+      svg.setAttribute("preserveAspectRatio", "none");
+      svg.setAttribute("aria-hidden", "true");
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", paths[i % paths.length]);
+      path.setAttribute("pathLength", "1");
+      svg.appendChild(path);
+      em.appendChild(svg);
+      const inHero = em.closest(".hero, .page-hero");
+      gsap.fromTo(path, { strokeDashoffset: 1 }, inHero
+        ? { strokeDashoffset: 0, duration: 1.2, ease: "power2.inOut", delay: firstVisit ? 4.1 : 1.5 }
+        : { strokeDashoffset: 0, duration: 1.1, ease: "power2.inOut", delay: 0.5, scrollTrigger: { trigger: em, start: "top 85%", once: true } });
+    });
+  }
+
+  /* ---------- Dark sections open from a rounded inset panel to full bleed ---------- */
+  function sectionsOpen() {
+    const inset = window.innerWidth < 760 ? 3 : 4.5;
+    $$(".lam, .hgal, .quote-band, .footer, main > .section.theme-dark").forEach((el) => {
+      gsap.fromTo(el, { clipPath: `inset(0% ${inset}% 0% ${inset}% round 44px)` }, {
+        clipPath: "inset(0% 0% 0% 0% round 0px)", ease: "none",
+        scrollTrigger: { trigger: el, start: "top bottom", end: "top 25%", scrub: true },
+      });
+    });
+  }
+
+  /* ---------- Photos unveil with a soft wipe, settle from a slight zoom, then drift ---------- */
+  function photos() {
+    $$(".path__media, .split__media .media, .about-hero__img .media, .ig-grid a").forEach((wrap) => {
+      const img = $("img", wrap);
+      if (!img) return;
+      const r = getComputedStyle(wrap).borderTopLeftRadius || "0px";
+      gsap.fromTo(wrap, { clipPath: `inset(100% 0% 0% 0% round ${r})` }, { clipPath: `inset(0% 0% 0% 0% round ${r})`, duration: 1.3, ease: "expo.inOut", scrollTrigger: { trigger: wrap, start: "top 88%", once: true } });
+      gsap.fromTo(img, { scale: 1.35 }, { scale: 1.12, duration: 1.8, ease: "expo.out", scrollTrigger: { trigger: wrap, start: "top 88%", once: true } });
+      if (!wrap.closest(".ig-grid")) gsap.fromTo(img, { yPercent: -5 }, { yPercent: 5, ease: "none", scrollTrigger: { trigger: wrap, start: "top bottom", end: "bottom top", scrub: true } });
+    });
+  }
+
+  /* ---------- A warm glow follows the pointer behind the hero ---------- */
+  function heroGlow() {
+    if (!finePointer) return;
+    $$(".hero, .page-hero").forEach((hero) => {
+      const g = document.createElement("div");
+      g.className = "hero-glow";
+      g.setAttribute("aria-hidden", "true");
+      hero.prepend(g);
+      const xTo = gsap.quickTo(g, "x", { duration: 1.4, ease: "power3" }), yTo = gsap.quickTo(g, "y", { duration: 1.4, ease: "power3" });
+      gsap.set(g, { x: hero.offsetWidth * 0.66, y: hero.offsetHeight * 0.55 });
+      hero.addEventListener("mousemove", (e) => { const r = hero.getBoundingClientRect(); xTo(e.clientX - r.left); yTo(e.clientY - r.top); });
+    });
   }
 
   /* ---------- Boot ---------- */
@@ -659,7 +746,11 @@
     cursor();
     voucher();
     footerMega();
+    sectionsOpen();
+    photos();
     runIntro();
+    swashes();
+    heroGlow();
     ScrollTrigger.refresh();
   };
   if (document.fonts && document.fonts.load) {
