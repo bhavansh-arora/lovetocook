@@ -66,13 +66,16 @@
     const lastShade = new Array(N).fill(-1);
     // a dark sheet over each photo that deepens as it turns away; its own layer, so only opacity changes
     const shades = cards.map((c) => { const f = $(".ring3d__face--front", c); const s = document.createElement("i"); s.className = "ring3d__shade"; s.setAttribute("aria-hidden", "true"); f.prepend(s); return s; });
-    const wake = () => { if (!raf && visible && !document.hidden) raf = requestAnimationFrame(frame); };
+    let covered = false;
+    const wake = () => { if (!raf && visible && !covered && !document.hidden) raf = requestAnimationFrame(frame); };
     onScreen(root, (v) => { visible = v; root.classList.toggle("is-offscreen", !v); if (v) layout(); wake(); });
+    window.addEventListener("ltc:covered", () => { covered = true; });
+    window.addEventListener("ltc:uncovered", () => { covered = false; wake(); });
     document.addEventListener("visibilitychange", wake);
 
     const frame = () => {
       raf = 0;
-      if (!visible || document.hidden) return;
+      if (!visible || covered || document.hidden) return;
       {
         if (!dragging && introAt !== null) { vel += (auto - vel) * 0.035; rot += vel; }
         cur.x += (target.x - cur.x) * 0.06;
@@ -122,13 +125,16 @@
     host.addEventListener("pointermove", (e) => { const r = host.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
     host.addEventListener("pointerleave", () => { mx = my = -999; });
     let raf = 0;
-    const wake = () => { if (!raf && visible && !document.hidden) raf = requestAnimationFrame(tick); };
+    let covered = false;
+    const wake = () => { if (!raf && visible && !covered && !document.hidden) raf = requestAnimationFrame(tick); };
+    window.addEventListener("ltc:covered", () => { covered = true; });
+    window.addEventListener("ltc:uncovered", () => { covered = false; wake(); });
     onScreen(host, (v) => { visible = v; wake(); });
     document.addEventListener("visibilitychange", wake);
     let odd = false;
     const tick = () => {
       raf = 0;
-      if (!visible || document.hidden) return;
+      if (!visible || covered || document.hidden) return;
       odd = !odd;
       if (odd) {
         ctx.clearRect(0, 0, w, h);
@@ -163,7 +169,8 @@
   }
 
   gsap.registerPlugin(ScrollTrigger);
-  ScrollTrigger.config({ ignoreMobileResize: true, limitCallbacks: true });
+  // no automatic re-measure on "load": it would land in the middle of the page-change lift (see boot)
+  ScrollTrigger.config({ ignoreMobileResize: true, limitCallbacks: true, autoRefreshEvents: "visibilitychange,DOMContentLoaded,resize" });
   html.classList.add("motion-ok");
   const ease = "expo.out";
 
@@ -271,6 +278,8 @@
     return tl;
   }
 
+  // the sheets glide: a soft start and a long, gentle landing (no sudden snap in the middle)
+  const SHEET = "power3.inOut";
   const cLead = curtain && $(".curtain__lead", curtain);
   const cMain = curtain && $(".curtain__main", curtain);
   const cTitle = curtain && $(".curtain__title", curtain);
@@ -287,7 +296,7 @@
       const count = $(".loader__count b", loader);
       const cardsEl = $$(".loader__card", loader);
       const o = { v: 0 };
-      const tl = gsap.timeline();
+      const tl = gsap.timeline({ paused: true });
       // the logo and line arrive, then Sam's bakes are dealt out around them as the count climbs
       tl.fromTo(".loader__logo", { y: -22, opacity: 0 }, { y: 0, opacity: 1, duration: 1, ease })
         .fromTo(".loader__line", { y: -14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease }, 0.15)
@@ -308,19 +317,23 @@
         .fromTo(lBot, { scaleY: 0 }, { scaleY: 1, duration: 1.1, ease: "expo.inOut" }, "<")
         .add(() => { loader.classList.add("is-done"); }, ">")
         .add(heroIn(), "-=0.7");
+      return () => tl.play();
     } else {
       if (loader) loader.classList.add("is-done");
       if (curtain) {
         // arriving: the name lifts out, the chocolate curtain rises off the page, then the butter sheet
-        const tl = gsap.timeline({ onComplete: () => { gsap.set(curtain, { visibility: "hidden" }); gsap.set([cLead, cMain], { yPercent: 100 }); gsap.set([cTop, cBot], { scaleY: 0 }); gsap.set(cCards, { clearProps: "transform,opacity" }); } });
+        const tl = gsap.timeline({ paused: true, onComplete: () => { gsap.set(curtain, { visibility: "hidden" }); gsap.set([cLead, cMain], { yPercent: 100 }); gsap.set([cTop, cBot], { scaleY: 0 }); gsap.set(cCards, { clearProps: "transform,opacity" }); } });
         tl.set(curtain, { visibility: "visible" })
-          .to(cCards, { y: () => -window.innerHeight * 0.55, rotation: (i) => [-26, 24, -8][i % 3], opacity: 0, duration: 0.6, ease: "power3.in", stagger: 0.05 }, 0)
-          .to([cLabel, cTitle], { yPercent: -110, opacity: 0, duration: 0.45, ease: "power3.in", stagger: 0.04 }, 0.08)
-          .to(cMain, { yPercent: -100, duration: 0.95, ease: "expo.inOut" }, 0.3)
-          .fromTo(cBot, { scaleY: 0 }, { scaleY: 1, duration: 0.95, ease: "expo.inOut" }, 0.3)
-          .to(cLead, { yPercent: -100, duration: 0.95, ease: "expo.inOut" }, 0.4);
-        heroIn().delay(0.6);
-      } else heroIn();
+          .to(cCards, { y: () => -window.innerHeight * 0.5, rotation: (i) => [-22, 20, -6][i % 3], opacity: 0, duration: 0.8, ease: "power2.in", stagger: 0.06 }, 0)
+          .to([cLabel, cTitle], { yPercent: -110, opacity: 0, duration: 0.6, ease: "power2.in", stagger: 0.05 }, 0.1)
+          .to(cMain, { yPercent: -100, duration: 1.2, ease: SHEET }, 0.42)
+          .fromTo(cBot, { scaleY: 0 }, { scaleY: 1, duration: 1.2, ease: SHEET }, 0.42)
+          .to(cLead, { yPercent: -100, duration: 1.2, ease: SHEET }, 0.56);
+        const hero = heroIn().pause();
+        return () => { tl.play(); hero.delay(0.8).restart(true); };
+      }
+      const hero = heroIn().pause();
+      return () => hero.play();
     }
   }
 
@@ -367,19 +380,41 @@
     cTitle.textContent = name;
     const imgs = imgsFor(url);
     try { sessionStorage.setItem("ltc:imgs", JSON.stringify(imgs)); } catch (err) { /* ignore */ }
-    cImgs.forEach((im, i) => { if (imgs[i]) im.src = imgs[i]; });
+    cImgs.forEach((im, i) => { if (imgs[i]) { im.src = imgs[i]; if (im.decode) im.decode().catch(() => {}); } });
+    prefetch(url);
     gsap.timeline({ onComplete: () => (location.href = url.href) })
       .set(curtain, { visibility: "visible" })
       .set([cLabel, cTitle], { yPercent: 110, opacity: 1 })
-      .fromTo(cLead, { yPercent: 100 }, { yPercent: 0, duration: 0.6, ease: "expo.inOut" }, 0)
-      .fromTo(cMain, { yPercent: 100 }, { yPercent: 0, duration: 0.7, ease: "expo.inOut" }, 0.08)
-      .fromTo(cTop, { scaleY: 1 }, { scaleY: 0, duration: 0.7, ease: "expo.inOut" }, 0.08)
-      .fromTo(cCards, { y: () => -window.innerHeight * 0.45, rotation: (i) => [-24, 22, 10][i % 3], opacity: 0 }, { y: 0, rotation: (i) => [-10, 9, -2][i % 3], opacity: 1, duration: 0.55, ease: "back.out(1.3)", stagger: 0.06 }, 0.3)
-      .to([cLabel, cTitle], { yPercent: 0, duration: 0.5, ease: "expo.out", stagger: 0.05 }, 0.42)
-      .to({}, { duration: 0.12 });
+      .fromTo(cLead, { yPercent: 100 }, { yPercent: 0, duration: 1, ease: SHEET }, 0)
+      .fromTo(cMain, { yPercent: 100 }, { yPercent: 0, duration: 1.1, ease: SHEET }, 0.12)
+      .fromTo(cTop, { scaleY: 1 }, { scaleY: 0, duration: 1.1, ease: SHEET }, 0.12)
+      // once the page is covered, its own animations rest so the curtain has the frame to itself
+      .add(() => window.dispatchEvent(new Event("ltc:covered")), 1.1)
+      .fromTo(cCards, { y: () => -window.innerHeight * 0.4, rotation: (i) => [-20, 18, 8][i % 3], opacity: 0 }, { y: 0, rotation: (i) => [-10, 9, -2][i % 3], opacity: 1, duration: 0.85, ease: "power3.out", stagger: 0.08 }, 0.55)
+      .to([cLabel, cTitle], { yPercent: 0, duration: 0.75, ease: "power3.out", stagger: 0.07 }, 0.72);
   });
+  // fetch the next page while the pointer is on its link, so it is ready when the curtain closes
+  const fetched = new Set();
+  function prefetch(url) {
+    const k = url.pathname + url.search;
+    if (fetched.has(k)) return;
+    fetched.add(k);
+    const l = document.createElement("link");
+    l.rel = "prefetch"; l.href = url.href;
+    document.head.appendChild(l);
+  }
+  const intent = (e) => {
+    const a = e.target.closest && e.target.closest("a[href]");
+    if (!a || a.target === "_blank") return;
+    const href = a.getAttribute("href");
+    if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:")) return;
+    const url = new URL(a.href, location.href);
+    if (url.origin === location.origin && url.pathname !== location.pathname) prefetch(url);
+  };
+  document.addEventListener("mouseover", intent, { passive: true });
+  document.addEventListener("touchstart", intent, { passive: true });
   window.addEventListener("pageshow", (e) => {
-    if (e.persisted && curtain) { leaving = false; gsap.set(curtain, { visibility: "hidden" }); gsap.set([cLead, cMain], { yPercent: 100 }); }
+    if (e.persisted && curtain) { leaving = false; gsap.set(curtain, { visibility: "hidden" }); gsap.set([cLead, cMain], { yPercent: 100 }); gsap.set([cTop, cBot], { scaleY: 0 }); window.dispatchEvent(new Event("ltc:uncovered")); }
   });
 
   /* ---------- Reveals ---------- */
@@ -740,9 +775,10 @@
       em.appendChild(svg);
       const inHero = em.closest(".hero, .page-hero, .loader");
       const from = { clipPath: "inset(-50% 100% -50% 0%)" }, to = { clipPath: "inset(-50% 0% -50% 0%)", ease: "power2.inOut" };
-      gsap.fromTo(svg, from, inHero
-        ? { ...to, duration: 1.1, delay: firstVisit ? 4.9 : 1.5 }
+      const tw = gsap.fromTo(svg, from, inHero
+        ? { ...to, duration: 1.1, delay: firstVisit ? 4.9 : 2, paused: true }
         : { ...to, duration: 1, delay: 0.5, scrollTrigger: { trigger: em, start: "top 85%", once: true } });
+      if (inHero) heroLate.push(tw);
     });
   }
 
@@ -773,7 +809,11 @@
   }
 
   /* ---------- Boot ---------- */
+  const heroLate = [];
+  let calmAt = Infinity;
   const boot = () => {
+    // a late re-measure (after images load) waits until the intro has finished moving
+    calmAt = performance.now() + (loader && firstVisit ? 6500 : curtain ? 3400 : 2000);
     reveals();
     scrubWords();
     marquees();
@@ -789,10 +829,13 @@
     footerMega();
     photos();
     deal();
-    runIntro();
+    const start = runIntro();
     swashes();
     heroGlow();
     ScrollTrigger.refresh();
+    // the setup above is heavy; begin moving only once it is behind us (the curtain or loader covers
+    // the page until then), so the first frames of the intro are never held up
+    requestAnimationFrame(() => requestAnimationFrame(() => { start(); heroLate.forEach((t) => t.restart(true)); }));
   };
   if (document.fonts && document.fonts.load) {
     // split headlines only once the real display faces are in, so lines are measured in the final font
@@ -801,5 +844,8 @@
     Promise.all([document.fonts.load('360 1em "Fraunces"'), document.fonts.load('italic 360 1em "Fraunces"'), document.fonts.ready]).then(go, go);
     setTimeout(go, 3000);
   } else boot();
-  window.addEventListener("load", () => ScrollTrigger.refresh());
+  window.addEventListener("load", () => {
+    if (calmAt === Infinity) return; // boot has not run yet; it measures after load anyway
+    setTimeout(() => ScrollTrigger.refresh(), Math.max(0, calmAt - performance.now()));
+  });
 })();
