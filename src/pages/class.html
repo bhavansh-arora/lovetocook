@@ -29,30 +29,30 @@
         <p class="body-lg" style="margin-top:28px;max-width:60ch" data-d="overview"></p>
       </div>
       <div class="detail__block" data-reveal>
-        <h2>What you'll <em>make</em></h2>
-        <ul class="ticks" data-d="make"></ul>
-      </div>
-      <div class="detail__block" data-reveal>
-        <h2>What you'll <em>learn</em></h2>
-        <ul class="ticks" data-d="learn"></ul>
+        <h2>What you'll <em>make</em> &amp; <em>learn</em></h2>
+        <div class="j-recipe">
+          <div class="j-recipe__top"><span class="label">Recipe card</span><b data-d="crumb"></b></div>
+          <div class="j-recipe__col"><span class="label">You'll make</span><ol class="j-recipe__make" data-d="make"></ol></div>
+          <div class="j-recipe__col"><span class="label">You'll learn</span><ul class="j-recipe__learn" data-d="learn"></ul></div>
+        </div>
       </div>
       <div class="detail__block" data-reveal>
         <h2>Your <em>day</em></h2>
-        <ol class="timeline-day" data-d="schedule"></ol>
+        <div class="j-day"><ol class="j-day__list" data-d="schedule"></ol></div>
       </div>
       <div class="detail__block" data-reveal>
         <h2>Good to <em>know</em></h2>
-        <ul class="ticks">
-          <li>{{i:check}}<span>All ingredients, equipment and apron provided</span></li>
-          <li>{{i:check}}<span>Wear flat, closed shoes; tie back long hair</span></li>
-          <li>{{i:check}}<span>Tell us about allergies when you book</span></li>
-          <li>{{i:check}}<span>Free date transfer up to 7 days before</span></li>
-        </ul>
+        <div class="j-know">
+          <div class="j-know__item"><span class="j-know__ic">{{i:box}}</span><div><b>Everything's provided</b><p>All ingredients, equipment and an apron.</p></div></div>
+          <div class="j-know__item"><span class="j-know__ic">{{i:hat}}</span><div><b>Dress for the kitchen</b><p>Flat, closed shoes, and long hair tied back.</p></div></div>
+          <div class="j-know__item"><span class="j-know__ic">{{i:wheat}}</span><div><b>Allergies</b><p>Tell us when you book. Many recipes can be adapted.</p></div></div>
+          <div class="j-know__item"><span class="j-know__ic">{{i:calendar}}</span><div><b>Plans change</b><p>Free date transfer up to 7 days before.</p></div></div>
+        </div>
       </div>
       <div class="detail__block" data-reveal>
         <h2>Your <em>teacher</em></h2>
         <div class="teacher">
-          <img decoding="async" src="assets/img/sam-square.jpg" alt="Sam Heeney-Governo" loading="lazy">
+          <figure class="pola teacher__pola" style="--r:-4deg"><img decoding="async" src="assets/img/m/sam-square.jpg" alt="Sam Heeney-Governo" loading="lazy"><figcaption>Sam</figcaption></figure>
           <div>
             <span class="label" style="color:var(--caramel)">Chef · Pâtissier · Artisan baker</span>
             <h3 class="h4" style="margin-top:8px">Sam Heeney-Governo</h3>

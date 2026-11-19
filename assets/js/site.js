@@ -226,15 +226,20 @@
   /* ---------- Upcoming rows (home) ---------- */
   function rowHTML(s) {
     const c = s.course, left = seatsLeft(s);
-    return `<article class="row-class" data-sid="${s.id}">
-      <a class="row-class__thumb" href="class.html?c=${c.id}&s=${s.id}" tabindex="-1" aria-hidden="true"><img src="${sm(c.image)}" alt="" loading="lazy" style="object-position:${c.imagePos || "center"}"></a>
-      <div class="row-class__date"><b>${String(s.d.getDate()).padStart(2, "0")}</b><span>${monShort(s.d)} · ${dayShort(s.d)}</span></div>
-      <div class="row-class__info"><span class="label" style="color:var(--caramel)">${catLabel(c.category)}</span>
-        <h3 class="row-class__title"><a href="class.html?c=${c.id}&s=${s.id}">${esc(c.title)}</a></h3>
-        <div class="row-class__meta"><span>${icon("clock")}${s.start}–${s.end}</span><span>${icon("level")}${c.level}</span><span>${icon("users")}Max ${c.capacity}</span></div>
+    const href = `class.html?c=${c.id}&s=${s.id}`;
+    return `<article class="row-class ticket" data-sid="${s.id}">
+      <a class="ticket__photo" href="${href}" tabindex="-1" aria-hidden="true">
+        <span class="row-class__thumb"><img src="${sm(c.image)}" alt="" loading="lazy" decoding="async" style="object-position:${c.imagePos || "center"}"></span>
+        <span class="ticket__date"><b>${String(s.d.getDate()).padStart(2, "0")}</b><small>${monShort(s.d)}</small></span>
+      </a>
+      <div class="row-class__info"><span class="label">${catLabel(c.category)} · ${dayShort(s.d)} ${s.start}</span>
+        <h3 class="row-class__title"><a href="${href}">${esc(c.title)}</a></h3>
+        <div class="row-class__meta"><span>${icon("clock")}${s.start}–${s.end}</span><span>${icon("level")}${c.level}</span></div>
         <div class="row-class__seats">${seatsHTML(s, c.capacity)}</div></div>
-      <div class="row-class__price">${money(c.price)}<small>per person</small></div>
-      <div class="row-class__cta">${left ? `<button class="btn btn--sm" type="button" data-quick-book="${s.id}">Book ${arrowIcon()}</button>` : `<button class="btn btn--sm btn--ghost" type="button" data-waitlist="${s.id}">Waitlist ${arrowIcon()}</button>`}</div>
+      <div class="ticket__stub">
+        <div class="row-class__price">${money(c.price)}<small>per person</small></div>
+        <div class="row-class__cta">${left ? `<button class="btn btn--sm" type="button" data-quick-book="${s.id}">Book ${arrowIcon()}</button>` : `<button class="btn btn--sm btn--ghost" type="button" data-waitlist="${s.id}">Waitlist ${arrowIcon()}</button>`}</div>
+      </div>
     </article>`;
   }
   function renderUpcoming() {
@@ -408,9 +413,20 @@
       if (k === "level") el.textContent = c.level;
       if (k === "size") el.textContent = `Max ${c.capacity}`;
       if (k === "price") el.textContent = money(c.price);
-      if (k === "make") el.innerHTML = c.make.map((x) => `<li>${icon("check")}<span>${esc(x)}</span></li>`).join("");
+      if (k === "make") el.innerHTML = c.make.map((x, i) => `<li><span class="j-recipe__n">${String(i + 1).padStart(2, "0")}</span><span>${esc(x)}</span></li>`).join("");
       if (k === "learn") el.innerHTML = c.learn.map((x) => `<li>${icon("check")}<span>${esc(x)}</span></li>`).join("");
-      if (k === "schedule") el.innerHTML = c.schedule.map(([t, x]) => `<li><time>${t}</time><span>${esc(x)}</span></li>`).join("");
+      if (k === "schedule") {
+        // each step of the day with how long it lasts; lunch is marked as the break
+        const mins = (t) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
+        const dur = (m) => (m >= 60 ? `${Math.floor(m / 60)} hr${m % 60 ? " " + (m % 60) : ""}` : `${m} min`);
+        const end = sessions.length ? sessions[0].end : null;
+        el.innerHTML = c.schedule.map(([t, x], i) => {
+          const next = i + 1 < c.schedule.length ? c.schedule[i + 1][0] : end;
+          const d = next ? mins(next) - mins(t) : 0;
+          const brk = /lunch/i.test(x);
+          return `<li class="j-day__item${brk ? " is-break" : ""}"><time>${t}</time><span class="j-day__dot">${brk ? icon("cup") : ""}</span><div class="j-day__what"><b>${esc(x)}</b>${d > 0 ? `<small>${dur(d)}</small>` : ""}</div></li>`;
+        }).join("");
+      }
       if (k === "gallery") el.innerHTML = c.gallery.map((g, i) => `<div class="media img-reveal" data-reveal-img><img src="${g}" alt="${i ? "" : esc(c.title)}" ${i ? 'loading="lazy"' : ""} style="object-position:${i === 0 && c.imagePos ? c.imagePos : "center"}"></div>`).join("");
     });
     // related

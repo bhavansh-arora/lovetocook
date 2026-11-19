@@ -1,7 +1,7 @@
 /* ==========================================================================
    Love to Cook: motion & 3D
    Preloader, page transitions, smooth scroll, 3D split text, 3D reveals,
-   bake carousel, flour particles, lamination story, curved gallery,
+   bake carousel, flour particles, the craft in four folds, curved gallery,
    velocity marquee, pointer tilt, depth parallax, magnetic UI, cursor.
    Built by Code Bunny
    ========================================================================== */
@@ -449,53 +449,56 @@
     });
   }
 
-  /* ---------- The craft: Sam's photos dropped onto a pile of polaroids, 3 → 9 → 27 ---------- */
-  function lamination() {
-    const sec = $("[data-lam]");
-    if (!sec) return;
-    const cards = $$(".j-pile__card", sec);
-    if (!cards.length) return;
-    const count = $("[data-lam-count]", sec);
-    const steps = $$(".lam__step", sec);
-    const dots = $$(".lam__dots i", sec);
-    const bar = $(".lam__progress span", sec);
-    const num = (el, k) => parseFloat(el.dataset[k]) || 0;
-    cards.forEach((c, i) => gsap.set(c, { rotation: num(c, "r"), xPercent: num(c, "x"), yPercent: num(c, "y"), zIndex: i + 1 }));
-    let shown = 3, lastStep = -1;
-    const setCount = (v) => { const n = Math.round(v); if (n !== shown) { shown = n; count.textContent = n; } };
-    const cnt = { v: 3 };
-    const Dur = 10;
-    const tl = gsap.timeline({
-      defaults: { ease: "power2.inOut" },
+  /* ---------- The craft: four polaroids dealt in order, each stamped with its layer count ---------- */
+  function foldSteps() {
+    const list = $("[data-fold]");
+    if (!list) return;
+    const steps = $$(".j-fold__step", list);
+    const tl = gsap.timeline({ scrollTrigger: { trigger: list, start: "top 80%", once: true } });
+    steps.forEach((st, i) => {
+      const media = $(".j-fold__media", st), txt = $(".j-fold__txt", st), stamp = $(".j-fold__stamp", st), num = $(".j-fold__stamp b", st), op = $(".j-fold__op", st);
+      const n = parseInt(num.dataset.n, 10) || 0, o = { v: 0 }, at = i * 0.3;
+      num.textContent = "0";
+      tl.fromTo(media, { y: -130, rotation: i % 2 ? 14 : -14, opacity: 0 }, { y: 0, rotation: 0, opacity: 1, duration: 1, ease: "back.out(1.25)", clearProps: "transform,opacity" }, at)
+        .fromTo(txt, { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", clearProps: "transform,opacity" }, at + 0.32)
+        .fromTo(stamp, { scale: 0, rotation: -60 }, { scale: 1, rotation: 0, duration: 0.7, ease: "back.out(2.2)", clearProps: "transform" }, at + 0.62)
+        .to(o, { v: n, duration: 0.8, ease: "power2.out", onUpdate: () => { num.textContent = Math.round(o.v); } }, at + 0.62);
+      if (op) tl.fromTo(op, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2)", clearProps: "transform,opacity" }, at + 0.5);
+    });
+  }
+
+  /* ---------- Class day: a caramel line runs down the day as you read it ---------- */
+  function dayRail() {
+    const wrap = $(".j-day");
+    if (!wrap) return;
+    const items = $$(".j-day__item", wrap);
+    if (items.length < 2) return;
+    const fill = document.createElement("span");
+    fill.className = "j-day__fill";
+    fill.setAttribute("aria-hidden", "true");
+    wrap.appendChild(fill);
+    let ys = [];
+    // layout offsets, not screen rects, so a block still mid-reveal (tilted in 3D) measures true
+    const measure = () => {
+      const pts = items.map((it) => { const d = $(".j-day__dot", it); return { x: it.offsetLeft + d.offsetLeft + d.offsetWidth / 2, y: it.offsetTop + d.offsetTop + d.offsetHeight / 2 }; });
+      ys = pts.map((p) => p.y - pts[0].y);
+      fill.style.left = `${pts[0].x - 1}px`;
+      fill.style.top = `${pts[0].y}px`;
+      fill.style.height = `${ys[ys.length - 1]}px`;
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    window.addEventListener("load", measure);
+    gsap.fromTo(fill, { scaleY: 0 }, {
+      scaleY: 1, ease: "none",
       scrollTrigger: {
-        trigger: sec, start: "top top", end: () => "+=" + window.innerHeight * 2.6, pin: true, scrub: 0.5, anticipatePin: 1, invalidateOnRefresh: true,
+        trigger: wrap, start: "top 72%", end: "bottom 58%", scrub: 0.4, onRefresh: measure,
         onUpdate: (self) => {
-          if (bar) bar.style.transform = `scaleX(${self.progress.toFixed(4)})`;
-          const t = self.progress * Dur;
-          const k = t < 1.4 ? 0 : t < 4.6 ? 1 : t < 6.6 ? 2 : 3;
-          if (k !== lastStep) {
-            lastStep = k;
-            steps.forEach((s, i) => s.classList.toggle("is-active", i === k));
-            dots.forEach((d, i) => d.classList.toggle("is-on", i <= k));
-          }
+          const h = self.progress * ys[ys.length - 1] + 2;
+          items.forEach((it, i) => { const on = ys[i] <= h; if (it.classList.contains("is-past") !== on) it.classList.toggle("is-past", on); });
         },
       },
     });
-    // each new polaroid falls from above, turning as it drops, and lands on the pile;
-    // the pile beneath settles a touch under its weight
-    const drop = (i, at) => {
-      const r = num(cards[i], "r");
-      tl.fromTo(cards[i], { y: () => -window.innerHeight * 0.85, rotation: r + (i % 2 ? 22 : -22), opacity: 0, scale: 1.06 },
-        { y: 0, rotation: r, opacity: 1, scale: 1, duration: 1.1, ease: "power3.out" }, at)
-        .to(cards.slice(0, i), { y: 4, scale: 0.985, duration: 0.5, ease: "power2.out" }, at + 0.75)
-        .to(cards.slice(0, i), { y: 0, scale: 1, duration: 0.6, ease: "power2.inOut" }, at + 1.25);
-    };
-    drop(1, 1.45);
-    tl.to(cnt, { v: 9, duration: 0.9, onUpdate: () => setCount(cnt.v) }, 1.8);
-    drop(2, 4.65);
-    drop(3, 6.65);
-    tl.to(cnt, { v: 27, duration: 1.0, onUpdate: () => setCount(cnt.v) }, 6.9)
-      .set({}, {}, Dur);
   }
 
   /* ---------- Gallery: pinned on desktop, bends around you in 3D ---------- */
@@ -712,13 +715,13 @@
       svg.setAttribute("aria-hidden", "true");
       const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
       path.setAttribute("d", paths[i % paths.length]);
-      path.setAttribute("pathLength", "1");
       svg.appendChild(path);
       em.appendChild(svg);
       const inHero = em.closest(".hero, .page-hero, .loader");
-      gsap.fromTo(path, { strokeDashoffset: 1 }, inHero
-        ? { strokeDashoffset: 0, duration: 1.2, ease: "power2.inOut", delay: firstVisit ? 4.9 : 1.5 }
-        : { strokeDashoffset: 0, duration: 1.1, ease: "power2.inOut", delay: 0.5, scrollTrigger: { trigger: em, start: "top 85%", once: true } });
+      const from = { clipPath: "inset(-50% 100% -50% 0%)" }, to = { clipPath: "inset(-50% 0% -50% 0%)", ease: "power2.inOut" };
+      gsap.fromTo(svg, from, inHero
+        ? { ...to, duration: 1.1, delay: firstVisit ? 4.9 : 1.5 }
+        : { ...to, duration: 1, delay: 0.5, scrollTrigger: { trigger: em, start: "top 85%", once: true } });
     });
   }
 
@@ -764,7 +767,8 @@
     reveals();
     scrubWords();
     marquees();
-    lamination();
+    foldSteps();
+    dayRail();
     hgallery();
     steps();
     tilt3d();

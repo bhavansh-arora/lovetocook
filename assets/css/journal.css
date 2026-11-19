@@ -271,3 +271,146 @@ a.pola:hover, a.pola:focus-visible { transform: rotate(0deg) translateY(-6px); b
 .page-home .j-cta__inner { gap: 18px; }
 .page-home .toolbar { margin-bottom: 18px; }
 .page-home .j-sam__photos { aspect-ratio: 1 / .92; }
+
+/* ---------- Upcoming classes as admission tickets: polaroid and date stamp, details, tear-off stub ---------- */
+.j-up .rows { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 22px; }
+.row-class.ticket { --stub: 150px; position: relative; grid-template-columns: 108px minmax(0, 1fr) var(--stub); gap: 0 22px; align-items: center; padding: 18px 0 18px 20px; border-radius: 18px; }
+.ticket__photo { position: relative; display: block; align-self: center; }
+.ticket .row-class__thumb { display: block; }
+.ticket__date { position: absolute; right: -12px; bottom: -10px; z-index: 2; width: 56px; height: 56px; border-radius: 50%; background: var(--ink); color: var(--cream);
+  display: grid; place-content: center; text-align: center; line-height: 1; transform: rotate(9deg); box-shadow: 0 10px 22px -10px rgba(29, 14, 4, .6); transition: transform .6s var(--ease); }
+.ticket__date b { font-family: var(--f-display); font-style: italic; font-weight: 400; font-size: 1.45rem; color: var(--butter); }
+.ticket__date small { margin-top: 2px; font-size: 9px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+.ticket:hover .ticket__date { transform: rotate(0deg) scale(1.06); }
+.ticket .row-class__info { min-width: 0; padding-block: 2px; }
+.ticket .row-class__info .label { color: var(--caramel); }
+.ticket .row-class__title { margin-top: 6px; font-size: clamp(1.15rem, 1.45vw, 1.42rem); line-height: 1.15; }
+.ticket .row-class__meta { margin-top: 8px; gap: 4px 14px; }
+.ticket .row-class__seats { margin-top: 10px; }
+.ticket__stub { position: relative; z-index: 1; align-self: stretch; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; padding: 0 14px; margin-block: -18px; border-left: 2px dashed rgba(29, 14, 4, .16); text-align: center; }
+.ticket__stub .row-class__price { text-align: center; font-size: 1.65rem; line-height: 1; }
+.ticket__stub .row-class__price small { margin-top: 4px; }
+.ticket__stub .btn { position: relative; z-index: 1; }
+/* the half-moon notches where the stub tears off */
+.row-class.ticket::before, .row-class.ticket::after { content: ""; display: block; position: absolute; z-index: 2; right: calc(var(--stub) - 12px); width: 24px; height: 24px; border-radius: 50%; background: var(--cream);
+  box-shadow: inset 0 2px 4px rgba(29, 14, 4, .06); opacity: 1; transform: none; inset-inline-start: auto; }
+.row-class.ticket::before { top: -12px; }
+.row-class.ticket::after { bottom: -12px; }
+@media (max-width: 1100px) { .j-up .rows { grid-template-columns: 1fr; } }
+@media (max-width: 640px) {
+  .row-class.ticket { grid-template-columns: 84px minmax(0, 1fr); gap: 14px 18px; padding: 16px 16px 0; }
+  .ticket .row-class__thumb { display: block; }
+  .ticket__date { width: 46px; height: 46px; right: -10px; }
+  .ticket__date b { font-size: 1.15rem; }
+  .ticket__stub { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; margin: 0 -16px; padding: 14px 16px; border-left: 0; border-top: 2px dashed rgba(29, 14, 4, .16); }
+  .ticket__stub .row-class__price { text-align: left; font-size: 1.35rem; }
+  .ticket__stub .row-class__price small { display: inline; margin-left: 6px; }
+  .row-class.ticket::before, .row-class.ticket::after { display: none; }
+}
+
+/* ---------- The craft: four polaroids, one fold at a time, each stamped with its layers ---------- */
+.j-fold { background: var(--paper); }
+.j-fold__steps { --g: clamp(30px, 3.6vw, 60px); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 44px var(--g); align-items: start; }
+.j-fold__step { position: relative; display: grid; gap: 24px; align-content: start; }
+.j-fold__step:nth-child(even) { margin-top: clamp(20px, 2.6vw, 44px); }
+.j-fold__media { position: relative; }
+.j-fold__step .pola img { aspect-ratio: 4 / 4.5; }
+.j-fold__step:hover .pola { transform: rotate(0deg) translateY(-6px); box-shadow: 0 1px 0 rgba(29, 14, 4, .04), 0 44px 80px -34px rgba(29, 14, 4, .55); }
+.j-fold__stamp { position: absolute; right: -16px; bottom: 30px; z-index: 2; width: 70px; height: 70px; border-radius: 50%; background: var(--ink); color: var(--cream); rotate: 8deg;
+  display: grid; place-content: center; text-align: center; line-height: 1; box-shadow: 0 12px 26px -12px rgba(29, 14, 4, .65); }
+.j-fold__stamp b { font-family: var(--f-display); font-style: italic; font-weight: 400; font-size: 1.8rem; color: var(--butter); font-variant-numeric: tabular-nums; font-variation-settings: "SOFT" 100, "WONK" 0; }
+.j-fold__stamp small { margin-top: 3px; font-size: 8.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.j-fold__step:last-child .j-fold__stamp { width: 86px; height: 86px; right: -20px; background: var(--caramel); }
+.j-fold__step:last-child .j-fold__stamp b { font-size: 2.3rem; color: var(--white); }
+.j-fold__op { position: absolute; z-index: 3; top: 44%; left: calc(var(--g) / -2); translate: -50% -50%; padding: 7px 12px; border-radius: var(--r-pill); background: var(--butter); box-shadow: 0 8px 18px -10px rgba(29, 14, 4, .5);
+  font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); white-space: nowrap; }
+.j-fold__txt { padding-inline: 4px; }
+.j-fold__txt .label { color: var(--caramel); }
+.j-fold__txt h3 { margin: 10px 0 8px; font-family: var(--f-display); font-weight: 380; font-size: clamp(1.35rem, 1.75vw, 1.7rem); letter-spacing: -.02em; line-height: 1.08; font-variation-settings: "SOFT" 60, "opsz" 144; }
+.j-fold__txt p { color: var(--muted); font-size: var(--fs-sm); line-height: 1.6; }
+@media (max-width: 1000px) {
+  .j-fold__steps { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 56px; }
+  .j-fold__step:nth-child(3) .j-fold__op { display: none; }
+  .j-fold__step .pola img { aspect-ratio: 4 / 3.6; }
+}
+@media (max-width: 600px) {
+  .j-fold__steps { grid-template-columns: 1fr; row-gap: 40px; }
+  .j-fold__step { grid-template-columns: 44% minmax(0, 1fr); gap: 18px; align-items: center; }
+  .j-fold__step:nth-child(even) { margin-top: 0; }
+  .j-fold__step .pola { padding: 7px 7px 0; border-radius: 12px; }
+  .j-fold__step .pola img { aspect-ratio: 4 / 4.6; border-radius: 7px; }
+  .j-fold__step .pola figcaption { font-size: .8rem; padding: 8px 4px 10px; }
+  .j-fold__stamp { width: 50px; height: 50px; right: -12px; top: -12px; bottom: auto; }
+  .j-fold__stamp b { font-size: 1.25rem; }
+  .j-fold__stamp small { font-size: 7px; letter-spacing: .1em; }
+  .j-fold__step:last-child .j-fold__stamp { width: 58px; height: 58px; right: -14px; top: -14px; }
+  .j-fold__step:last-child .j-fold__stamp b { font-size: 1.45rem; }
+  .j-fold__step:nth-child(3) .j-fold__op { display: block; }
+  .j-fold__op { top: -20px; left: 50%; }
+  .j-fold__txt { padding-inline: 0; }
+  .j-fold__txt h3 { font-size: 1.25rem; margin: 6px 0; }
+  .j-fold__txt p { font-size: .9rem; line-height: 1.5; }
+}
+
+/* ---------- Class page: recipe card ---------- */
+.detail__main { min-width: 0; }
+.j-recipe { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); background: var(--white); border-radius: 18px; box-shadow: var(--shadow-sm); overflow: hidden; }
+.j-recipe__top { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 16px clamp(20px, 2.6vw, 32px) 14px; border-bottom: 2px solid rgba(196, 122, 44, .4); }
+.j-recipe__top .label { color: var(--caramel); }
+.j-recipe__top b { font-family: var(--f-display); font-style: italic; font-weight: 400; font-size: 1.15rem; color: var(--ink); font-variation-settings: "SOFT" 100, "WONK" 0; }
+.j-recipe__col { display: grid; align-content: start; gap: 6px; padding: clamp(18px, 2.2vw, 26px) clamp(20px, 2.6vw, 32px) clamp(10px, 1.4vw, 16px); }
+.j-recipe__col + .j-recipe__col { border-left: 2px dashed var(--line); }
+.j-recipe__col > .label { color: var(--muted); }
+.j-recipe__make li, .j-recipe__learn li { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 10px; align-items: baseline; padding: 13px 0; border-bottom: 1px solid var(--line); }
+.j-recipe__make li:last-child, .j-recipe__learn li:last-child { border-bottom: 0; }
+.j-recipe__make li { font-family: var(--f-display); font-size: 1.18rem; line-height: 1.25; letter-spacing: -.01em; }
+.j-recipe__n { font-style: italic; color: var(--caramel); font-size: 1rem; font-variation-settings: "SOFT" 100, "WONK" 0; }
+.j-recipe__learn li { align-items: start; line-height: 1.4; }
+.j-recipe__learn svg { width: 24px; height: 24px; padding: 5px; border-radius: 50%; background: rgba(241, 207, 143, .55); color: var(--caramel); }
+@media (max-width: 640px) { .j-recipe { grid-template-columns: 1fr; } .j-recipe__col + .j-recipe__col { border-left: 0; border-top: 2px dashed var(--line); } }
+
+/* ---------- Class page: the day on a rail ---------- */
+.j-day { position: relative; padding: clamp(14px, 2vw, 22px) clamp(18px, 2.6vw, 32px); background: var(--white); border-radius: 18px; box-shadow: var(--shadow-sm); }
+.j-day__list { --tw: 72px; --rail: 30px; --cg: 18px; }
+.j-day__item { position: relative; display: grid; grid-template-columns: var(--tw) var(--rail) minmax(0, 1fr); column-gap: var(--cg); align-items: center; }
+.j-day__item::before { content: ""; position: absolute; left: calc(var(--tw) + var(--cg) + var(--rail) / 2 - 1px); top: 0; bottom: 0; width: 2px; background: var(--line); }
+.j-day__item:first-child::before { top: 50%; }
+.j-day__item:last-child::before { bottom: 50%; }
+.j-day__item time { font-family: var(--f-display); font-style: italic; font-size: 1.3rem; color: var(--caramel); font-variant-numeric: tabular-nums; font-variation-settings: "SOFT" 100, "WONK" 0; }
+.j-day__dot { position: relative; z-index: 2; justify-self: center; width: 14px; height: 14px; border-radius: 50%; background: var(--white); border: 2px solid rgba(29, 14, 4, .22); transition: background-color .35s, border-color .35s, transform .5s var(--ease); }
+.j-day__item.is-past .j-day__dot { background: var(--caramel); border-color: var(--caramel); }
+.no-motion .j-day__dot { background: var(--caramel); border-color: var(--caramel); }
+.j-day__fill { position: absolute; z-index: 1; width: 2px; background: var(--caramel); border-radius: 2px; transform-origin: top; transform: scaleY(0); pointer-events: none; }
+.j-day__what { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 18px; padding: 17px 0; border-bottom: 1px dashed var(--line); min-width: 0; }
+.j-day__item:last-child .j-day__what { border-bottom: 0; }
+.j-day__what b { font-family: var(--f-display); font-weight: 400; font-size: 1.16rem; line-height: 1.3; letter-spacing: -.01em; }
+.j-day__what small { flex: none; font-size: var(--fs-label); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.j-day__item.is-break .j-day__what { margin: 6px 0; padding: 13px 16px; border-radius: 12px; border-bottom: 0; background: rgba(241, 207, 143, .32); }
+.j-day__item.is-break .j-day__dot { width: 32px; height: 32px; display: grid; place-items: center; border: 0; background: var(--butter); color: var(--ink); }
+.j-day__item.is-break .j-day__dot svg { width: 16px; height: 16px; }
+.j-day__item.is-break.is-past .j-day__dot { background: var(--butter); transform: scale(1.08); }
+@media (max-width: 560px) {
+  .j-day__list { --tw: 52px; --rail: 22px; --cg: 12px; }
+  .j-day__item time { font-size: 1.05rem; }
+  .j-day__what { flex-direction: column; align-items: flex-start; padding: 13px 0; }
+  .j-day__what b { font-size: 1.05rem; }
+  .j-day__item.is-break .j-day__what { padding: 11px 12px; }
+  .j-day__item.is-break .j-day__dot { width: 26px; height: 26px; }
+}
+
+/* ---------- Class page: a note to read before you come ---------- */
+.j-know { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px 34px; padding: clamp(24px, 3vw, 38px) clamp(22px, 3vw, 38px) max(48px, clamp(24px, 3vw, 38px));
+  background: #f8e8c2; border-radius: 6px; rotate: -.6deg; box-shadow: 0 1px 0 rgba(29, 14, 4, .05), 0 26px 50px -30px rgba(29, 14, 4, .5); }
+.j-know::after { content: ""; position: absolute; right: 0; bottom: 0; width: 38px; height: 38px; background: linear-gradient(315deg, var(--cream) 50%, #ebcf8f 50%); border-top-left-radius: 6px; box-shadow: -4px -4px 8px -6px rgba(29, 14, 4, .35); }
+.j-know__item { display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 14px; align-items: start; }
+.j-know__ic { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: var(--white); color: var(--caramel); box-shadow: 0 6px 14px -8px rgba(29, 14, 4, .35); }
+.j-know__ic svg { width: 21px; height: 21px; }
+.j-know__item b { display: block; font-family: var(--f-display); font-weight: 400; font-size: 1.2rem; line-height: 1.2; letter-spacing: -.01em; padding-top: 2px; }
+.j-know__item p { margin-top: 4px; font-size: var(--fs-sm); line-height: 1.5; color: rgba(29, 14, 4, .7); }
+@media (max-width: 640px) { .j-know { grid-template-columns: 1fr; rotate: 0deg; } }
+
+/* ---------- Class page: Sam as a polaroid ---------- */
+.teacher .teacher__pola { width: 140px; padding: 7px 7px 0; border-radius: 12px; }
+.teacher .teacher__pola img { width: 100%; height: auto; aspect-ratio: 1; border-radius: 8px; }
+.teacher .teacher__pola figcaption { padding: 8px 4px 10px; font-size: .95rem; }
+@media (max-width: 560px) { .teacher .teacher__pola { width: 120px; } }
