@@ -40,6 +40,7 @@
 
     const layout = () => {
       const cw = cards[0].offsetWidth;
+      if (!cw) return; // hidden while off screen: keep the last radius
       spin.style.setProperty("--r", (cw / (2 * Math.tan(Math.PI / N))) * 1.14 + "px");
       spin.style.setProperty("--step", step + "deg");
     };
@@ -49,7 +50,7 @@
     root.addEventListener("pointerdown", (e) => { dragging = true; moved = 0; lastX = e.clientX; root.classList.add("is-dragging"); });
     window.addEventListener("pointermove", (e) => {
       if (dragging) { const dx = e.clientX - lastX; lastX = e.clientX; moved += Math.abs(dx); vel = dx * 0.22; rot += dx * 0.22; }
-      if (e.pointerType === "mouse") {
+      if (e.pointerType === "mouse" && visible) {
         const r = root.getBoundingClientRect();
         target.x = clamp((e.clientX - r.left) / r.width - 0.5, -0.8, 0.8);
         target.y = clamp((e.clientY - r.top) / r.height - 0.5, -0.8, 0.8);
@@ -63,8 +64,10 @@
     window.addEventListener("scroll", () => { if (!visible) { lastScroll = window.scrollY; return; } const d = window.scrollY - lastScroll; lastScroll = window.scrollY; if (!reduce) vel += clamp(d, -60, 60) * -0.012; }, { passive: true });
     let raf = 0;
     const lastShade = new Array(N).fill(-1);
+    // a dark sheet over each photo that deepens as it turns away; its own layer, so only opacity changes
+    const shades = cards.map((c) => { const f = $(".ring3d__face--front", c); const s = document.createElement("i"); s.className = "ring3d__shade"; s.setAttribute("aria-hidden", "true"); f.prepend(s); return s; });
     const wake = () => { if (!raf && visible && !document.hidden) raf = requestAnimationFrame(frame); };
-    onScreen(root, (v) => { visible = v; root.classList.toggle("is-offscreen", !v); wake(); });
+    onScreen(root, (v) => { visible = v; root.classList.toggle("is-offscreen", !v); if (v) layout(); wake(); });
     document.addEventListener("visibilitychange", wake);
 
     const frame = () => {
@@ -81,8 +84,8 @@
         let best = 0, bestCos = -2;
         for (let i = 0; i < N; i++) {
           const cs = Math.cos(((i * step + rot) * Math.PI) / 180);
-          const sh = Math.round(((1 - cs) / 2) * 66) / 100;
-          if (sh !== lastShade[i]) { lastShade[i] = sh; cards[i].style.setProperty("--shade", sh); }
+          const sh = Math.round(((1 - cs) / 2) * 33) / 50;
+          if (sh !== lastShade[i]) { lastShade[i] = sh; shades[i].style.opacity = sh; }
           if (cs > bestCos) { bestCos = cs; best = i; }
         }
         if (best !== front) {
@@ -105,14 +108,14 @@
     const P = [];
     let w = 0, h = 0, mx = -999, my = -999, visible = true;
     const size = () => {
-      const dpr = 1;
-      w = host.offsetWidth; h = host.offsetHeight;
-      cv.width = w * dpr; cv.height = h * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const nw = host.offsetWidth, nh = host.offsetHeight;
+      if (nw === w && Math.abs(nh - h) < 120) return; // mobile toolbars resize the window as you scroll
+      w = nw; h = nh;
+      cv.width = w; cv.height = h;
     };
     size();
     window.addEventListener("resize", size);
-    const n = window.innerWidth < 700 ? 28 : 64;
+    const n = window.innerWidth < 700 ? 18 : 40;
     for (let i = 0; i < n; i++) {
       P.push({ x: Math.random() * w, y: Math.random() * h, r: 0.6 + Math.random() * 2.2, vx: (Math.random() - 0.5) * 0.14, vy: 0.06 + Math.random() * 0.22, ph: Math.random() * 6.28, a: 0.12 + Math.random() * 0.34, c: Math.random() < 0.72 ? "196,122,44" : "71,31,0" });
     }
@@ -122,15 +125,17 @@
     const wake = () => { if (!raf && visible && !document.hidden) raf = requestAnimationFrame(tick); };
     onScreen(host, (v) => { visible = v; wake(); });
     document.addEventListener("visibilitychange", wake);
+    let odd = false;
     const tick = () => {
       raf = 0;
       if (!visible || document.hidden) return;
-      {
+      odd = !odd;
+      if (odd) {
         ctx.clearRect(0, 0, w, h);
         for (const p of P) {
-          p.ph += 0.01;
-          p.x += p.vx + Math.sin(p.ph) * 0.16;
-          p.y += p.vy;
+          p.ph += 0.02;
+          p.x += (p.vx + Math.sin(p.ph) * 0.16) * 2;
+          p.y += p.vy * 2;
           const dx = p.x - mx, dy = p.y - my, d = Math.sqrt(dx * dx + dy * dy) + 0.01;
           if (d < 130) { const f = (1 - d / 130) * 2.2; p.x += (dx / d) * f; p.y += (dy / d) * f; }
           if (p.y > h + 6) { p.y = -6; p.x = Math.random() * w; }
@@ -158,6 +163,7 @@
   }
 
   gsap.registerPlugin(ScrollTrigger);
+  ScrollTrigger.config({ ignoreMobileResize: true, limitCallbacks: true });
   html.classList.add("motion-ok");
   const ease = "expo.out";
 
@@ -170,6 +176,14 @@
     const t = $(id);
     if (t) { e.preventDefault(); window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 90, behavior: "smooth" }); }
   }));
+
+  // Tidy up after an entrance without GSAP's clearProps, which re-reads the computed transform
+  // straight away and forces the whole page to lay out again mid-scroll. Removing the inline
+  // styles is enough; GSAP re-reads lazily if the element is ever tweened again.
+  const unset = (props) => {
+    const list = props.split(",").flatMap((p) => (p === "transform" ? ["transform", "translate", "rotate", "scale"] : [p === "clipPath" ? "clip-path" : p]));
+    return function () { this.targets().forEach((t) => { list.forEach((p) => t.style.removeProperty(p)); if (t._gsap) t._gsap.uncache = 1; }); };
+  };
 
   /* ---------- Split text into lines ---------- */
   function splitLines(el) {
@@ -228,7 +242,7 @@
     return $$(".split-line > span", el);
   }
   // lines rise out of their mask (flat: a 3D flip distorts very wide display type)
-  const lineIn = { yPercent: 118, rotation: 2.5, transformOrigin: "0% 100%", duration: 1.25, stagger: 0.08, clearProps: "transform" };
+  const lineIn = { yPercent: 118, rotation: 3, transformOrigin: "0% 100%", duration: 1.2, stagger: 0.1, ease: "expo.out", onComplete: unset("transform") };
 
   /* ---------- Intro / preloader ---------- */
   const loader = $(".loader");
@@ -240,19 +254,19 @@
     $$("[data-hero-split]").forEach((el, k) => {
       splitLines(el);
       const chars = splitChars(el);
-      tl.from(chars, { yPercent: 115, rotation: 6, opacity: 0, filter: "blur(12px)", duration: 1.15, stagger: 0.022, ease: "expo.out", clearProps: "transform,opacity,filter" }, k * 0.12);
+      tl.from(chars, { yPercent: 115, rotation: 6, opacity: 0, duration: 1.15, stagger: 0.022, ease: "expo.out", onComplete: unset("transform,opacity") }, k * 0.12);
     });
     const has = (s) => document.querySelector(s);
-    if (has("[data-hero-fade]")) tl.fromTo("[data-hero-fade]", { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2, stagger: 0.08, clearProps: "transform" }, 0.35);
+    if (has("[data-hero-fade]")) tl.fromTo("[data-hero-fade]", { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2, stagger: 0.08, onComplete: unset("transform") }, 0.35);
     if (has("[data-ring]")) {
       tl.add(() => window.dispatchEvent(new Event("ltc:hero")), 0.1);
-      tl.fromTo("[data-ring]", { opacity: 0, y: -60 }, { opacity: 1, y: 0, duration: 1.6, ease: "expo.out", clearProps: "transform" }, 0.15);
+      tl.fromTo("[data-ring]", { opacity: 0, y: -60 }, { opacity: 1, y: 0, duration: 1.6, ease: "expo.out", onComplete: unset("transform") }, 0.15);
     }
     if (has("[data-deck]")) {
       tl.fromTo("[data-deck] .deck__face", { y: -160, rotationX: -40, rotationZ: (i) => [-14, 12, 0][i % 3], opacity: 0 }, { y: 0, rotationX: 0, rotationZ: 0, opacity: 1, duration: 1.9, stagger: 0.12, ease: "expo.out" }, 0.2);
       if (has("[data-deck] .deck__chip")) tl.fromTo("[data-deck] .deck__chip", { y: -30, scale: 0.85, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 1.2, ease: "back.out(1.4)" }, 0.9);
     }
-    $$("[data-hero-media]:not([data-ring])").forEach((m, k) => tl.fromTo(m, { clipPath: "inset(0% 0% 100% 0% round 32px)", y: -40, opacity: 0 }, { clipPath: "inset(0% 0% 0% 0% round 32px)", y: 0, opacity: 1, duration: 1.6, ease: "expo.inOut", clearProps: "clipPath,transform" }, 0.15 + k * 0.1));
+    $$("[data-hero-media]:not([data-ring])").forEach((m, k) => tl.fromTo(m, { clipPath: "inset(0% 0% 100% 0% round 32px)", y: -40, opacity: 0 }, { clipPath: "inset(0% 0% 0% 0% round 32px)", y: 0, opacity: 1, duration: 1.6, ease: "expo.inOut", onComplete: unset("clipPath,transform") }, 0.15 + k * 0.1));
     if (has("[data-hero-pop]")) tl.from("[data-hero-pop]", { scale: 0, rotate: -40, duration: 1.2, stagger: 0.1, ease: "back.out(1.6)" }, 0.9);
     return tl;
   }
@@ -263,6 +277,9 @@
   const cLabel = curtain && $(".curtain__label", curtain);
   const cCards = curtain ? $$(".curtain__card", curtain) : [];
   const cImgs = curtain ? $$("[data-curtain-img]", curtain) : [];
+  const cap = (host, cls) => { const c = document.createElement("span"); c.className = "cap " + cls; c.setAttribute("aria-hidden", "true"); host.appendChild(c); return c; };
+  const cTop = cMain && cap(cMain, "cap--top"), cBot = cMain && cap(cMain, "cap--bot");
+  const lBot = loader && cap(loader, "cap--bot");
 
   function runIntro() {
     if (loader && firstVisit) {
@@ -286,19 +303,21 @@
           y: (i) => parseFloat(cardsEl[i].style.getPropertyValue("--y")) * window.innerHeight * 0.016,
           rotation: (i) => (i % 2 ? 24 : -24), opacity: 0, duration: 0.8, stagger: 0.03, ease: "power3.in",
         }, "+=0.15")
-        .to([".loader__center", ".loader__row"], { y: -24, opacity: 0, duration: 0.5, ease: "power2.in" }, "<0.2")
-        .to(loader, { yPercent: -100, "--cb": "18vh", duration: 1.1, ease: "expo.inOut" }, "-=0.25")
+        .to([".loader__center", ".loader__row", ".loader__bar"], { y: -24, opacity: 0, duration: 0.5, ease: "power2.in" }, "<0.2")
+        .to(loader, { yPercent: -100, duration: 1.1, ease: "expo.inOut" }, "-=0.25")
+        .fromTo(lBot, { scaleY: 0 }, { scaleY: 1, duration: 1.1, ease: "expo.inOut" }, "<")
         .add(() => { loader.classList.add("is-done"); }, ">")
         .add(heroIn(), "-=0.7");
     } else {
       if (loader) loader.classList.add("is-done");
       if (curtain) {
         // arriving: the name lifts out, the chocolate curtain rises off the page, then the butter sheet
-        const tl = gsap.timeline({ onComplete: () => { gsap.set(curtain, { visibility: "hidden" }); gsap.set([cLead, cMain], { yPercent: 100, "--ct": "0px", "--cb": "0px" }); gsap.set(cCards, { clearProps: "transform,opacity" }); } });
+        const tl = gsap.timeline({ onComplete: () => { gsap.set(curtain, { visibility: "hidden" }); gsap.set([cLead, cMain], { yPercent: 100 }); gsap.set([cTop, cBot], { scaleY: 0 }); gsap.set(cCards, { clearProps: "transform,opacity" }); } });
         tl.set(curtain, { visibility: "visible" })
           .to(cCards, { y: () => -window.innerHeight * 0.55, rotation: (i) => [-26, 24, -8][i % 3], opacity: 0, duration: 0.6, ease: "power3.in", stagger: 0.05 }, 0)
           .to([cLabel, cTitle], { yPercent: -110, opacity: 0, duration: 0.45, ease: "power3.in", stagger: 0.04 }, 0.08)
-          .to(cMain, { yPercent: -100, "--cb": "16vh", duration: 0.95, ease: "expo.inOut" }, 0.3)
+          .to(cMain, { yPercent: -100, duration: 0.95, ease: "expo.inOut" }, 0.3)
+          .fromTo(cBot, { scaleY: 0 }, { scaleY: 1, duration: 0.95, ease: "expo.inOut" }, 0.3)
           .to(cLead, { yPercent: -100, duration: 0.95, ease: "expo.inOut" }, 0.4);
         heroIn().delay(0.6);
       } else heroIn();
@@ -353,7 +372,8 @@
       .set(curtain, { visibility: "visible" })
       .set([cLabel, cTitle], { yPercent: 110, opacity: 1 })
       .fromTo(cLead, { yPercent: 100 }, { yPercent: 0, duration: 0.6, ease: "expo.inOut" }, 0)
-      .fromTo(cMain, { yPercent: 100, "--ct": "16vh" }, { yPercent: 0, "--ct": "0vh", duration: 0.7, ease: "expo.inOut" }, 0.08)
+      .fromTo(cMain, { yPercent: 100 }, { yPercent: 0, duration: 0.7, ease: "expo.inOut" }, 0.08)
+      .fromTo(cTop, { scaleY: 1 }, { scaleY: 0, duration: 0.7, ease: "expo.inOut" }, 0.08)
       .fromTo(cCards, { y: () => -window.innerHeight * 0.45, rotation: (i) => [-24, 22, 10][i % 3], opacity: 0 }, { y: 0, rotation: (i) => [-10, 9, -2][i % 3], opacity: 1, duration: 0.55, ease: "back.out(1.3)", stagger: 0.06 }, 0.3)
       .to([cLabel, cTitle], { yPercent: 0, duration: 0.5, ease: "expo.out", stagger: 0.05 }, 0.42)
       .to({}, { duration: 0.12 });
@@ -365,23 +385,20 @@
   /* ---------- Reveals ---------- */
   function reveals() {
     $$("[data-split]").forEach((el) => {
-      splitLines(el);
-      const long = el.textContent.trim().length > 64;
-      const parts = long ? $$(".w", el) : splitChars(el);
-      gsap.from(parts, { yPercent: 115, rotation: 6, opacity: 0, duration: long ? 1.2 : 1.1, stagger: long ? 0.04 : 0.02, ease: "expo.out",
-        clearProps: "transform,opacity", scrollTrigger: { trigger: el, start: "top 86%", once: true } });
+      const lines = splitLines(el);
+      gsap.from(lines, { ...lineIn, scrollTrigger: { trigger: el, start: "top 88%", once: true } });
     });
-    // content rises and tips forward into place
-    gsap.set("[data-reveal]", { y: 56, rotationX: 14, transformPerspective: 1200, transformOrigin: "50% 0%" });
+    // content rises into place (flat at rest, so waiting blocks are not held on their own layers)
+    gsap.set("[data-reveal]", { y: 48 });
     ScrollTrigger.batch("[data-reveal]", {
       start: "top 92%",
       once: true,
-      onEnter: (els) => { gsap.to(els, { opacity: 1, y: 0, rotationX: 0, duration: 1.3, ease, stagger: 0.08, overwrite: "auto", clearProps: "transform" }); els.forEach((e) => e.classList.add("is-lit")); },
+      onEnter: (els) => { gsap.fromTo(els, { opacity: 0, y: 48 }, { opacity: 1, y: 0, duration: 1.1, ease, stagger: 0.08, overwrite: "auto", onComplete: unset("transform") }); els.forEach((e) => e.classList.add("is-lit")); },
     });
     $$("[data-reveal-img]").forEach((el) => {
       const img = $("img", el);
-      gsap.fromTo(el, { clipPath: "inset(0% 0% 100% 0% round 32px)" }, { clipPath: "inset(0% 0% 0% 0% round 32px)", duration: 1.4, ease: "expo.inOut", scrollTrigger: { trigger: el, start: "top 88%", once: true }, clearProps: "clipPath" });
-      if (img) gsap.fromTo(img, { scale: 1.25, yPercent: -10 }, { scale: 1, yPercent: 0, duration: 1.8, ease: "expo.out", clearProps: "transform", scrollTrigger: { trigger: el, start: "top 88%", once: true } });
+      gsap.fromTo(el, { clipPath: "inset(0% 0% 100% 0% round 32px)" }, { clipPath: "inset(0% 0% 0% 0% round 32px)", duration: 1.4, ease: "expo.inOut", scrollTrigger: { trigger: el, start: "top 88%", once: true }, onComplete: unset("clipPath") });
+      if (img) gsap.fromTo(img, { scale: 1.25, yPercent: -10 }, { scale: 1, yPercent: 0, duration: 1.8, ease: "expo.out", onComplete: unset("transform"), scrollTrigger: { trigger: el, start: "top 88%", once: true } });
     });
     $$("[data-parallax]").forEach((el) => {
       const amt = parseFloat(el.dataset.parallax) || 12;
@@ -459,11 +476,11 @@
       const media = $(".j-fold__media", st), txt = $(".j-fold__txt", st), stamp = $(".j-fold__stamp", st), num = $(".j-fold__stamp b", st), op = $(".j-fold__op", st);
       const n = parseInt(num.dataset.n, 10) || 0, o = { v: 0 }, at = i * 0.3;
       num.textContent = "0";
-      tl.fromTo(media, { y: -130, rotation: i % 2 ? 14 : -14, opacity: 0 }, { y: 0, rotation: 0, opacity: 1, duration: 1, ease: "back.out(1.25)", clearProps: "transform,opacity" }, at)
-        .fromTo(txt, { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", clearProps: "transform,opacity" }, at + 0.32)
-        .fromTo(stamp, { scale: 0, rotation: -60 }, { scale: 1, rotation: 0, duration: 0.7, ease: "back.out(2.2)", clearProps: "transform" }, at + 0.62)
+      tl.fromTo(media, { y: -130, rotation: i % 2 ? 14 : -14, opacity: 0 }, { y: 0, rotation: 0, opacity: 1, duration: 1, ease: "back.out(1.25)", onComplete: unset("transform,opacity") }, at)
+        .fromTo(txt, { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", onComplete: unset("transform,opacity") }, at + 0.32)
+        .fromTo(stamp, { scale: 0, rotation: -60 }, { scale: 1, rotation: 0, duration: 0.7, ease: "back.out(2.2)", onComplete: unset("transform") }, at + 0.62)
         .to(o, { v: n, duration: 0.8, ease: "power2.out", onUpdate: () => { num.textContent = Math.round(o.v); } }, at + 0.62);
-      if (op) tl.fromTo(op, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2)", clearProps: "transform,opacity" }, at + 0.5);
+      if (op) tl.fromTo(op, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2)", onComplete: unset("transform,opacity") }, at + 0.5);
     });
   }
 
@@ -517,7 +534,9 @@
     measure();
     window.addEventListener("resize", measure);
     window.addEventListener("load", measure);
+    let near = true;
     const curve = (scrollLeft = 0) => {
+      if (!near) return;
       const vw = window.innerWidth, left = baseLeft + (gsap.getProperty(track, "x") || 0);
       items.forEach((it, k) => {
         const cx = left + geo[k] - scrollLeft;
@@ -525,6 +544,8 @@
         it.style.transform = `translateZ(${(-Math.abs(d) * 70).toFixed(1)}px) rotateY(${(-d * 13).toFixed(2)}deg)`;
       });
     };
+    // far from view the photos lie flat, so they don't hold GPU layers for the rest of the page
+    onScreen(sec, (v) => { near = v; if (v) curve(track.scrollLeft); else items.forEach((it) => (it.style.transform = "")); });
     const mm = gsap.matchMedia();
     mm.add("(min-width: 1001px) and (hover: hover)", () => {
       const dist = () => track.scrollWidth - window.innerWidth;
@@ -586,8 +607,8 @@
     $$(TILT).forEach(bind);
     // classes, bakes and related cards are rendered later (batched to one scan per frame)
     let pending = false;
-    new MutationObserver(() => {
-      if (pending) return;
+    new MutationObserver((recs) => {
+      if (pending || !recs.some((r) => Array.prototype.some.call(r.addedNodes, (n) => n.nodeType === 1))) return;
       pending = true;
       requestAnimationFrame(() => { pending = false; $$(TILT).forEach(bind); });
     }).observe($("main") || document.body, { childList: true, subtree: true });
@@ -664,7 +685,7 @@
     const m = $(".footer__mega");
     if (!m) return;
     const chars = splitChars(m);
-    gsap.from(chars, { yPercent: 105, rotation: 8, opacity: 0, stagger: 0.06, ease: "power3.out", scrollTrigger: { trigger: m, start: "top bottom", end: "bottom bottom", scrub: 0.8 } });
+    gsap.from(chars, { yPercent: 105, rotation: 8, opacity: 0, duration: 1.1, stagger: 0.05, ease: "expo.out", onComplete: unset("transform,opacity"), scrollTrigger: { trigger: m, start: "top 95%", once: true } });
   }
 
   /* ---------- Letters: wrap each character (inside any line or em) so it can move on its own ---------- */
@@ -696,7 +717,7 @@
       const cards = Array.from(group.children);
       const tilt = (el) => parseFloat(getComputedStyle(el).getPropertyValue("--r")) || 0;
       gsap.fromTo(cards, { opacity: 0, y: -110, scale: 0.86, rotation: (i, el) => tilt(el) + (i % 2 ? 14 : -14) }, {
-        opacity: 1, y: 0, scale: 1, rotation: (i, el) => tilt(el), duration: 1.05, stagger: 0.13, ease: "back.out(1.3)", clearProps: "transform",
+        opacity: 1, y: 0, scale: 1, rotation: (i, el) => tilt(el), duration: 1.05, stagger: 0.13, ease: "back.out(1.3)", onComplete: unset("transform"),
         scrollTrigger: { trigger: group, start: "top 82%", once: true },
       });
     });
@@ -722,17 +743,6 @@
       gsap.fromTo(svg, from, inHero
         ? { ...to, duration: 1.1, delay: firstVisit ? 4.9 : 1.5 }
         : { ...to, duration: 1, delay: 0.5, scrollTrigger: { trigger: em, start: "top 85%", once: true } });
-    });
-  }
-
-  /* ---------- Dark sections open from a rounded inset panel to full bleed ---------- */
-  function sectionsOpen() {
-    const inset = window.innerWidth < 760 ? 3 : 4.5;
-    $$(".footer").forEach((el) => {
-      gsap.fromTo(el, { clipPath: `inset(0% ${inset}% 0% ${inset}% round 44px)` }, {
-        clipPath: "inset(0% 0% 0% 0% round 0px)", ease: "none",
-        scrollTrigger: { trigger: el, start: "top bottom", end: "top 25%", scrub: true },
-      });
     });
   }
 
@@ -777,7 +787,6 @@
     cursor();
     voucher();
     footerMega();
-    sectionsOpen();
     photos();
     deal();
     runIntro();

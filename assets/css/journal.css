@@ -244,11 +244,12 @@ a.pola:hover, a.pola:focus-visible { transform: rotate(0deg) translateY(-6px); b
 .j-sam, .j-note, .j-gift, .j-ways, .j-cta, .j-craft { overflow-x: clip; }
 
 /* things that move every frame get their own layer, so the page around them is not repainted */
-.j-pile__card, .hgal__item, .hero-glow, .j-ticker .marquee__track { will-change: transform; }
+.hero-glow, .j-ticker .marquee__track { will-change: transform; }
 
 /* ---------- Page change: a caramel sheet, then a cream curtain with the destination's polaroids ---------- */
-.curtain__main { overflow: hidden; isolation: isolate; gap: 14px; }
-.curtain__main::before { content: ""; position: absolute; z-index: -1; left: 50%; top: 48%; width: min(1000px, 120vw); aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%;
+.curtain { overflow: hidden; }
+.curtain__main { isolation: isolate; gap: 14px; }
+.curtain__main::before { content: ""; position: absolute; z-index: -1; left: 50%; top: 48%; width: min(1000px, 120vw, 92vh); aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%;
   background: radial-gradient(closest-side, rgba(241, 207, 143, .6), rgba(241, 207, 143, .16) 55%, transparent); }
 .curtain__cards { position: relative; width: clamp(110px, 10vw, 150px); aspect-ratio: 4 / 5.9; margin: 0 auto clamp(12px, 2vw, 26px); }
 .curtain__card { position: absolute; top: 0; width: 100%; margin: 0; padding: 6px 6px 24px; background: #fffdf9; border-radius: 12px;
@@ -414,3 +415,7 @@ a.pola:hover, a.pola:focus-visible { transform: rotate(0deg) translateY(-6px); b
 .teacher .teacher__pola img { width: 100%; height: auto; aspect-ratio: 1; border-radius: 8px; }
 .teacher .teacher__pola figcaption { padding: 8px 4px 10px; font-size: .95rem; }
 @media (max-width: 560px) { .teacher .teacher__pola { width: 120px; } }
+
+/* ---------- Smoothness: each photo section is its own stacking context, so a moving piece in one
+   never forces the next section onto extra GPU layers ---------- */
+main > section, main > .marquee, .footer { isolation: isolate; }

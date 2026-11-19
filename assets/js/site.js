@@ -20,10 +20,11 @@
   const CONFIG = { DEMO_MODE: true, FORM_ENDPOINT: "" };
 
   /* ---------- Utils ---------- */
-  const money = (n) =>
-    new Intl.NumberFormat("en-GB", { style: "currency", currency: B.currency, minimumFractionDigits: n % 1 ? 2 : 0 }).format(n);
+  const moneyFmt = [0, 2].map((d) => new Intl.NumberFormat("en-GB", { style: "currency", currency: B.currency, minimumFractionDigits: d }));
+  const money = (n) => moneyFmt[n % 1 ? 1 : 0].format(n);
   const parseDate = (s) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
-  const fmt = (d, o) => d.toLocaleDateString("en-GB", o);
+  const fmtCache = new Map();
+  const fmt = (d, o) => { const k = JSON.stringify(o); let f = fmtCache.get(k); if (!f) { f = new Intl.DateTimeFormat("en-GB", o); fmtCache.set(k, f); } return f.format(d); };
   const dayShort = (d) => fmt(d, { weekday: "short" });
   const monShort = (d) => fmt(d, { month: "short" });
   const longDate = (d) => fmt(d, { weekday: "long", day: "numeric", month: "long" });
@@ -193,9 +194,11 @@
     $$("[data-header-dark]").forEach((el) => darkIO.observe(el));
     if (footer) new IntersectionObserver(([e]) => { footerIn = e.isIntersecting; onScroll(); }).observe(footer);
   }
+  // scroll position is read in the scroll event (layout is clean then), never inside the frame
+  let sy = window.scrollY;
   function update() {
     ticking = false;
-    const y = window.scrollY;
+    const y = sy;
     const mbarOn = !!mbar && y > window.innerHeight * 0.6 && !footerIn;
     const hide = y > 400 && y > lastY && !document.body.classList.contains("menu-open");
     lastY = y;
@@ -206,7 +209,7 @@
     setCls(mbar, "is-on", mbarOn);
   }
   function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
-  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("scroll", () => { sy = window.scrollY; onScroll(); }, { passive: true });
 
   /* ---------- Next class pill & mobile bar ---------- */
   function nextOpen() { return allSessions().find((s) => seatsLeft(s) > 0); }

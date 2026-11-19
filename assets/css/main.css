@@ -438,10 +438,13 @@ body::after {
 
 /* ---------- Preloader & transitions ---------- */
 /* ---------- Loader: a stop-motion flipbook of the week's bakes ---------- */
-.loader { --cb: 0px; position: fixed; inset: 0; z-index: 500; overflow: hidden; background: var(--cream); color: var(--ink);
-  border-radius: 0 0 50% 50% / 0 0 var(--cb) var(--cb); will-change: transform; }
-.loader::before { content: ""; position: absolute; left: 50%; top: 50%; width: 80vmax; height: 80vmax; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(241, 207, 143, .6), rgba(241, 207, 143, 0)); }
-.loader__cards { position: absolute; inset: 0; }
+.loader { position: fixed; inset: 0; z-index: 500; background: var(--cream); color: var(--ink); will-change: transform; }
+.loader__cards { position: absolute; inset: 0; overflow: hidden; }
+.loader__cards::before { content: ""; position: absolute; left: 50%; top: 50%; width: 80vmax; height: 80vmax; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(241, 207, 143, .6), rgba(241, 207, 143, 0)); }
+/* the curved edge of a lifting sheet: a dome that grows out of its edge (scaled, so nothing repaints) */
+.cap { position: absolute; left: 0; right: 0; height: 17vh; background: inherit; pointer-events: none; transform: scaleY(0); }
+.cap--bot { top: calc(100% - 1px); border-radius: 0 0 50% 50% / 0 0 100% 100%; transform-origin: 50% 0; }
+.cap--top { bottom: calc(100% - 1px); border-radius: 50% 50% 0 0 / 100% 100% 0 0; transform-origin: 50% 100%; }
 .loader__card { --w: clamp(104px, 11vw, 176px); position: absolute; width: var(--w); aspect-ratio: 4 / 5; margin: 0; padding: 7px 7px 26px; background: var(--white); border-radius: 14px;
   left: calc(50% + var(--x) * 1vw - var(--w) / 2); top: calc(50% + var(--y) * var(--ys, 1vh) - var(--w) * .625);
   box-shadow: 0 30px 60px -28px rgba(29, 14, 4, .45); transform: rotate(var(--r)); }
@@ -468,8 +471,7 @@ body::after {
 .curtain { position: fixed; inset: 0; z-index: 450; pointer-events: none; visibility: hidden; }
 .curtain__lead, .curtain__main { position: absolute; inset: 0; transform: translateY(100%); will-change: transform; }
 .curtain__lead { background: var(--caramel); }
-.curtain__main { --ct: 0px; --cb: 0px; background: var(--cream); color: var(--ink); display: grid; place-content: center; justify-items: center; gap: 18px; text-align: center; padding: var(--gutter);
-  border-radius: 50% 50% 50% 50% / var(--ct) var(--ct) var(--cb) var(--cb); }
+.curtain__main { background: var(--cream); color: var(--ink); display: grid; place-content: center; justify-items: center; gap: 18px; text-align: center; padding: var(--gutter); }
 .curtain__label { font-size: var(--fs-label); letter-spacing: .2em; text-transform: uppercase; font-weight: 600; color: var(--caramel); }
 .curtain__mask { display: block; overflow: hidden; padding: .05em .1em .18em; }
 .curtain__title { display: block; font-family: var(--f-display); font-style: italic; font-weight: 340; font-size: clamp(2.8rem, 8vw, 7.5rem); line-height: 1; letter-spacing: -.04em; }
@@ -555,7 +557,7 @@ body::after {
 .ring3d__face { position: absolute; inset: 0; border-radius: 22px; overflow: hidden; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 .ring3d__face img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; -webkit-user-drag: none; }
 .ring3d__face--front { box-shadow: 0 30px 60px -30px rgba(29, 14, 4, .55); }
-.ring3d__face--front::before { content: ""; position: absolute; inset: 0; background: var(--ink); opacity: var(--shade, 0); transition: opacity .2s linear; z-index: 1; }
+.ring3d__shade { position: absolute; inset: 0; z-index: 1; background: var(--ink); opacity: 0; will-change: opacity; pointer-events: none; }
 .ring3d__face--front::after { content: ""; position: absolute; inset: 45% 0 0; background: linear-gradient(transparent, rgba(29, 14, 4, .7)); }
 .ring3d__face--front span { position: absolute; left: 16px; right: 16px; bottom: 14px; z-index: 2; color: var(--cream); font-family: var(--f-display); font-style: italic; font-size: clamp(1rem, 1.3vw, 1.25rem); line-height: 1.1; font-variation-settings: "SOFT" 100, "WONK" 0; }
 .ring3d__face--back { transform: rotateY(180deg); background: radial-gradient(120% 90% at 30% 20%, #fbf4e8, #ead9bd 70%); box-shadow: inset 0 0 0 1px rgba(71, 31, 0, .08); display: grid; place-items: center; }
@@ -712,7 +714,7 @@ body::after {
 .hgal { position: relative; overflow: hidden; }
 .hgal__head { display: flex; justify-content: space-between; align-items: end; gap: var(--gap); padding-bottom: clamp(36px, 4vw, 64px); }
 .hgal__viewport { perspective: 1500px; perspective-origin: 50% 40%; }
-.hgal__track { display: flex; align-items: flex-end; gap: clamp(28px, 3vw, 56px); padding-inline: var(--gutter); width: max-content; transform-style: preserve-3d; will-change: transform; }
+.hgal__track { display: flex; align-items: flex-end; gap: clamp(28px, 3vw, 56px); padding-inline: var(--gutter); width: max-content; transform-style: preserve-3d; }
 .hgal__item { flex: none; display: flex; flex-direction: column; transform-style: preserve-3d; }
 .hgal__item .media { height: clamp(280px, 44vh, 460px); width: auto; aspect-ratio: var(--ar, 4 / 3); border-radius: var(--r-lg); box-shadow: 0 40px 80px -40px rgba(0, 0, 0, .7); }
 .hgal__cap { width: 0; min-width: 100%; display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding-top: 18px; }
@@ -1445,7 +1447,7 @@ form.is-sent .form-success { display: block; animation: cardIn .8s var(--ease); 
 .marquee__track { transform-origin: 50% 50%; }
 
 /* Performance: 3D scenes that are off screen stop being composited */
-.is-offscreen .ring3d__tilt { visibility: hidden; }
+.is-offscreen .ring3d__tilt { display: none; }
 /* Elements moved every frame get their own layer so the page itself is not repainted */
 .cursor, .lam__progress span, .hgal__progress span, .steps-line span, .marquee__track { will-change: transform; }
 
