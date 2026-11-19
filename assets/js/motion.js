@@ -467,14 +467,28 @@
       },
     });
     // a new sheet is laid over the last: it wipes down from the top while the one beneath settles back
+    const edge = $(".lx__edge", sec);
+    // a new sheet is laid down over the last: a straight edge travels top to bottom with a butter rim
+    // and a soft shadow on the photo beneath, which sinks back and dims
     const lay = (i, at) => {
       tl.to(notes[i - 1], { opacity: 0, duration: 0.25 }, at)
-        .fromTo(layers[i], { clipPath: "inset(0% 0% 100% 0% round 26px)" }, { clipPath: "inset(0% 0% 0% 0% round 26px)", duration: 1.1, ease: "power3.inOut" }, at + 0.1)
-        .fromTo(imgs[i], { scale: 1.25, yPercent: -8 }, { scale: 1, yPercent: 0, duration: 1.3, ease: "power3.out" }, at + 0.1)
-        .to(imgs[i - 1], { scale: 0.92, duration: 1.1 }, at + 0.1)
-        .to(layers[i - 1], { "--dim": 0.55, duration: 1.1 }, at + 0.1)
+        .fromTo(layers[i], { clipPath: "inset(0% 0% 100% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.1, ease: "power3.inOut", immediateRender: i === 1 }, at + 0.1)
+        .set(edge, { top: "0%", opacity: 1 }, at + 0.1)
+        .to(edge, { top: "100%", duration: 1.1, ease: "power3.inOut" }, at + 0.1)
+        .to(edge, { opacity: 0, duration: 0.2 }, at + 1.05)
+        .fromTo(imgs[i], { scale: 1.25, yPercent: -8 }, { scale: 1, yPercent: 0, duration: 1.3, ease: "power3.out", immediateRender: i === 1 }, at + 0.1)
+        .to(imgs[i - 1], { scale: 1.08, yPercent: 4, duration: 1.1 }, at + 0.1)
+        .to(layers[i - 1], { "--dim": 0.6, duration: 1.1 }, at + 0.1)
         .to(notes[i], { opacity: 1, duration: 0.3 }, at + 1.2);
     };
+    // the frame leans gently towards the pointer
+    const frame = $("[data-lx-frame]", sec);
+    if (finePointer && frame) {
+      gsap.set(frame, { transformPerspective: 1400 });
+      const rx = gsap.quickTo(frame, "rotationX", { duration: 1, ease: "power3" }), ry = gsap.quickTo(frame, "rotationY", { duration: 1, ease: "power3" });
+      sec.addEventListener("mousemove", (e) => { ry((e.clientX / innerWidth - 0.5) * 9); rx(-(e.clientY / innerHeight - 0.5) * 7); });
+      sec.addEventListener("mouseleave", () => { rx(0); ry(0); });
+    }
     lay(1, 1.45);
     tl.to(cnt, { v: 9, duration: 0.9, onUpdate: () => setCount(cnt.v) }, 1.7);
     lay(2, 4.65);
