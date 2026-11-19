@@ -272,25 +272,28 @@
     if (loader && firstVisit) {
       try { sessionStorage.setItem("ltc:seen", "1"); } catch (e) { /* ignore */ }
       const count = $(".loader__count b", loader);
-      const flips = $$(".loader__flip img", loader);
+      const cardsEl = $$(".loader__card", loader);
       const o = { v: 0 };
-      let shownImg = 0;
       const tl = gsap.timeline();
-      tl.from(".loader__row", { y: 24, opacity: 0, duration: 0.9, stagger: 0.1, ease })
-        .to(".loader__flip", { clipPath: "inset(0% 0% 0% 0% round 22px)", duration: 1, ease: "expo.out" }, 0.1)
-        .to(o, {
-          v: 100, duration: 1.9, ease: "power2.inOut",
-          onUpdate: () => {
-            count.textContent = Math.round(o.v);
-            // stop-motion: a new bake every few percent
-            const k = Math.min(flips.length - 1, Math.floor((o.v / 100) * flips.length));
-            if (k !== shownImg) { flips[shownImg].style.opacity = 0; flips[k].style.opacity = 1; shownImg = k; }
-          },
-        }, 0.2)
-        .to(".loader__bar span", { scaleX: 1, duration: 1.9, ease: "power2.inOut" }, 0.2)
-        .to(".loader__flip", { scale: 1.08, opacity: 0, duration: 0.6, ease: "power2.in" }, "+=0.05")
-        .to(".loader__row", { y: -20, opacity: 0, duration: 0.5, stagger: 0.05, ease: "power2.in" }, "<")
-        .to(loader, { yPercent: -100, "--cb": "18vh", duration: 1.1, ease: "expo.inOut" }, "-=0.15")
+      // the logo and line arrive, then Sam's bakes are dealt out around them as the count climbs
+      tl.from(".loader__logo", { y: 26, opacity: 0, duration: 1, ease })
+        .from(".loader__line", { y: 18, opacity: 0, duration: 0.9, ease }, 0.15)
+        .from(".loader__row", { y: 20, opacity: 0, duration: 0.8, ease }, 0.2)
+        .from(cardsEl, {
+          opacity: 0, scale: 0.55, x: (i) => -parseFloat(cardsEl[i].style.getPropertyValue("--x")) * window.innerWidth * 0.004,
+          y: (i) => 60 - parseFloat(cardsEl[i].style.getPropertyValue("--y")) * window.innerHeight * 0.004, rotation: (i) => (i % 2 ? 18 : -18),
+          duration: 0.9, stagger: 0.2, ease: "back.out(1.5)",
+        }, 0.35)
+        .to(o, { v: 100, duration: 2.1, ease: "power2.inOut", onUpdate: () => (count.textContent = Math.round(o.v)) }, 0.25)
+        .to(".loader__bar span", { scaleX: 1, duration: 2.1, ease: "power2.inOut" }, 0.25)
+        // at 100 the cards fly out to the edges and the cream screen lifts away
+        .to(cardsEl, {
+          x: (i) => parseFloat(cardsEl[i].style.getPropertyValue("--x")) * window.innerWidth * 0.012,
+          y: (i) => parseFloat(cardsEl[i].style.getPropertyValue("--y")) * window.innerHeight * 0.016,
+          rotation: (i) => (i % 2 ? 24 : -24), opacity: 0, duration: 0.8, stagger: 0.03, ease: "power3.in",
+        }, "+=0.15")
+        .to([".loader__center", ".loader__row"], { y: -24, opacity: 0, duration: 0.5, ease: "power2.in" }, "<0.2")
+        .to(loader, { yPercent: -100, "--cb": "18vh", duration: 1.1, ease: "expo.inOut" }, "-=0.25")
         .add(() => { loader.classList.add("is-done"); }, ">")
         .add(heroIn(), "-=0.7");
     } else {
@@ -434,7 +437,6 @@
     const layers = $$("[data-lx-layer]", sec);
     const imgs = layers.map((l) => $("img", l));
     const notes = layers.map((l) => $(".lp__note", l));
-    const meter = $$(".lx__meter i", sec);
     const count = $("[data-lam-count]", sec);
     const steps = $$(".lam__step", sec);
     const dots = $$(".lam__dots i", sec);
@@ -445,7 +447,6 @@
       if (n === shown) return;
       shown = n;
       count.textContent = n;
-      meter.forEach((m, i) => m.classList.toggle("is-on", i < n));
     };
     setCount(3);
     gsap.set(notes[0], { opacity: 1 });
@@ -467,11 +468,11 @@
         },
       },
     });
-    // a new sheet is laid over the last: it wipes up from the bottom while the one beneath settles back
+    // a new sheet is laid over the last: it wipes down from the top while the one beneath settles back
     const lay = (i, at) => {
       tl.to(notes[i - 1], { opacity: 0, duration: 0.25 }, at)
-        .fromTo(layers[i], { clipPath: "inset(100% 0% 0% 0% round 26px)" }, { clipPath: "inset(0% 0% 0% 0% round 26px)", duration: 1.1, ease: "power3.inOut" }, at + 0.1)
-        .fromTo(imgs[i], { scale: 1.25, yPercent: 8 }, { scale: 1, yPercent: 0, duration: 1.3, ease: "power3.out" }, at + 0.1)
+        .fromTo(layers[i], { clipPath: "inset(0% 0% 100% 0% round 26px)" }, { clipPath: "inset(0% 0% 0% 0% round 26px)", duration: 1.1, ease: "power3.inOut" }, at + 0.1)
+        .fromTo(imgs[i], { scale: 1.25, yPercent: -8 }, { scale: 1, yPercent: 0, duration: 1.3, ease: "power3.out" }, at + 0.1)
         .to(imgs[i - 1], { scale: 0.92, duration: 1.1 }, at + 0.1)
         .to(layers[i - 1], { "--dim": 0.55, duration: 1.1 }, at + 0.1)
         .to(notes[i], { opacity: 1, duration: 0.3 }, at + 1.2);
@@ -690,7 +691,7 @@
       em.appendChild(svg);
       const inHero = em.closest(".hero, .page-hero");
       gsap.fromTo(path, { strokeDashoffset: 1 }, inHero
-        ? { strokeDashoffset: 0, duration: 1.2, ease: "power2.inOut", delay: firstVisit ? 4.1 : 1.5 }
+        ? { strokeDashoffset: 0, duration: 1.2, ease: "power2.inOut", delay: firstVisit ? 4.9 : 1.5 }
         : { strokeDashoffset: 0, duration: 1.1, ease: "power2.inOut", delay: 0.5, scrollTrigger: { trigger: em, start: "top 85%", once: true } });
     });
   }
