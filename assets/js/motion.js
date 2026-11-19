@@ -226,8 +226,8 @@
     el.classList.add("is-split");
     return $$(".split-line > span", el);
   }
-  // lines flip up out of the baseline in 3D
-  const lineIn = { yPercent: 120, rotationX: -78, opacity: 0, duration: 1.4, stagger: 0.09, transformPerspective: 900, clearProps: "transform,opacity" };
+  // lines rise out of their mask (flat: a 3D flip distorts very wide display type)
+  const lineIn = { yPercent: 118, rotation: 2.5, transformOrigin: "0% 100%", duration: 1.25, stagger: 0.08, clearProps: "transform" };
 
   /* ---------- Intro / preloader ---------- */
   const loader = $(".loader");
@@ -367,70 +367,160 @@
     });
   }
 
-  /* ---------- Lamination: 3 → 9 → 27 layers, scrubbed in 3D ---------- */
+  /* ---------- Lamination: butter lock-in, roll, letter fold ×2 → 27 layers, scrubbed in 3D ---------- */
   function lamination() {
     const sec = $("[data-lam]");
     if (!sec) return;
-    const sheets = $$(".lam__sheet", sec);
-    const stack = $(".lam__stack", sec);
+    const stage = $(".lam__stage", sec);
+    const scene = $("[data-l3]", sec);
+    const B = {};
+    $$("[data-b]", scene).forEach((el) => (B[el.dataset.b] = { el, c: {} }));
+    const pin = $("[data-l3-pin]", scene), roll = $("[data-l3-roll]", scene), shadow = $("[data-l3-shadow]", scene);
     const count = $("[data-lam-count]", sec);
     const steps = $$(".lam__step", sec);
     const dots = $$(".lam__dots i", sec);
     const bar = $(".lam__progress span", sec);
     const photo = $(".lam__photo", sec);
-    const st = { n: 3, ex: 0, rz: -40, rx: 58 };
-    let S = sheets[0].offsetWidth;
-    window.addEventListener("resize", () => (S = sheets[0].offsetWidth || S));
-    let lastN = -1, lastStep = -1, lastT = "", lastStack = "";
-    const prev = sheets.map(() => ({ o: "", z: "", v: "" }));
     onScreen(sec, (v) => sec.classList.toggle("is-offscreen", !v));
+
+    let W = 400, T = 28, D = 220, PR = 18;
+    const G = 0.8; // hairline gap so folded layers never z-fight
+    const size = () => {
+      const sw = stage.clientWidth;
+      if (!sw) return;
+      W = clamp(sw * 0.58, 190, 470); T = W * 0.072; D = W * 0.56; PR = W * 0.045;
+      scene.style.setProperty("--W", W + "px");
+      scene.style.setProperty("--D", D + "px");
+    };
+    size();
+
+    // write a style only when it changes
+    const put = (o, k, v, fn) => { if (o.c[k] !== v) { o.c[k] = v; fn(v); } };
+    const setBox = (key, vis, w, h, n, x, y, a = 0, d = D, o = 1) => {
+      const b = B[key], el = b.el;
+      put(b, "vis", vis ? "visible" : "hidden", (v) => (el.style.visibility = v));
+      if (!vis) return;
+      put(b, "w", w.toFixed(1), (v) => el.style.setProperty("--w", v + "px"));
+      put(b, "h", h.toFixed(2), (v) => el.style.setProperty("--h", v + "px"));
+      put(b, "d", d.toFixed(1), (v) => el.style.setProperty("--d", v + "px"));
+      put(b, "sh", (h / n).toFixed(3), (v) => el.style.setProperty("--sh", v + "px"));
+      put(b, "o", o.toFixed(2), (v) => el.style.setProperty("--o", v));
+      put(b, "t", `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0) rotateZ(${a.toFixed(2)}deg)`, (v) => (el.style.transform = v));
+    };
+    const rot = (P, c, deg) => {
+      const r = (deg * Math.PI) / 180, dx = c[0] - P[0], dy = c[1] - P[1];
+      return [P[0] + dx * Math.cos(r) - dy * Math.sin(r), P[1] + dx * Math.sin(r) + dy * Math.cos(r)];
+    };
+
+    const st = {};
+    const reset = () => Object.assign(st, {
+      mode: 0, drop: 0, lid: 0, tags: 0,
+      pw: (W * 0.82) / 3, h: T * 1.25, n: 3, fl: 0, fr: 0,
+      sw: W / 3, sh: 3 * T + 2 * G, N: 9,
+      px: -W * 0.82, py: -PR,
+      rx: -22, ry: -34, cs: 1, cy: 0, count: 3,
+    });
+    reset();
+    const misc = { c: {} };
+    let lastStep = -1;
+
     const render = () => {
-      const n = st.n, thick = S * 0.34, gap = thick / Math.max(1, n - 1), spread = 1 + st.ex * 1.9;
-      const t = Math.max(2, gap * 0.92);
-      const ts = t.toFixed(1) + "px";
-      if (ts !== lastT) { lastT = ts; stack.style.setProperty("--t", ts); }
-      for (let i = 0; i < sheets.length; i++) {
-        const vis = clamp(n - i, 0, 1);
-        const el = sheets[i], pv = prev[i];
-        const v = vis > 0.01 ? "visible" : "hidden";
-        if (v !== pv.v) { pv.v = v; el.style.visibility = v; }
-        if (v === "hidden") continue;
-        const o = vis.toFixed(2);
-        if (o !== pv.o) { pv.o = o; el.style.setProperty("--o", o); }
-        const z = (Math.min(i, n - 1) * gap * spread - thick * 0.5 - t * 0.5).toFixed(1);
-        if (z !== pv.z) { pv.z = z; el.style.transform = `translateZ(${z}px)`; }
-      }
-      const sk = `rotateX(${st.rx.toFixed(2)}deg) rotateZ(${st.rz.toFixed(2)}deg)`;
-      if (sk !== lastStack) { lastStack = sk; stack.style.transform = sk; }
-      const shown = Math.round(n);
-      if (shown !== lastN) { lastN = shown; count.textContent = shown; }
+      const hI = T * 1.25, lift = W * 0.75;
+      setBox("board", true, W * 2.1, 14, 1, W * 0.02, 7, 0, D * 1.75);
+      // 1. lock-in: butter drops onto the dough, the dough lid closes over it
+      const intro = st.mode === 0;
+      setBox("base", intro, W * 0.82, hI / 3, 1, 0, -hI / 6);
+      setBox("butter", intro && st.drop > 0.02, W * 0.62, hI / 3, 1, 0, -hI / 2 - (1 - st.drop) * lift, 0, D * 0.78, clamp(st.drop * 4, 0, 1));
+      setBox("lid", intro && st.lid > 0.02, W * 0.82, hI / 3, 1, 0, -hI * 5 / 6 - (1 - st.lid) * lift, 0, D, clamp(st.lid * 4, 0, 1));
+      // 2. three panels, letter-folded: left over the middle, then right over the top
+      const panels = st.mode === 1, pw = st.pw, h = st.h;
+      setBox("M", panels, pw, h, st.n, 0, -h / 2);
+      const aL = 180 * st.fl, cL = rot([-pw / 2, -h - G / 2], [-pw, -h / 2], aL);
+      setBox("L", panels, pw, h, st.n, cL[0], cL[1], aL);
+      const aR = -180 * st.fr, cR = rot([pw / 2, -1.5 * h - G], [pw, -h / 2], aR);
+      setBox("R", panels, pw, h, st.n, cR[0], cR[1], aR);
+      put(B.R, "tags", st.tags.toFixed(2), (v) => B.R.el.style.setProperty("--tags", v));
+      // 3. the folded block rolled back out into one long, thinner sheet
+      setBox("S", st.mode === 2, st.sw, st.sh, st.N, 0, -st.sh / 2);
+      // rolling pin turns as it travels
+      put(misc, "pin", `translate3d(${st.px.toFixed(1)}px,${st.py.toFixed(1)}px,0)`, (v) => (pin.style.transform = v));
+      put(misc, "roll", `rotateZ(${((st.px / PR) * 57.2958).toFixed(1)}deg)`, (v) => (roll.style.transform = v));
+      // soft shadow under whatever is on the board
+      let l, r;
+      if (st.mode === 0) { l = -W * 0.41; r = W * 0.41; }
+      else if (st.mode === 1) { l = -pw / 2 - pw * (1 - st.fl); r = pw / 2 + pw * (1 - st.fr); }
+      else { l = -st.sw / 2; r = st.sw / 2; }
+      const fw = (r - l) * 1.3;
+      put(misc, "sh", `translate3d(${((l + r) / 2).toFixed(1)}px,-1px,0) rotateX(90deg) scaleX(${(fw / 100).toFixed(3)})`, (v) => (shadow.style.transform = v));
+      put(misc, "cam", `translateY(${st.cy.toFixed(1)}px) rotateX(${st.rx.toFixed(2)}deg) rotateY(${st.ry.toFixed(2)}deg) scale3d(${st.cs.toFixed(3)},${st.cs.toFixed(3)},${st.cs.toFixed(3)})`, (v) => (scene.style.transform = v));
+      put(misc, "count", String(Math.round(st.count)), (v) => (count.textContent = v));
     };
     render();
-    const D = 10;
-    const tl = gsap.timeline({
-      defaults: { ease: "none" },
-      onUpdate: render,
-      scrollTrigger: {
-        trigger: sec, start: "top top", end: () => "+=" + window.innerHeight * 2.6, pin: true, scrub: 0.4, anticipatePin: 1, invalidateOnRefresh: true,
-        onUpdate: (self) => {
-          if (bar) gsap.set(bar, { scaleX: self.progress });
-          const t = self.progress * D;
-          const k = t < 1.2 ? 0 : t < 4 ? 1 : t < 5.4 ? 2 : 3;
-          if (k !== lastStep) {
-            lastStep = k;
-            steps.forEach((s, i) => s.classList.toggle("is-active", i === k));
-            dots.forEach((d, i) => d.classList.toggle("is-on", i <= k));
-          }
+
+    const Dur = 10;
+    let tl;
+    const build = () => {
+      if (tl) { tl.scrollTrigger && tl.scrollTrigger.kill(); tl.kill(); }
+      size(); reset(); misc.c = {}; Object.values(B).forEach((b) => (b.c = {}));
+      const pe = { ease: "power2.inOut" };
+      tl = gsap.timeline({
+        defaults: { ease: "none" },
+        onUpdate: render,
+        scrollTrigger: {
+          trigger: sec, start: "top top", end: () => "+=" + window.innerHeight * 2.8, pin: true, scrub: 0.4, anticipatePin: 1,
+          onUpdate: (self) => {
+            if (bar) gsap.set(bar, { scaleX: self.progress });
+            const t = self.progress * Dur;
+            const k = t < 1.15 ? 0 : t < 3.65 ? 1 : t < 5.4 ? 2 : 3;
+            if (k !== lastStep) {
+              lastStep = k;
+              steps.forEach((s, i) => s.classList.toggle("is-active", i === k));
+              dots.forEach((d, i) => d.classList.toggle("is-on", i <= k));
+            }
+          },
         },
-      },
+      });
+      const rollY = (top) => top - PR;
+      tl
+        // lock-in
+        .to(st, { drop: 1, duration: 0.6, ease: "power2.in" }, 0.05)
+        .to(st, { lid: 1, duration: 0.55, ease: "power2.in" }, 0.55)
+        .set(st, { mode: 1 }, 1.12)
+        .to(st, { tags: 1, duration: 0.2 }, 1.12)
+        // first roll: the pin hops on and rolls left to right
+        .to(st, { px: -W * 0.41 - PR, py: rollY(-T * 1.25), duration: 0.18, ...pe }, 1.14)
+        .to(st, { px: W / 2 + PR, py: rollY(-T), pw: W / 3, h: T, duration: 0.7, ease: "power1.inOut" }, 1.32)
+        .to(st, { tags: 0, duration: 0.15 }, 1.95)
+        .to(st, { px: W * 0.82, py: -PR, duration: 0.18, ...pe }, 2.02)
+        // first letter fold: ×3
+        .to(st, { fl: 1, duration: 0.7, ease: "power2.inOut" }, 2.2)
+        .to(st, { fr: 1, duration: 0.7, ease: "power2.inOut" }, 2.9)
+        .to(st, { count: 9, duration: 1.1, ease: "power1.inOut" }, 2.5)
+        // rest & roll out the folded block, right to left
+        .set(st, { mode: 2, sw: W / 3, sh: 3 * T + 2 * G, N: 9 }, 3.65)
+        .to(st, { px: W / 6 + PR, py: rollY(-(3 * T + 2 * G)), duration: 0.16, ...pe }, 3.66)
+        .to(st, { px: -W / 2 - PR, py: rollY(-T), sw: W, sh: T, duration: 1.35, ease: "power1.inOut" }, 3.84)
+        .to(st, { px: -W * 0.82, py: -PR, duration: 0.18, ...pe }, 5.2)
+        // second letter fold: ×3 again
+        .set(st, { mode: 1, pw: W / 3, h: T, n: 9, fl: 0, fr: 0 }, 5.4)
+        .to(st, { fl: 1, duration: 0.7, ease: "power2.inOut" }, 5.45)
+        .to(st, { fr: 1, duration: 0.7, ease: "power2.inOut" }, 6.15)
+        .to(st, { count: 27, duration: 1.2, ease: "power1.inOut" }, 5.65)
+        // move in on the 27-layer cut edge
+        .to(st, { rx: -10, ry: -16, cs: 1.4, cy: T * 1.6, duration: 1.8, ease: "power2.inOut" }, 7.0)
+        .to(photo, { opacity: 1, rotationY: 0, x: 0, duration: 1.2, ease: "power3.out" }, 8.2)
+        .set({}, {}, Dur);
+    };
+    build();
+    let rw = window.innerWidth;
+    window.addEventListener("resize", () => {
+      if (Math.abs(window.innerWidth - rw) < 2) return;
+      rw = window.innerWidth;
+      const p = tl.scrollTrigger ? tl.scrollTrigger.progress : 0;
+      build();
+      ScrollTrigger.refresh();
+      render();
     });
-    tl.to(st, { rz: 50, duration: D }, 0)
-      .to(st, { ex: 1, duration: 1, ease: "power2.inOut" }, 1.2)
-      .to(st, { n: 9, ex: 0, duration: 1.6, ease: "power2.inOut" }, 2.2)
-      .to(st, { ex: 1, duration: 1, ease: "power2.inOut" }, 4.4)
-      .to(st, { n: 27, ex: 0, duration: 1.8, ease: "power2.inOut" }, 5.4)
-      .to(st, { rx: 64, duration: 2 }, 7.6)
-      .to(photo, { opacity: 1, rotationY: 0, x: 0, duration: 1.4, ease: "power3.out" }, 8);
   }
 
   /* ---------- Gallery: pinned on desktop, bends around you in 3D ---------- */
@@ -615,11 +705,12 @@
     runIntro();
     ScrollTrigger.refresh();
   };
-  if (document.fonts && document.fonts.ready) {
+  if (document.fonts && document.fonts.load) {
+    // split headlines only once the real display faces are in, so lines are measured in the final font
     let done = false;
     const go = () => { if (!done) { done = true; boot(); } };
-    document.fonts.ready.then(go);
-    setTimeout(go, 1500);
+    Promise.all([document.fonts.load('360 1em "Fraunces"'), document.fonts.load('italic 360 1em "Fraunces"'), document.fonts.ready]).then(go, go);
+    setTimeout(go, 3000);
   } else boot();
   window.addEventListener("load", () => ScrollTrigger.refresh());
 })();
