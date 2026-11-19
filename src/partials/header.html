@@ -35,8 +35,16 @@
 </svg>
 
 <div class="loader" aria-hidden="true">
-  <div class="loader__words"><span>Love</span><span>to</span><span>Cook</span></div>
-  <div class="loader__foot"><span>Cook school · Bakery · Pâtisserie · Crieff</span><b class="loader__count">0</b></div>
+  <div class="loader__row">
+    <img class="loader__logo" src="assets/img/logo-cream.png" alt="" width="132" height="87">
+    <span class="loader__word">Cook School · Bakery · Pâtisserie<br>16 King Street, Crieff</span>
+  </div>
+  <div class="loader__flip"><img src="assets/img/m/croissants.jpg" alt=""><img src="assets/img/m/fig-pastry.jpg" alt=""><img src="assets/img/m/sourdough.jpg" alt=""><img src="assets/img/m/fruit-danish.jpg" alt=""><img src="assets/img/m/chocolate-tart.jpg" alt=""><img src="assets/img/m/almond-croissant.jpg" alt=""><img src="assets/img/m/focaccia.jpg" alt=""><img src="assets/img/m/plum-danish.jpg" alt=""></div>
+  <div class="loader__row loader__row--end">
+    <p class="loader__line"><span>Made by hand,</span><span><em>shared</em> with love.</span></p>
+    <span class="loader__count"><b>0</b><small>%</small></span>
+  </div>
+  <div class="loader__bar"><span></span></div>
 </div>
 <div class="curtain" aria-hidden="true">
   <div class="curtain__lead"></div>
@@ -53,6 +61,7 @@
     } catch (e) {}
   })();
 </script>
+<div class="cursor" aria-hidden="true"><div class="cursor__dot"></div><div class="cursor__label"></div></div>
 
 <header class="header" id="top">
   <div class="container header__inner">
@@ -76,15 +85,15 @@
   </div>
 </header>
 
-<div class="mmenu" id="mmenu">
+<div class="mmenu" id="mmenu" data-lenis-prevent>
   <nav class="mmenu__list" aria-label="Mobile">
-    <a href="index.html" data-nav="home">Home</a>
-    <a href="classes.html" data-nav="classes">Classes &amp; Events</a>
-    <a href="private.html" data-nav="private">Private Lessons</a>
-    <a href="bakery.html" data-nav="bakery">Bakery</a>
-    <a href="gift.html" data-nav="gift">Gift Vouchers</a>
-    <a href="about.html" data-nav="about">About Sam</a>
-    <a href="contact.html" data-nav="contact">Contact</a>
+    <a href="index.html" data-nav="home">Home <small>01</small></a>
+    <a href="classes.html" data-nav="classes">Classes &amp; Events <small>02</small></a>
+    <a href="private.html" data-nav="private">Private Lessons <small>03</small></a>
+    <a href="bakery.html" data-nav="bakery">Bakery <small>04</small></a>
+    <a href="gift.html" data-nav="gift">Gift Vouchers <small>05</small></a>
+    <a href="about.html" data-nav="about">About Sam <small>06</small></a>
+    <a href="contact.html" data-nav="contact">Contact <small>07</small></a>
   </nav>
   <div class="mmenu__foot">
     <div><span class="label" style="color:var(--butter)">Visit</span><br>16 King Street<br>Crieff, Scotland</div>
