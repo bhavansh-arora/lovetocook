@@ -27,7 +27,7 @@
   @font-face { font-family: "Fraunces"; font-style: italic; font-weight: 300 700; font-display: block; src: url("assets/fonts/fraunces-italic-v2.woff2") format("woff2"); }
   @font-face { font-family: "Inter Tight"; font-style: normal; font-weight: 400 700; font-display: swap; src: url("assets/fonts/inter-tight.woff2") format("woff2"); }
 </style>
-<link rel="stylesheet" href="assets/css/main.css?v=202611190601">
+<link rel="stylesheet" href="assets/css/main.css?v=202611190625">
 <script>
   (function (h) {
     h.classList.remove("no-js"); h.classList.add("js");
@@ -91,15 +91,32 @@
 </svg>
 
 <div class="loader" aria-hidden="true">
-  <div class="loader__inner">
-    <img class="loader__logo" src="assets/img/logo-cream.png" alt="" width="220" height="145">
-    <div class="loader__bar"><span></span></div>
-    <span class="loader__count">000</span>
+  <div class="loader__row">
+    <img class="loader__logo" src="assets/img/logo-cream.png" alt="" width="132" height="87">
+    <span class="loader__word">Cook School · Bakery · Pâtisserie<br>16 King Street, Crieff</span>
   </div>
-  <span class="loader__word">Cook School · Bakery · Pâtisserie</span>
-  <span class="loader__word loader__word--r">Crieff, Scotland</span>
+  <div class="loader__flip"><img src="assets/img/m/croissants.jpg" alt=""><img src="assets/img/m/fig-pastry.jpg" alt=""><img src="assets/img/m/sourdough.jpg" alt=""><img src="assets/img/m/fruit-danish.jpg" alt=""><img src="assets/img/m/chocolate-tart.jpg" alt=""><img src="assets/img/m/almond-croissant.jpg" alt=""><img src="assets/img/m/focaccia.jpg" alt=""><img src="assets/img/m/plum-danish.jpg" alt=""></div>
+  <div class="loader__row loader__row--end">
+    <p class="loader__line"><span>Made by hand,</span><span><em>shared</em> with love.</span></p>
+    <span class="loader__count"><b>0</b><small>%</small></span>
+  </div>
+  <div class="loader__bar"><span></span></div>
 </div>
-<div class="curtain" aria-hidden="true"></div>
+<div class="curtain" aria-hidden="true">
+  <div class="curtain__lead"></div>
+  <div class="curtain__main">
+    <span class="curtain__label">Love to Cook</span>
+    <span class="curtain__mask"><span class="curtain__title" data-curtain-title></span></span>
+  </div>
+</div>
+<script>
+  (function () {
+    try {
+      var t = sessionStorage.getItem("ltc:to"), el = document.querySelector("[data-curtain-title]");
+      if (el) el.textContent = t || document.title.split("|")[0].trim();
+    } catch (e) {}
+  })();
+</script>
 <div class="cursor" aria-hidden="true"><div class="cursor__dot"></div><div class="cursor__label"></div></div>
 
 <header class="header" id="top">
@@ -236,12 +253,15 @@
         </div>
         <div class="lam__stage" aria-hidden="true">
           <div class="lam__count"><b data-lam-count>3</b><span class="label">layers of butter &amp; dough</span></div>
-          <div class="lp" data-lp>
-            <figure class="lp__card" data-lp-card><div class="lp__s lp__s--0"><div class="lp__f"><img src="assets/img/sam.jpg" alt="" loading="lazy" decoding="async" style="object-position:50% 22%"></div><i class="lp__b"></i></div><div class="lp__s lp__s--1"><div class="lp__f"><img src="assets/img/sam.jpg" alt="" loading="lazy" decoding="async" style="object-position:50% 22%"></div><i class="lp__b"></i></div><div class="lp__s lp__s--2"><div class="lp__f"><img src="assets/img/sam.jpg" alt="" loading="lazy" decoding="async" style="object-position:50% 22%"></div><i class="lp__b"></i></div><figcaption class="lp__cap">Sam at the bench</figcaption><span class="lp__note lp__note--r" style="--x:73%;--y:51%"><i></i><b>Sam: Le Cordon Bleu pâtissier</b></span></figure>
-            <figure class="lp__card" data-lp-card><div class="lp__s lp__s--0"><div class="lp__f"><img src="assets/img/fig-pastry.jpg" alt="" loading="lazy" decoding="async" style="object-position:27% 50%"></div><i class="lp__b"></i></div><div class="lp__s lp__s--1"><div class="lp__f"><img src="assets/img/fig-pastry.jpg" alt="" loading="lazy" decoding="async" style="object-position:27% 50%"></div><i class="lp__b"></i></div><div class="lp__s lp__s--2"><div class="lp__f"><img src="assets/img/fig-pastry.jpg" alt="" loading="lazy" decoding="async" style="object-position:27% 50%"></div><i class="lp__b"></i></div><figcaption class="lp__cap">Fig supreme</figcaption><span class="lp__note lp__note--r" style="--x:44%;--y:66%"><i></i><b>Count the layers on the side</b></span></figure>
-            <figure class="lp__card" data-lp-card><div class="lp__s lp__s--0"><div class="lp__f"><img src="assets/img/plum-danish.jpg" alt="" loading="lazy" decoding="async" style="object-position:46% 50%"></div><i class="lp__b"></i></div><div class="lp__s lp__s--1"><div class="lp__f"><img src="assets/img/plum-danish.jpg" alt="" loading="lazy" decoding="async" style="object-position:46% 50%"></div><i class="lp__b"></i></div><div class="lp__s lp__s--2"><div class="lp__f"><img src="assets/img/plum-danish.jpg" alt="" loading="lazy" decoding="async" style="object-position:46% 50%"></div><i class="lp__b"></i></div><figcaption class="lp__cap">Plum Danish</figcaption><span class="lp__note lp__note--r" style="--x:40%;--y:80%"><i></i><b>Butter sheets lift the rim</b></span></figure>
-            <figure class="lp__card" data-lp-card><div class="lp__s lp__s--0"><div class="lp__f"><img src="assets/img/croissants.jpg" alt="" loading="lazy" decoding="async" style="object-position:50% 50%"></div><i class="lp__b"></i></div><div class="lp__s lp__s--1"><div class="lp__f"><img src="assets/img/croissants.jpg" alt="" loading="lazy" decoding="async" style="object-position:50% 50%"></div><i class="lp__b"></i></div><div class="lp__s lp__s--2"><div class="lp__f"><img src="assets/img/croissants.jpg" alt="" loading="lazy" decoding="async" style="object-position:50% 50%"></div><i class="lp__b"></i></div><figcaption class="lp__cap">Croissants, this morning</figcaption><span class="lp__note lp__note--r" style="--x:50%;--y:60%"><i></i><b>27 layers of butter &amp; dough</b></span></figure>
-        </div>
+          <div class="lx" data-lx>
+            <div class="lx__frame">
+            <figure class="lx__layer" data-lx-layer><img src="assets/img/sam.jpg" alt="" loading="lazy" decoding="async" style="object-position:50% 22%"><figcaption class="lx__cap">Sam at the bench</figcaption><span class="lp__note lp__note--l" style="--x:72%;--y:50%"><i></i><b>Sam: Le Cordon Bleu pâtissier</b></span></figure>
+            <figure class="lx__layer" data-lx-layer><img src="assets/img/fig-pastry.jpg" alt="" loading="lazy" decoding="async" style="object-position:27% 50%"><figcaption class="lx__cap">Fig supreme</figcaption><span class="lp__note lp__note--r" style="--x:20%;--y:70%"><i></i><b>Count the layers on the side</b></span></figure>
+            <figure class="lx__layer" data-lx-layer><img src="assets/img/plum-danish.jpg" alt="" loading="lazy" decoding="async" style="object-position:46% 50%"><figcaption class="lx__cap">Plum Danish</figcaption><span class="lp__note lp__note--r" style="--x:18%;--y:74%"><i></i><b>Butter sheets lift the rim</b></span></figure>
+            <figure class="lx__layer" data-lx-layer><img src="assets/img/croissants.jpg" alt="" loading="lazy" decoding="async" style="object-position:50% 50%"><figcaption class="lx__cap">Croissants, this morning</figcaption><span class="lp__note lp__note--r" style="--x:22%;--y:58%"><i></i><b>27 layers of butter &amp; dough</b></span></figure>
+            </div>
+            <div class="lx__meter" aria-hidden="true"><i class=""></i><i class="is-butter"></i><i class=""></i><i class="is-butter"></i><i class=""></i><i class="is-butter"></i><i class=""></i><i class="is-butter"></i><i class=""></i><i class="is-butter"></i><i class=""></i><i class="is-butter"></i><i class=""></i><i class="is-butter"></i><i class=""></i><i class="is-butter"></i><i class=""></i><i class="is-butter"></i><i class=""></i><i class="is-butter"></i><i class=""></i><i class="is-butter"></i><i class=""></i><i class="is-butter"></i><i class=""></i><i class="is-butter"></i><i class=""></i></div>
+          </div>
         </div>
       </div>
       <div class="lam__progress"><span></span></div>
@@ -567,8 +587,8 @@
 <script src="assets/vendor/gsap.min.js" defer></script>
 <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
 <script src="assets/vendor/lenis.min.js" defer></script>
-<script src="assets/js/data.js?v=202611190601" defer></script>
-<script src="assets/js/site.js?v=202611190601" defer></script>
-<script src="assets/js/motion.js?v=202611190601" defer></script>
+<script src="assets/js/data.js?v=202611190625" defer></script>
+<script src="assets/js/site.js?v=202611190625" defer></script>
+<script src="assets/js/motion.js?v=202611190625" defer></script>
 </body>
 </html>

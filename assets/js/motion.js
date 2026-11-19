@@ -259,40 +259,86 @@
     return tl;
   }
 
+  const cLead = curtain && $(".curtain__lead", curtain);
+  const cMain = curtain && $(".curtain__main", curtain);
+  const cTitle = curtain && $(".curtain__title", curtain);
+  const cLabel = curtain && $(".curtain__label", curtain);
+
   function runIntro() {
     if (loader && firstVisit) {
       try { sessionStorage.setItem("ltc:seen", "1"); } catch (e) { /* ignore */ }
-      const count = $(".loader__count", loader);
+      const count = $(".loader__count b", loader);
+      const flips = $$(".loader__flip img", loader);
       const o = { v: 0 };
+      let shownImg = 0;
       const tl = gsap.timeline();
-      tl.to(".loader__logo", { opacity: 1, y: 0, duration: 1, ease })
-        .to(o, { v: 100, duration: 1.1, ease: "power2.inOut", onUpdate: () => (count.textContent = String(Math.round(o.v)).padStart(3, "0")) }, 0.1)
-        .to(".loader__bar span", { scaleX: 1, duration: 1.1, ease: "power2.inOut" }, 0.1)
-        .to(".loader__inner", { opacity: 0, y: -20, duration: 0.6, ease: "power2.in" }, "+=0.1")
-        .to(loader, { clipPath: "inset(0 0 100% 0)", duration: 1.1, ease: "expo.inOut" }, "-=0.2")
+      tl.from(".loader__row", { y: 24, opacity: 0, duration: 0.9, stagger: 0.1, ease })
+        .to(".loader__flip", { clipPath: "inset(0% 0% 0% 0% round 22px)", duration: 1, ease: "expo.out" }, 0.1)
+        .to(o, {
+          v: 100, duration: 1.9, ease: "power2.inOut",
+          onUpdate: () => {
+            count.textContent = Math.round(o.v);
+            // stop-motion: a new bake every few percent
+            const k = Math.min(flips.length - 1, Math.floor((o.v / 100) * flips.length));
+            if (k !== shownImg) { flips[shownImg].style.opacity = 0; flips[k].style.opacity = 1; shownImg = k; }
+          },
+        }, 0.2)
+        .to(".loader__bar span", { scaleX: 1, duration: 1.9, ease: "power2.inOut" }, 0.2)
+        .to(".loader__flip", { scale: 1.08, opacity: 0, duration: 0.6, ease: "power2.in" }, "+=0.05")
+        .to(".loader__row", { y: -20, opacity: 0, duration: 0.5, stagger: 0.05, ease: "power2.in" }, "<")
+        .to(loader, { yPercent: -100, "--cb": "18vh", duration: 1.1, ease: "expo.inOut" }, "-=0.15")
         .add(() => { loader.classList.add("is-done"); }, ">")
-        .add(heroIn(), "-=0.75");
+        .add(heroIn(), "-=0.7");
     } else {
       if (loader) loader.classList.add("is-done");
-      if (curtain) gsap.fromTo(curtain, { yPercent: 0, visibility: "visible" }, { yPercent: -100, duration: 0.8, ease: "expo.inOut", onComplete: () => gsap.set(curtain, { visibility: "hidden" }) });
-      heroIn().delay(curtain ? 0.25 : 0);
+      if (curtain) {
+        // arriving: the name lifts out, the chocolate curtain rises off the page, then the butter sheet
+        const tl = gsap.timeline({ onComplete: () => { gsap.set(curtain, { visibility: "hidden" }); gsap.set([cLead, cMain], { yPercent: 100, "--ct": "0px", "--cb": "0px" }); } });
+        tl.set(curtain, { visibility: "visible" })
+          .to([cLabel, cTitle], { yPercent: -110, opacity: 0, duration: 0.45, ease: "power3.in", stagger: 0.04 }, 0.05)
+          .to(cMain, { yPercent: -100, "--cb": "16vh", duration: 0.95, ease: "expo.inOut" }, 0.25)
+          .to(cLead, { yPercent: -100, duration: 0.95, ease: "expo.inOut" }, 0.36);
+        heroIn().delay(0.55);
+      } else heroIn();
     }
   }
 
   /* ---------- Page transitions ---------- */
+  const pageNames = { "": "Home", "index.html": "Home", "classes.html": "Classes & Events", "private.html": "Private Lessons", "bakery.html": "Bakery", "gift.html": "Gift Vouchers", "about.html": "About Sam", "contact.html": "Contact", "for-sam.html": "For Sam" };
+  const nameFor = (url) => {
+    const file = url.pathname.split("/").pop();
+    if (file === "class.html") {
+      const id = url.searchParams.get("c");
+      const c = window.LTC_DATA && window.LTC_DATA.courses.find((x) => x.id === id);
+      return c ? c.title : "The class";
+    }
+    return pageNames[file] || "Love to Cook";
+  };
+  let leaving = false;
   document.addEventListener("click", (e) => {
     const a = e.target.closest("a[href]");
-    if (!a || !curtain || e.defaultPrevented) return;
+    if (!a || !curtain || e.defaultPrevented || leaving) return;
     const href = a.getAttribute("href");
     if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:") || a.target === "_blank" || a.hasAttribute("download") || e.metaKey || e.ctrlKey || e.shiftKey) return;
     const url = new URL(a.href, location.href);
     if (url.origin !== location.origin) return;
     if (url.pathname === location.pathname && url.search === location.search && url.hash) return;
     e.preventDefault();
-    gsap.set(curtain, { yPercent: 100, visibility: "visible" });
-    gsap.to(curtain, { yPercent: 0, duration: 0.45, ease: "power3.in", onComplete: () => (location.href = url.href) });
+    leaving = true;
+    const name = nameFor(url);
+    try { sessionStorage.setItem("ltc:to", name); } catch (err) { /* ignore */ }
+    cTitle.textContent = name;
+    gsap.timeline({ onComplete: () => (location.href = url.href) })
+      .set(curtain, { visibility: "visible" })
+      .set([cLabel, cTitle], { yPercent: 110, opacity: 1 })
+      .fromTo(cLead, { yPercent: 100 }, { yPercent: 0, duration: 0.6, ease: "expo.inOut" }, 0)
+      .fromTo(cMain, { yPercent: 100, "--ct": "16vh" }, { yPercent: 0, "--ct": "0vh", duration: 0.7, ease: "expo.inOut" }, 0.08)
+      .to([cLabel, cTitle], { yPercent: 0, duration: 0.5, ease: "expo.out", stagger: 0.05 }, 0.42)
+      .to({}, { duration: 0.12 });
   });
-  window.addEventListener("pageshow", (e) => { if (e.persisted && curtain) gsap.set(curtain, { yPercent: 100, visibility: "hidden" }); });
+  window.addEventListener("pageshow", (e) => {
+    if (e.persisted && curtain) { leaving = false; gsap.set(curtain, { visibility: "hidden" }); gsap.set([cLead, cMain], { yPercent: 100 }); }
+  });
 
   /* ---------- Reveals ---------- */
   function reveals() {
@@ -377,29 +423,34 @@
     });
   }
 
-  /* ---------- Lamination: Sam's real photos fold in thirds like dough, 3 → 9 → 27 ---------- */
+  /* ---------- Lamination: Sam's photos laid one over another like sheets of pastry, 3 → 9 → 27 ---------- */
   function lamination() {
     const sec = $("[data-lam]");
     if (!sec) return;
-    const cards = $$("[data-lp-card]", sec);
+    const layers = $$("[data-lx-layer]", sec);
+    const imgs = layers.map((l) => $("img", l));
+    const notes = layers.map((l) => $(".lp__note", l));
+    const meter = $$(".lx__meter i", sec);
     const count = $("[data-lam-count]", sec);
     const steps = $$(".lam__step", sec);
     const dots = $$(".lam__dots i", sec);
     const bar = $(".lam__progress span", sec);
-    const strips = cards.map((c) => $$(".lp__s", c));
-    const notes = cards.map((c) => $(".lp__note", c));
-    const caps = cards.map((c) => $(".lp__cap", c));
-    // the deck: cards further down sit back and lower, the top card is tilted towards the copy
-    const rest = (k) => ({ x: 0, yPercent: -50 + k * 3.2, z: -k * 70, rotationY: -14 + k * 2, rotationX: 4, rotationZ: k * 1.6, scale: 1 - k * 0.045 });
-    cards.forEach((c, k) => gsap.set(c, { ...rest(k), zIndex: cards.length - k, transformPerspective: 0 }));
+    let shown = -1, lastStep = -1;
+    const setCount = (v) => {
+      const n = Math.round(v);
+      if (n === shown) return;
+      shown = n;
+      count.textContent = n;
+      meter.forEach((m, i) => m.classList.toggle("is-on", i < n));
+    };
+    setCount(3);
     gsap.set(notes[0], { opacity: 1 });
     const cnt = { v: 3 };
-    let lastStep = -1;
     const Dur = 10;
     const tl = gsap.timeline({
       defaults: { ease: "power2.inOut" },
       scrollTrigger: {
-        trigger: sec, start: "top top", end: () => "+=" + window.innerHeight * 2.8, pin: true, scrub: 0.5, anticipatePin: 1, invalidateOnRefresh: true,
+        trigger: sec, start: "top top", end: () => "+=" + window.innerHeight * 2.6, pin: true, scrub: 0.5, anticipatePin: 1, invalidateOnRefresh: true,
         onUpdate: (self) => {
           if (bar) gsap.set(bar, { scaleX: self.progress });
           const t = self.progress * Dur;
@@ -412,34 +463,20 @@
         },
       },
     });
-    const advance = (from, at) => {
-      for (let k = from; k < cards.length; k++) tl.to(cards[k], { ...rest(k - from), duration: 0.7 }, at);
+    // a new sheet is laid over the last: it wipes up from the bottom while the one beneath settles back
+    const lay = (i, at) => {
+      tl.to(notes[i - 1], { opacity: 0, duration: 0.25 }, at)
+        .fromTo(layers[i], { clipPath: "inset(100% 0% 0% 0% round 26px)" }, { clipPath: "inset(0% 0% 0% 0% round 26px)", duration: 1.1, ease: "power3.inOut" }, at + 0.1)
+        .fromTo(imgs[i], { scale: 1.25, yPercent: 8 }, { scale: 1, yPercent: 0, duration: 1.3, ease: "power3.out" }, at + 0.1)
+        .to(imgs[i - 1], { scale: 0.92, duration: 1.1 }, at + 0.1)
+        .to(layers[i - 1], { "--dim": 0.55, duration: 1.1 }, at + 0.1)
+        .to(notes[i], { opacity: 1, duration: 0.3 }, at + 1.2);
     };
-    // letter fold: left third over the middle, right third over the top, then the folded strip lifts away
-    const fold = (i, at) => {
-      const [L, , R] = strips[i];
-      tl.to([notes[i], caps[i]], { opacity: 0, duration: 0.2 }, at)
-        .fromTo(L, { z: 1, rotationY: 0 }, { z: 1, rotationY: 180, duration: 0.6 }, at + 0.1)
-        .fromTo(R, { z: 2, rotationY: 0 }, { z: 2, rotationY: -180, duration: 0.6 }, at + 0.7)
-        .to(cards[i], { yPercent: -150, z: 160, rotationX: 28, rotationZ: -10, duration: 0.6, ease: "power2.in" }, at + 1.35)
-        .set(cards[i], { visibility: "hidden" }, at + 1.95);
-      advance(i + 1, at + 1.45);
-    };
-    // rest & roll: the card rolls back and away
-    const rollAway = (i, at) => {
-      tl.to([notes[i], caps[i]], { opacity: 0, duration: 0.2 }, at)
-        .to(cards[i], { transformOrigin: "50% 100%", rotationX: -95, yPercent: -20, z: -120, duration: 0.8, ease: "power2.in" }, at + 0.1)
-        .set(cards[i], { visibility: "hidden" }, at + 0.9);
-      advance(i + 1, at + 0.4);
-    };
-    fold(0, 1.45);
-    tl.to(cnt, { v: 9, duration: 0.9, onUpdate: () => (count.textContent = Math.round(cnt.v)) }, 2.0)
-      .to(notes[1], { opacity: 1, duration: 0.3 }, 3.3);
-    rollAway(1, 4.65);
-    tl.to(notes[2], { opacity: 1, duration: 0.3 }, 5.6);
-    fold(2, 6.65);
-    tl.to(cnt, { v: 27, duration: 0.9, onUpdate: () => (count.textContent = Math.round(cnt.v)) }, 7.2)
-      .to(notes[3], { opacity: 1, duration: 0.3 }, 8.4)
+    lay(1, 1.45);
+    tl.to(cnt, { v: 9, duration: 0.9, onUpdate: () => setCount(cnt.v) }, 1.7);
+    lay(2, 4.65);
+    lay(3, 6.65);
+    tl.to(cnt, { v: 27, duration: 1.0, onUpdate: () => setCount(cnt.v) }, 6.9)
       .set({}, {}, Dur);
   }
 

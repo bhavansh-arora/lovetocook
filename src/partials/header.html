@@ -35,15 +35,32 @@
 </svg>
 
 <div class="loader" aria-hidden="true">
-  <div class="loader__inner">
-    <img class="loader__logo" src="assets/img/logo-cream.png" alt="" width="220" height="145">
-    <div class="loader__bar"><span></span></div>
-    <span class="loader__count">000</span>
+  <div class="loader__row">
+    <img class="loader__logo" src="assets/img/logo-cream.png" alt="" width="132" height="87">
+    <span class="loader__word">Cook School · Bakery · Pâtisserie<br>16 King Street, Crieff</span>
   </div>
-  <span class="loader__word">Cook School · Bakery · Pâtisserie</span>
-  <span class="loader__word loader__word--r">Crieff, Scotland</span>
+  <div class="loader__flip"><img src="assets/img/m/croissants.jpg" alt=""><img src="assets/img/m/fig-pastry.jpg" alt=""><img src="assets/img/m/sourdough.jpg" alt=""><img src="assets/img/m/fruit-danish.jpg" alt=""><img src="assets/img/m/chocolate-tart.jpg" alt=""><img src="assets/img/m/almond-croissant.jpg" alt=""><img src="assets/img/m/focaccia.jpg" alt=""><img src="assets/img/m/plum-danish.jpg" alt=""></div>
+  <div class="loader__row loader__row--end">
+    <p class="loader__line"><span>Made by hand,</span><span><em>shared</em> with love.</span></p>
+    <span class="loader__count"><b>0</b><small>%</small></span>
+  </div>
+  <div class="loader__bar"><span></span></div>
 </div>
-<div class="curtain" aria-hidden="true"></div>
+<div class="curtain" aria-hidden="true">
+  <div class="curtain__lead"></div>
+  <div class="curtain__main">
+    <span class="curtain__label">Love to Cook</span>
+    <span class="curtain__mask"><span class="curtain__title" data-curtain-title></span></span>
+  </div>
+</div>
+<script>
+  (function () {
+    try {
+      var t = sessionStorage.getItem("ltc:to"), el = document.querySelector("[data-curtain-title]");
+      if (el) el.textContent = t || document.title.split("|")[0].trim();
+    } catch (e) {}
+  })();
+</script>
 <div class="cursor" aria-hidden="true"><div class="cursor__dot"></div><div class="cursor__label"></div></div>
 
 <header class="header" id="top">
