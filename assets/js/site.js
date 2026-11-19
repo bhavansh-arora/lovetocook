@@ -10,6 +10,7 @@
   const B = D.business;
   const $ = (s, c = document) => c.querySelector(s);
   const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
+  const sm = (u) => (u && /^assets\/img\/[^/]+\.jpg$/.test(u) ? u.replace("assets/img/", "assets/img/m/") : u);
   const TODAY = new Date();
   TODAY.setHours(0, 0, 0, 0);
 
@@ -105,7 +106,7 @@
       .map((i, idx) => {
         const l = bagLine(i);
         if (!l) return "";
-        const img = l.voucher ? `<div class="bag-item__img bag-item__img--voucher">${money(l.amount)}</div>` : `<img class="bag-item__img" src="${l.img}" alt="">`;
+        const img = l.voucher ? `<div class="bag-item__img bag-item__img--voucher">${money(l.amount)}</div>` : `<img class="bag-item__img" src="${sm(l.img)}" alt="">`;
         return `<div class="bag-item">${img}<div><b>${esc(l.title)}</b><small>${esc(l.sub)}</small>
           <div class="stepper" role="group" aria-label="Quantity"><button type="button" data-bag-dec="${idx}" aria-label="Fewer">−</button><output>${i.qty}</output><button type="button" data-bag-inc="${idx}" ${i.qty >= l.max ? "disabled" : ""} aria-label="More">+</button></div></div>
           <div class="bag-item__price">${money(l.price * i.qty)}<button type="button" class="bag-item__rm" data-bag-rm="${idx}">Remove</button></div></div>`;
@@ -178,26 +179,31 @@
   });
   $$(".mmenu a").forEach((a) => a.addEventListener("click", closeMenu));
 
-  let lastY = 0;
-  function onScroll() {
+  // Header state: all layout reads first, then class writes, at most once per frame
+  let lastY = 0, ticking = false;
+  const darkSecs = $$("[data-header-dark]");
+  const mbar = $(".mbar"), footer = $(".footer");
+  const nearFooter = () => footer && footer.getBoundingClientRect().top < window.innerHeight;
+  const setCls = (el, c, on) => { if (el && el.classList.contains(c) !== on) el.classList.toggle(c, on); };
+  function update() {
+    ticking = false;
     const y = window.scrollY;
-    header.classList.toggle("is-scrolled", y > 24);
-    const hide = y > 400 && y > lastY && !document.body.classList.contains("menu-open");
-    header.classList.toggle("is-hidden", hide);
-    document.body.classList.toggle("header-hidden", hide);
-    lastY = y;
-    // theme switch on dark sections under header
     const probe = header.offsetHeight / 2;
     let dark = false;
-    for (const s of $$("[data-header-dark]")) {
+    for (const s of darkSecs) {
       const r = s.getBoundingClientRect();
       if (r.top <= probe && r.bottom >= probe) { dark = true; break; }
     }
-    header.classList.toggle("is-dark", dark);
-    const mbar = $(".mbar");
-    if (mbar) mbar.classList.toggle("is-on", y > window.innerHeight * 0.6 && !nearFooter());
+    const mbarOn = !!mbar && y > window.innerHeight * 0.6 && !nearFooter();
+    const hide = y > 400 && y > lastY && !document.body.classList.contains("menu-open");
+    lastY = y;
+    setCls(header, "is-scrolled", y > 24);
+    setCls(header, "is-hidden", hide);
+    setCls(document.body, "header-hidden", hide);
+    setCls(header, "is-dark", dark);
+    setCls(mbar, "is-on", mbarOn);
   }
-  const nearFooter = () => { const f = $(".footer"); return f && f.getBoundingClientRect().top < window.innerHeight; };
+  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
   window.addEventListener("scroll", onScroll, { passive: true });
 
   /* ---------- Next class pill & mobile bar ---------- */
@@ -252,11 +258,11 @@
     if (!card) return { show() {} };
     const el = (k) => $(`[data-upv-${k}]`, card);
     const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    D.courses.forEach((c) => { const i = new Image(); i.src = c.image; });
+    D.courses.forEach((c) => { const i = new Image(); i.src = sm(c.image); });
     let current = null, busy = false, queued = null;
     const fill = (s) => {
       const img = el("img");
-      img.src = s.course.image;
+      img.src = sm(s.course.image);
       img.style.objectPosition = s.course.imagePos || "center";
       el("day").textContent = String(s.d.getDate()).padStart(2, "0");
       el("mon").textContent = `${monShort(s.d)} · ${dayShort(s.d)}`;
@@ -290,7 +296,7 @@
     const more = others.length ? `<div class="ccard__dates"><span class="label">More dates</span>${others.slice(0, 4).map((o) => `<a href="class.html?c=${c.id}&s=${o.id}" class="${seatsLeft(o) ? "" : "is-full"}" title="${seatsLeft(o) ? seatsLeft(o) + " seats left" : "Sold out"}">${o.d.getDate()} ${monShort(o.d)}</a>`).join("")}</div>` : "";
     const flag = left === 0 ? `<span class="tag tag--dark">Sold out</span>` : left <= 2 ? `<span class="tag tag--hot">Almost full</span>` : c.level === "Beginner" ? `<span class="tag">Beginner friendly</span>` : "";
     return `<article class="ccard">
-      <div class="ccard__media"><img src="${c.image}" alt="${esc(c.title)}" loading="lazy" style="object-position:${c.imagePos || "center"}">
+      <div class="ccard__media"><img src="${sm(c.image)}" alt="${esc(c.title)}" loading="lazy" decoding="async" style="object-position:${c.imagePos || "center"}">
         <span class="ccard__date"><b>${s.d.getDate()}</b><small>${monShort(s.d)} · ${dayShort(s.d)}</small></span>
         <span class="ccard__flags">${flag}</span></div>
       <div class="ccard__body"><span class="label ccard__cat">${catLabel(c.category)} · ${c.level}</span>
@@ -363,7 +369,7 @@
         cells += ev ? `<button type="button" class="${cls}" data-day="${d}" aria-label="${longDate(date)}, ${ev.length} class${ev.length > 1 ? "es" : ""}">${d}${dots}</button>` : `<div class="${cls}">${d}</div>`;
       }
       const side = selected && byDay[selected.getDate()]
-        ? `<h4>${longDate(selected)}</h4>` + byDay[selected.getDate()].map((s) => `<div class="cal__item"><img src="${s.course.image}" alt="" style="object-position:${s.course.imagePos || "center"}"><div><b>${esc(s.course.title)}</b><small>${s.start}–${s.end} · ${money(s.course.price)} pp</small>${seatsHTML(s, s.course.capacity)}<div class="btn-row" style="margin-top:12px">${seatsLeft(s) ? `<button class="btn btn--sm" type="button" data-quick-book="${s.id}">Book ${arrowIcon()}</button>` : `<button class="btn btn--sm btn--ghost" type="button" data-waitlist="${s.id}">Waitlist ${arrowIcon()}</button>`}<a class="link" href="class.html?c=${s.course.id}&s=${s.id}">Details</a></div></div></div>`).join("")
+        ? `<h4>${longDate(selected)}</h4>` + byDay[selected.getDate()].map((s) => `<div class="cal__item"><img src="${sm(s.course.image)}" loading="lazy" alt="" style="object-position:${s.course.imagePos || "center"}"><div><b>${esc(s.course.title)}</b><small>${s.start}–${s.end} · ${money(s.course.price)} pp</small>${seatsHTML(s, s.course.capacity)}<div class="btn-row" style="margin-top:12px">${seatsLeft(s) ? `<button class="btn btn--sm" type="button" data-quick-book="${s.id}">Book ${arrowIcon()}</button>` : `<button class="btn btn--sm btn--ghost" type="button" data-waitlist="${s.id}">Waitlist ${arrowIcon()}</button>`}<a class="link" href="class.html?c=${s.course.id}&s=${s.id}">Details</a></div></div></div>`).join("")
         : `<h4>${fmt(month, { month: "long" })}</h4><p class="muted">No classes this month in this category. Try the next month, or <a class="link" href="private.html">book a private lesson</a>.</p>`;
       calWrap.innerHTML = `<div class="cal"><div><div class="cal__head"><h3>${fmt(month, { month: "long", year: "numeric" })}</h3><div class="cal__nav"><button class="icon-btn" type="button" data-cal-nav="-1" aria-label="Previous month">${icon("arrow")}</button><button class="icon-btn" type="button" data-cal-nav="1" aria-label="Next month">${icon("arrow")}</button></div></div>
         <div class="cal__grid">${cells}</div>
@@ -544,7 +550,7 @@
     let cat = "all";
     const draw = () => {
       grid.innerHTML = D.bakes.filter((b) => cat === "all" || b.cat === cat).map((b) => `<article class="bake" data-bake="${b.id}">
-        <div class="bake__media"><img src="${b.img}" alt="${esc(b.name)}" loading="lazy"><span class="tag">${b.cat}</span><div class="bake__add" data-bake-ctrl="${b.id}"></div></div>
+        <div class="bake__media"><img src="${sm(b.img)}" alt="${esc(b.name)}" loading="lazy" decoding="async"><span class="tag">${b.cat}</span><div class="bake__add" data-bake-ctrl="${b.id}"></div></div>
         <div class="bake__body"><div><h3>${esc(b.name)}</h3><p>${esc(b.note)}</p></div><span class="bake__price">${money(b.price)}</span></div></article>`).join("");
       renderBakeryQty();
       window.ScrollTrigger && ScrollTrigger.refresh();

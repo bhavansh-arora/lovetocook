@@ -16,7 +16,7 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const onScreen = (el, cb) => {
     if (!("IntersectionObserver" in window)) return cb(true);
-    new IntersectionObserver(([e]) => cb(e.isIntersecting), { rootMargin: "100px" }).observe(el);
+    new IntersectionObserver(([e]) => cb(e.isIntersecting), { rootMargin: "300px 0px" }).observe(el);
   };
 
   /* ---------- 3D bake carousel (plain JS: works with or without GSAP) ---------- */
@@ -55,11 +55,17 @@
     window.addEventListener("pointercancel", end);
     // a drag is not a click
     root.addEventListener("click", (e) => { if (moved > 6) { e.preventDefault(); e.stopPropagation(); } }, true);
-    window.addEventListener("scroll", () => { const d = window.scrollY - lastScroll; lastScroll = window.scrollY; if (!reduce) vel += clamp(d, -60, 60) * -0.012; }, { passive: true });
-    onScreen(root, (v) => (visible = v));
+    window.addEventListener("scroll", () => { if (!visible) { lastScroll = window.scrollY; return; } const d = window.scrollY - lastScroll; lastScroll = window.scrollY; if (!reduce) vel += clamp(d, -60, 60) * -0.012; }, { passive: true });
+    let raf = 0;
+    const lastShade = new Array(N).fill(-1);
+    const wake = () => { if (!raf && visible && !document.hidden) raf = requestAnimationFrame(frame); };
+    onScreen(root, (v) => { visible = v; root.classList.toggle("is-offscreen", !v); wake(); });
+    document.addEventListener("visibilitychange", wake);
 
     const frame = () => {
-      if (visible) {
+      raf = 0;
+      if (!visible || document.hidden) return;
+      {
         if (!dragging) { vel += (auto - vel) * 0.035; rot += vel; }
         cur.x += (target.x - cur.x) * 0.06;
         cur.y += (target.y - cur.y) * 0.06;
@@ -68,7 +74,8 @@
         let best = 0, bestCos = -2;
         for (let i = 0; i < N; i++) {
           const cs = Math.cos(((i * step + rot) * Math.PI) / 180);
-          cards[i].style.setProperty("--shade", (((1 - cs) / 2) * 0.66).toFixed(3));
+          const sh = Math.round(((1 - cs) / 2) * 66) / 100;
+          if (sh !== lastShade[i]) { lastShade[i] = sh; cards[i].style.setProperty("--shade", sh); }
           if (cs > bestCos) { bestCos = cs; best = i; }
         }
         if (best !== front) {
@@ -77,9 +84,9 @@
           if (idx) idx.textContent = String(best + 1).padStart(2, "0") + " / " + String(N).padStart(2, "0");
         }
       }
-      requestAnimationFrame(frame);
+      wake();
     };
-    requestAnimationFrame(frame);
+    wake();
   }
 
   /* ---------- Flour dust: drifting particles that part around the pointer ---------- */
@@ -91,22 +98,27 @@
     const P = [];
     let w = 0, h = 0, mx = -999, my = -999, visible = true;
     const size = () => {
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const dpr = 1;
       w = host.offsetWidth; h = host.offsetHeight;
       cv.width = w * dpr; cv.height = h * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     size();
     window.addEventListener("resize", size);
-    const n = window.innerWidth < 700 ? 36 : 90;
+    const n = window.innerWidth < 700 ? 28 : 64;
     for (let i = 0; i < n; i++) {
       P.push({ x: Math.random() * w, y: Math.random() * h, r: 0.6 + Math.random() * 2.2, vx: (Math.random() - 0.5) * 0.14, vy: 0.06 + Math.random() * 0.22, ph: Math.random() * 6.28, a: 0.12 + Math.random() * 0.34, c: Math.random() < 0.72 ? "196,122,44" : "71,31,0" });
     }
     host.addEventListener("pointermove", (e) => { const r = host.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
     host.addEventListener("pointerleave", () => { mx = my = -999; });
-    onScreen(host, (v) => (visible = v));
+    let raf = 0;
+    const wake = () => { if (!raf && visible && !document.hidden) raf = requestAnimationFrame(tick); };
+    onScreen(host, (v) => { visible = v; wake(); });
+    document.addEventListener("visibilitychange", wake);
     const tick = () => {
-      if (visible) {
+      raf = 0;
+      if (!visible || document.hidden) return;
+      {
         ctx.clearRect(0, 0, w, h);
         for (const p of P) {
           p.ph += 0.01;
@@ -123,9 +135,9 @@
           ctx.fill();
         }
       }
-      requestAnimationFrame(tick);
+      wake();
     };
-    requestAnimationFrame(tick);
+    wake();
   }
 
   ring3d();
@@ -145,7 +157,7 @@
   /* ---------- Smooth scroll ---------- */
   let lenis = null;
   if (typeof window.Lenis !== "undefined" && finePointer) {
-    lenis = new Lenis({ duration: 1.15, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true });
+    lenis = new Lenis({ lerp: 0.14, smoothWheel: true, wheelMultiplier: 1 });
     window.__lenis = lenis;
     lenis.on("scroll", ScrollTrigger.update);
     gsap.ticker.add((t) => lenis.raf(t * 1000));
@@ -215,7 +227,7 @@
     return $$(".split-line > span", el);
   }
   // lines flip up out of the baseline in 3D
-  const lineIn = { yPercent: 120, rotationX: -78, opacity: 0, duration: 1.4, stagger: 0.09 };
+  const lineIn = { yPercent: 120, rotationX: -78, opacity: 0, duration: 1.4, stagger: 0.09, transformPerspective: 900, clearProps: "transform,opacity" };
 
   /* ---------- Intro / preloader ---------- */
   const loader = $(".loader");
@@ -244,15 +256,15 @@
       const o = { v: 0 };
       const tl = gsap.timeline();
       tl.to(".loader__logo", { opacity: 1, y: 0, duration: 1, ease })
-        .to(o, { v: 100, duration: 1.6, ease: "power2.inOut", onUpdate: () => (count.textContent = String(Math.round(o.v)).padStart(3, "0")) }, 0.1)
-        .to(".loader__bar span", { scaleX: 1, duration: 1.6, ease: "power2.inOut" }, 0.1)
+        .to(o, { v: 100, duration: 1.1, ease: "power2.inOut", onUpdate: () => (count.textContent = String(Math.round(o.v)).padStart(3, "0")) }, 0.1)
+        .to(".loader__bar span", { scaleX: 1, duration: 1.1, ease: "power2.inOut" }, 0.1)
         .to(".loader__inner", { opacity: 0, y: -20, duration: 0.6, ease: "power2.in" }, "+=0.1")
         .to(loader, { clipPath: "inset(0 0 100% 0)", duration: 1.1, ease: "expo.inOut" }, "-=0.2")
         .add(() => { loader.classList.add("is-done"); }, ">")
         .add(heroIn(), "-=0.75");
     } else {
       if (loader) loader.classList.add("is-done");
-      if (curtain) gsap.fromTo(curtain, { yPercent: 0, visibility: "visible" }, { yPercent: -100, duration: 1, ease: "expo.inOut", onComplete: () => gsap.set(curtain, { visibility: "hidden" }) });
+      if (curtain) gsap.fromTo(curtain, { yPercent: 0, visibility: "visible" }, { yPercent: -100, duration: 0.8, ease: "expo.inOut", onComplete: () => gsap.set(curtain, { visibility: "hidden" }) });
       heroIn().delay(curtain ? 0.25 : 0);
     }
   }
@@ -268,25 +280,26 @@
     if (url.pathname === location.pathname && url.search === location.search && url.hash) return;
     e.preventDefault();
     gsap.set(curtain, { yPercent: 100, visibility: "visible" });
-    gsap.to(curtain, { yPercent: 0, duration: 0.7, ease: "expo.inOut", onComplete: () => (location.href = url.href) });
+    gsap.to(curtain, { yPercent: 0, duration: 0.45, ease: "power3.in", onComplete: () => (location.href = url.href) });
   });
   window.addEventListener("pageshow", (e) => { if (e.persisted && curtain) gsap.set(curtain, { yPercent: 100, visibility: "hidden" }); });
 
   /* ---------- Reveals ---------- */
   function reveals() {
     $$("[data-split]").forEach((el) => {
-      gsap.from(splitLines(el), { ...lineIn, duration: 1.3, ease, scrollTrigger: { trigger: el, start: "top 88%" } });
+      gsap.from(splitLines(el), { ...lineIn, duration: 1.3, ease, scrollTrigger: { trigger: el, start: "top 88%", once: true } });
     });
     // content rises and tips forward into place
     gsap.set("[data-reveal]", { y: 56, rotationX: 14, transformPerspective: 1200, transformOrigin: "50% 0%" });
     ScrollTrigger.batch("[data-reveal]", {
       start: "top 92%",
+      once: true,
       onEnter: (els) => gsap.to(els, { opacity: 1, y: 0, rotationX: 0, duration: 1.3, ease, stagger: 0.08, overwrite: "auto", clearProps: "transform" }),
     });
     $$("[data-reveal-img]").forEach((el) => {
       const img = $("img", el);
-      gsap.fromTo(el, { clipPath: "inset(14% 8% 14% 8% round 32px)" }, { clipPath: "inset(0% 0% 0% 0% round 32px)", duration: 1.6, ease: "expo.out", scrollTrigger: { trigger: el, start: "top 88%" }, clearProps: "clipPath" });
-      if (img) gsap.fromTo(img, { scale: 1.18 }, { scale: 1, duration: 1.8, ease: "expo.out", scrollTrigger: { trigger: el, start: "top 88%" } });
+      gsap.fromTo(el, { clipPath: "inset(14% 8% 14% 8% round 32px)" }, { clipPath: "inset(0% 0% 0% 0% round 32px)", duration: 1.6, ease: "expo.out", scrollTrigger: { trigger: el, start: "top 88%", once: true }, clearProps: "clipPath" });
+      if (img) gsap.fromTo(img, { scale: 1.18 }, { scale: 1, duration: 1.8, ease: "expo.out", clearProps: "transform", scrollTrigger: { trigger: el, start: "top 88%", once: true } });
     });
     $$("[data-parallax]").forEach((el) => {
       const amt = parseFloat(el.dataset.parallax) || 12;
@@ -295,7 +308,7 @@
     $$("[data-count]").forEach((el) => {
       const end = parseFloat(el.dataset.count);
       const o = { v: 0 };
-      gsap.to(o, { v: end, duration: 2, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 90%" }, onUpdate: () => (el.textContent = Math.round(o.v) + (el.dataset.suffix || "")) });
+      gsap.to(o, { v: end, duration: 2, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 90%", once: true }, onUpdate: () => (el.textContent = Math.round(o.v) + (el.dataset.suffix || "")) });
     });
     $$("[data-float]").forEach((el, k) => {
       gsap.to(el, { y: k % 2 ? -60 : 60, rotate: k % 2 ? 6 : -6, rotationY: k % 2 ? 18 : -18, ease: "none", scrollTrigger: { trigger: el.closest("section"), start: "top bottom", end: "bottom top", scrub: true } });
@@ -329,27 +342,27 @@
     });
   }
 
-  /* ---------- Marquee: speeds up and leans with scroll velocity ---------- */
+  /* ---------- Marquee: speeds up with scroll velocity ---------- */
   function marquees() {
     $$("[data-marquee]").forEach((m) => {
       const track = $(".marquee__track", m);
       const group = $(".marquee__group", track);
       track.appendChild(group.cloneNode(true)).setAttribute("aria-hidden", "true");
       const dir = m.dataset.marquee === "right" ? 1 : -1;
-      let x = 0, speed = 1, skew = 0, skewTo = 0, w = group.offsetWidth;
+      let x = 0, speed = 1, w = group.offsetWidth, on = true;
+      onScreen(m, (v) => (on = v));
       window.addEventListener("resize", () => (w = group.offsetWidth));
       ScrollTrigger.create({
         trigger: m, start: "top bottom", end: "bottom top",
-        onUpdate: (self) => { const v = self.getVelocity(); speed = 1 + Math.min(6, Math.abs(v / 300)); skewTo = clamp(v / -180, -9, 9); },
+        onUpdate: (self) => { const v = self.getVelocity(); speed = 1 + Math.min(6, Math.abs(v / 300)); },
       });
       gsap.ticker.add((t, dt) => {
+        if (!on) return;
         x += dir * 0.06 * speed * dt;
         speed += (1 - speed) * 0.05;
-        skewTo *= 0.92;
-        skew += (skewTo - skew) * 0.12;
         if (x <= -w) x += w;
         if (x > 0) x -= w;
-        track.style.transform = `translate3d(${x}px,0,0) skewX(${skew.toFixed(2)}deg)`;
+        track.style.transform = `translate3d(${x.toFixed(1)}px,0,0)`;
       });
     });
   }
@@ -367,21 +380,28 @@
     const photo = $(".lam__photo", sec);
     const st = { n: 3, ex: 0, rz: -40, rx: 58 };
     let S = sheets[0].offsetWidth;
-    window.addEventListener("resize", () => (S = sheets[0].offsetWidth));
-    let lastN = -1, lastStep = -1;
+    window.addEventListener("resize", () => (S = sheets[0].offsetWidth || S));
+    let lastN = -1, lastStep = -1, lastT = "", lastStack = "";
+    const prev = sheets.map(() => ({ o: "", z: "", v: "" }));
+    onScreen(sec, (v) => sec.classList.toggle("is-offscreen", !v));
     const render = () => {
       const n = st.n, thick = S * 0.34, gap = thick / Math.max(1, n - 1), spread = 1 + st.ex * 1.9;
       const t = Math.max(2, gap * 0.92);
+      const ts = t.toFixed(1) + "px";
+      if (ts !== lastT) { lastT = ts; stack.style.setProperty("--t", ts); }
       for (let i = 0; i < sheets.length; i++) {
         const vis = clamp(n - i, 0, 1);
-        const z = Math.min(i, n - 1) * gap * spread - thick * 0.5 - t * 0.5;
-        const el = sheets[i];
-        el.style.setProperty("--o", vis.toFixed(3));
-        el.style.setProperty("--t", t.toFixed(2) + "px");
-        el.style.transform = `translateZ(${z.toFixed(1)}px)`;
-        el.style.visibility = vis > 0.01 ? "visible" : "hidden";
+        const el = sheets[i], pv = prev[i];
+        const v = vis > 0.01 ? "visible" : "hidden";
+        if (v !== pv.v) { pv.v = v; el.style.visibility = v; }
+        if (v === "hidden") continue;
+        const o = vis.toFixed(2);
+        if (o !== pv.o) { pv.o = o; el.style.setProperty("--o", o); }
+        const z = (Math.min(i, n - 1) * gap * spread - thick * 0.5 - t * 0.5).toFixed(1);
+        if (z !== pv.z) { pv.z = z; el.style.transform = `translateZ(${z}px)`; }
       }
-      stack.style.transform = `rotateX(${st.rx}deg) rotateZ(${st.rz}deg)`;
+      const sk = `rotateX(${st.rx.toFixed(2)}deg) rotateZ(${st.rz.toFixed(2)}deg)`;
+      if (sk !== lastStack) { lastStack = sk; stack.style.transform = sk; }
       const shown = Math.round(n);
       if (shown !== lastN) { lastN = shown; count.textContent = shown; }
     };
@@ -391,7 +411,7 @@
       defaults: { ease: "none" },
       onUpdate: render,
       scrollTrigger: {
-        trigger: sec, start: "top top", end: () => "+=" + window.innerHeight * 3.2, pin: true, scrub: 0.7, anticipatePin: 1, invalidateOnRefresh: true,
+        trigger: sec, start: "top top", end: () => "+=" + window.innerHeight * 2.6, pin: true, scrub: 0.4, anticipatePin: 1, invalidateOnRefresh: true,
         onUpdate: (self) => {
           if (bar) gsap.set(bar, { scaleX: self.progress });
           const t = self.progress * D;
@@ -420,10 +440,19 @@
     const track = $(".hgal__track", sec);
     const bar = $(".hgal__progress span", sec);
     const items = $$(".hgal__item", sec);
+    let geo = [], baseLeft = 0;
+    const measure = () => {
+      const tx = gsap.getProperty(track, "x") || 0;
+      baseLeft = track.getBoundingClientRect().left - tx;
+      geo = items.map((it) => it.offsetLeft + it.offsetWidth / 2);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    window.addEventListener("load", measure);
     const curve = (scrollLeft = 0) => {
-      const vw = window.innerWidth, left = track.getBoundingClientRect().left;
-      items.forEach((it) => {
-        const cx = left + it.offsetLeft - scrollLeft + it.offsetWidth / 2;
+      const vw = window.innerWidth, left = baseLeft + (gsap.getProperty(track, "x") || 0);
+      items.forEach((it, k) => {
+        const cx = left + geo[k] - scrollLeft;
         const d = clamp((cx - vw / 2) / (vw / 2), -1.4, 1.4);
         it.style.transform = `translateZ(${(-Math.abs(d) * 150).toFixed(1)}px) rotateY(${(-d * 24).toFixed(2)}deg)`;
       });
@@ -434,9 +463,9 @@
       gsap.to(track, {
         x: () => -dist(), ease: "none",
         scrollTrigger: {
-          trigger: sec, start: "top top", end: () => "+=" + dist(), pin: true, scrub: 0.8, invalidateOnRefresh: true, anticipatePin: 1,
+          trigger: sec, start: "top top", end: () => "+=" + dist(), pin: true, scrub: 0.4, invalidateOnRefresh: true, anticipatePin: 1,
           onUpdate: (s) => { if (bar) gsap.set(bar, { scaleX: s.progress }); curve(); },
-          onRefresh: () => curve(),
+          onRefresh: () => { measure(); curve(); },
         },
       });
       curve();
@@ -470,19 +499,30 @@
       const g = document.createElement("span");
       g.className = "glare";
       el.appendChild(g);
+      let r = null, off = 0;
+      el.addEventListener("mouseenter", () => { r = el.getBoundingClientRect(); clearTimeout(off); el.classList.add("is-tilting"); });
       el.addEventListener("mousemove", (e) => {
-        const r = el.getBoundingClientRect();
+        if (!r) r = el.getBoundingClientRect();
         const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
         el.style.setProperty("--ry", ((px - 0.5) * 11).toFixed(2) + "deg");
         el.style.setProperty("--rx", (-(py - 0.5) * 11).toFixed(2) + "deg");
         el.style.setProperty("--gx", px * 100 + "%");
         el.style.setProperty("--gy", py * 100 + "%");
       });
-      el.addEventListener("mouseleave", () => { el.style.setProperty("--rx", "0deg"); el.style.setProperty("--ry", "0deg"); });
+      el.addEventListener("mouseleave", () => {
+        r = null;
+        el.style.setProperty("--rx", "0deg"); el.style.setProperty("--ry", "0deg");
+        off = setTimeout(() => el.classList.remove("is-tilting"), 750);
+      });
     };
     $$(TILT).forEach(bind);
-    // classes, bakes and related cards are rendered later
-    new MutationObserver(() => $$(TILT).forEach(bind)).observe($("main") || document.body, { childList: true, subtree: true });
+    // classes, bakes and related cards are rendered later (batched to one scan per frame)
+    let pending = false;
+    new MutationObserver(() => {
+      if (pending) return;
+      pending = true;
+      requestAnimationFrame(() => { pending = false; $$(TILT).forEach(bind); });
+    }).observe($("main") || document.body, { childList: true, subtree: true });
   }
 
   /* ---------- Inner page heroes: the photo deck turns with the pointer and fans open ---------- */
@@ -492,15 +532,15 @@
       const chip = $(".deck__chip", deck);
       if (!finePointer) return;
       const host = deck.closest("section");
+      const q = { duration: 1.2, ease: "power3" };
+      const ry = gsap.quickTo(inner, "rotationY", q), rx = gsap.quickTo(inner, "rotationX", q);
+      const cx = chip && gsap.quickTo(chip, "x", q), cy = chip && gsap.quickTo(chip, "y", q);
       host.addEventListener("mousemove", (e) => {
         const px = e.clientX / window.innerWidth - 0.5, py = e.clientY / window.innerHeight - 0.5;
-        gsap.to(inner, { rotationY: px * 18, rotationX: -py * 12, duration: 1.2, ease: "power3", overwrite: "auto" });
-        if (chip) gsap.to(chip, { x: px * -26, y: py * -18, duration: 1.2, ease: "power3", overwrite: "auto" });
+        ry(px * 18); rx(-py * 12);
+        if (chip) { cx(px * -26); cy(py * -18); }
       });
-      host.addEventListener("mouseleave", () => {
-        gsap.to(inner, { rotationY: 0, rotationX: 0, duration: 1.4, ease: "power3" });
-        if (chip) gsap.to(chip, { x: 0, y: 0, duration: 1.4, ease: "power3" });
-      });
+      host.addEventListener("mouseleave", () => { ry(0); rx(0); if (chip) { cx(0); cy(0); } });
       deck.addEventListener("mouseenter", () => deck.classList.add("is-open"));
       deck.addEventListener("mouseleave", () => deck.classList.remove("is-open"));
     });
@@ -513,8 +553,10 @@
       const s = el.matches(".btn") ? 0.25 : 0.4;
       const xTo = gsap.quickTo(el, "x", { duration: 0.8, ease: "elastic.out(1, 0.4)" });
       const yTo = gsap.quickTo(el, "y", { duration: 0.8, ease: "elastic.out(1, 0.4)" });
-      el.addEventListener("mousemove", (e) => { const r = el.getBoundingClientRect(); xTo((e.clientX - r.left - r.width / 2) * s); yTo((e.clientY - r.top - r.height / 2) * s); });
-      el.addEventListener("mouseleave", () => { xTo(0); yTo(0); });
+      let r = null;
+      el.addEventListener("mouseenter", () => (r = null));
+      el.addEventListener("mousemove", (e) => { if (!r) r = el.getBoundingClientRect(); xTo((e.clientX - r.left - r.width / 2) * s); yTo((e.clientY - r.top - r.height / 2) * s); });
+      el.addEventListener("mouseleave", () => { r = null; xTo(0); yTo(0); });
     });
   }
 
@@ -553,7 +595,7 @@
   function footerMega() {
     const m = $(".footer__mega");
     if (!m) return;
-    gsap.from(m, { yPercent: 50, rotationX: -60, transformPerspective: 1200, transformOrigin: "50% 100%", opacity: 0, duration: 1.8, ease, scrollTrigger: { trigger: m, start: "top 98%" } });
+    gsap.from(m, { yPercent: 50, rotationX: -60, transformPerspective: 1200, transformOrigin: "50% 100%", opacity: 0, duration: 1.8, ease, scrollTrigger: { trigger: m, start: "top 98%", once: true } });
   }
 
   /* ---------- Boot ---------- */
