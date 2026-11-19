@@ -131,7 +131,6 @@
   let openLayer = null;
   function lockScroll(on) {
     document.documentElement.style.overflow = on ? "hidden" : "";
-    if (window.__lenis) on ? window.__lenis.stop() : window.__lenis.start();
   }
   function openDrawer() { closeLayer(); $(".drawer").classList.add("is-open"); scrim.classList.add("is-on"); openLayer = "drawer"; lockScroll(true); setTimeout(() => $(".drawer .icon-btn").focus(), 50); }
   function openModal(html) {
@@ -179,22 +178,25 @@
   });
   $$(".mmenu a").forEach((a) => a.addEventListener("click", closeMenu));
 
-  // Header state: all layout reads first, then class writes, at most once per frame
-  let lastY = 0, ticking = false;
-  const darkSecs = $$("[data-header-dark]");
+  // Header state: scroll position only (no layout reads); dark sections and the footer are
+  // tracked by observers, so nothing is measured while scrolling
+  let lastY = 0, ticking = false, dark = false, footerIn = false;
   const mbar = $(".mbar"), footer = $(".footer");
-  const nearFooter = () => footer && footer.getBoundingClientRect().top < window.innerHeight;
   const setCls = (el, c, on) => { if (el && el.classList.contains(c) !== on) el.classList.toggle(c, on); };
+  if ("IntersectionObserver" in window) {
+    const under = new Map();
+    const darkIO = new IntersectionObserver((es) => {
+      es.forEach((e) => under.set(e.target, e.isIntersecting));
+      dark = Array.from(under.values()).some(Boolean);
+      onScroll();
+    }, { rootMargin: "0px 0px -94% 0px" });
+    $$("[data-header-dark]").forEach((el) => darkIO.observe(el));
+    if (footer) new IntersectionObserver(([e]) => { footerIn = e.isIntersecting; onScroll(); }).observe(footer);
+  }
   function update() {
     ticking = false;
     const y = window.scrollY;
-    const probe = header.offsetHeight / 2;
-    let dark = false;
-    for (const s of darkSecs) {
-      const r = s.getBoundingClientRect();
-      if (r.top <= probe && r.bottom >= probe) { dark = true; break; }
-    }
-    const mbarOn = !!mbar && y > window.innerHeight * 0.6 && !nearFooter();
+    const mbarOn = !!mbar && y > window.innerHeight * 0.6 && !footerIn;
     const hide = y > 400 && y > lastY && !document.body.classList.contains("menu-open");
     lastY = y;
     setCls(header, "is-scrolled", y > 24);

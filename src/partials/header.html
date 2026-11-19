@@ -35,9 +35,9 @@
 </svg>
 
 <div class="loader" aria-hidden="true">
-  <div class="loader__cards"><figure class="loader__card" style="--x:-34;--y:-24;--r:-8deg"><img src="assets/img/m/croissants.jpg" alt=""></figure><figure class="loader__card" style="--x:-11;--y:-33;--r:5deg"><img src="assets/img/m/fig-pastry.jpg" alt=""></figure><figure class="loader__card" style="--x:14;--y:-31;--r:-4deg"><img src="assets/img/m/sourdough.jpg" alt=""></figure><figure class="loader__card" style="--x:35;--y:-20;--r:7deg"><img src="assets/img/m/fruit-danish.jpg" alt=""></figure><figure class="loader__card" style="--x:36;--y:17;--r:-6deg"><img src="assets/img/m/chocolate-tart.jpg" alt=""></figure><figure class="loader__card" style="--x:13;--y:30;--r:4deg"><img src="assets/img/m/almond-croissant.jpg" alt=""></figure><figure class="loader__card" style="--x:-13;--y:28;--r:-7deg"><img src="assets/img/m/focaccia.jpg" alt=""></figure><figure class="loader__card" style="--x:-36;--y:15;--r:6deg"><img src="assets/img/m/plum-danish.jpg" alt=""></figure></div>
+  <div class="loader__cards"><figure class="loader__card" style="--x:-34;--y:-24;--r:-8deg"><img decoding="async" src="assets/img/m/croissants.jpg" alt=""></figure><figure class="loader__card" style="--x:-11;--y:-33;--r:5deg"><img decoding="async" src="assets/img/m/fig-pastry.jpg" alt=""></figure><figure class="loader__card" style="--x:14;--y:-31;--r:-4deg"><img decoding="async" src="assets/img/m/sourdough.jpg" alt=""></figure><figure class="loader__card" style="--x:35;--y:-20;--r:7deg"><img decoding="async" src="assets/img/m/fruit-danish.jpg" alt=""></figure><figure class="loader__card" style="--x:36;--y:17;--r:-6deg"><img decoding="async" src="assets/img/m/chocolate-tart.jpg" alt=""></figure><figure class="loader__card" style="--x:13;--y:30;--r:4deg"><img decoding="async" src="assets/img/m/almond-croissant.jpg" alt=""></figure><figure class="loader__card" style="--x:-13;--y:28;--r:-7deg"><img decoding="async" src="assets/img/m/focaccia.jpg" alt=""></figure><figure class="loader__card" style="--x:-36;--y:15;--r:6deg"><img decoding="async" src="assets/img/m/plum-danish.jpg" alt=""></figure></div>
   <div class="loader__center">
-    <img class="loader__logo" src="assets/img/logo.png" alt="" width="260" height="171">
+    <img decoding="async" class="loader__logo" src="assets/img/logo.png" alt="" width="260" height="171">
     <p class="loader__line">Made by hand, <em>shared</em> with love.</p>
   </div>
   <div class="loader__row">
@@ -49,6 +49,11 @@
 <div class="curtain" aria-hidden="true">
   <div class="curtain__lead"></div>
   <div class="curtain__main">
+    <div class="curtain__cards">
+      <figure class="curtain__card" style="--tx:-78%;--r:-10deg"><img data-curtain-img src="assets/img/m/croissants.jpg" alt=""></figure>
+      <figure class="curtain__card" style="--tx:78%;--r:9deg"><img data-curtain-img src="assets/img/m/fig-pastry.jpg" alt=""></figure>
+      <figure class="curtain__card" style="--tx:0%;--r:-2deg"><img data-curtain-img src="assets/img/m/sourdough.jpg" alt=""></figure>
+    </div>
     <span class="curtain__label">Love to Cook</span>
     <span class="curtain__mask"><span class="curtain__title" data-curtain-title></span></span>
   </div>
@@ -58,6 +63,8 @@
     try {
       var t = sessionStorage.getItem("ltc:to"), el = document.querySelector("[data-curtain-title]");
       if (el) el.textContent = t || document.title.split("|")[0].trim();
+      var imgs = JSON.parse(sessionStorage.getItem("ltc:imgs") || "null"), cards = document.querySelectorAll("[data-curtain-img]");
+      if (imgs) for (var i = 0; i < cards.length && i < imgs.length; i++) cards[i].src = imgs[i];
     } catch (e) {}
   })();
 </script>
@@ -66,8 +73,8 @@
 <header class="header" id="top">
   <div class="container header__inner">
     <a class="header__logo" href="index.html" aria-label="Love to Cook, home">
-      <img class="logo-ink" src="assets/img/logo.png" alt="Love to Cook" width="600" height="395">
-      <img class="logo-cream" src="assets/img/logo-cream.png" alt="" width="600" height="395">
+      <img decoding="async" class="logo-ink" src="assets/img/logo.png" alt="Love to Cook" width="600" height="395">
+      <img decoding="async" class="logo-cream" src="assets/img/logo-cream.png" alt="" width="600" height="395">
     </a>
     <nav class="nav" aria-label="Main">
       <a href="classes.html" data-nav="classes">Classes &amp; Events</a>

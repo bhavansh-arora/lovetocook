@@ -162,20 +162,14 @@
   const ease = "expo.out";
 
   /* ---------- Smooth scroll ---------- */
-  let lenis = null;
-  if (typeof window.Lenis !== "undefined" && finePointer) {
-    lenis = new Lenis({ lerp: 0.14, smoothWheel: true, wheelMultiplier: 1 });
-    window.__lenis = lenis;
-    lenis.on("scroll", ScrollTrigger.update);
-    gsap.ticker.add((t) => lenis.raf(t * 1000));
-    gsap.ticker.lagSmoothing(0);
-    $$('a[href^="#"]').forEach((a) => a.addEventListener("click", (e) => {
-      const id = a.getAttribute("href");
-      if (id.length < 2) return;
-      const t = $(id);
-      if (t) { e.preventDefault(); lenis.scrollTo(t, { offset: -90, duration: 1.4 }); }
-    }));
-  }
+  // Native scrolling (smoothest and most responsive on every device); scroll-linked
+  // animations smooth themselves with scrub. In-page links glide to their section.
+  $$('a[href^="#"]').forEach((a) => a.addEventListener("click", (e) => {
+    const id = a.getAttribute("href");
+    if (id.length < 2) return;
+    const t = $(id);
+    if (t) { e.preventDefault(); window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 90, behavior: "smooth" }); }
+  }));
 
   /* ---------- Split text into lines ---------- */
   function splitLines(el) {
@@ -267,6 +261,8 @@
   const cMain = curtain && $(".curtain__main", curtain);
   const cTitle = curtain && $(".curtain__title", curtain);
   const cLabel = curtain && $(".curtain__label", curtain);
+  const cCards = curtain ? $$(".curtain__card", curtain) : [];
+  const cImgs = curtain ? $$("[data-curtain-img]", curtain) : [];
 
   function runIntro() {
     if (loader && firstVisit) {
@@ -298,12 +294,13 @@
       if (loader) loader.classList.add("is-done");
       if (curtain) {
         // arriving: the name lifts out, the chocolate curtain rises off the page, then the butter sheet
-        const tl = gsap.timeline({ onComplete: () => { gsap.set(curtain, { visibility: "hidden" }); gsap.set([cLead, cMain], { yPercent: 100, "--ct": "0px", "--cb": "0px" }); } });
+        const tl = gsap.timeline({ onComplete: () => { gsap.set(curtain, { visibility: "hidden" }); gsap.set([cLead, cMain], { yPercent: 100, "--ct": "0px", "--cb": "0px" }); gsap.set(cCards, { clearProps: "transform,opacity" }); } });
         tl.set(curtain, { visibility: "visible" })
-          .to([cLabel, cTitle], { yPercent: -110, opacity: 0, duration: 0.45, ease: "power3.in", stagger: 0.04 }, 0.05)
-          .to(cMain, { yPercent: -100, "--cb": "16vh", duration: 0.95, ease: "expo.inOut" }, 0.25)
-          .to(cLead, { yPercent: -100, duration: 0.95, ease: "expo.inOut" }, 0.36);
-        heroIn().delay(0.55);
+          .to(cCards, { y: () => -window.innerHeight * 0.55, rotation: (i) => [-26, 24, -8][i % 3], opacity: 0, duration: 0.6, ease: "power3.in", stagger: 0.05 }, 0)
+          .to([cLabel, cTitle], { yPercent: -110, opacity: 0, duration: 0.45, ease: "power3.in", stagger: 0.04 }, 0.08)
+          .to(cMain, { yPercent: -100, "--cb": "16vh", duration: 0.95, ease: "expo.inOut" }, 0.3)
+          .to(cLead, { yPercent: -100, duration: 0.95, ease: "expo.inOut" }, 0.4);
+        heroIn().delay(0.6);
       } else heroIn();
     }
   }
@@ -319,6 +316,22 @@
     }
     return pageNames[file] || "Love to Cook";
   };
+  const pageImgs = {
+    "": ["croissants", "fig-pastry", "sourdough"], "index.html": ["croissants", "fig-pastry", "sourdough"],
+    "classes.html": ["crumb", "croissants", "sam"], "private.html": ["chocolate-tart", "croissants", "sam"],
+    "bakery.html": ["almond-croissant", "plum-danish", "sourdough"], "gift.html": ["chocolate-tart", "croissants", "fruit-danish"],
+    "about.html": ["fig-pastry", "crumb", "sam"], "contact.html": ["sourdough", "croissants", "focaccia"], "for-sam.html": ["croissants", "sam", "fig-pastry"],
+  };
+  const imgsFor = (url) => {
+    const file = url.pathname.split("/").pop();
+    let list = pageImgs[file] || pageImgs[""];
+    if (file === "class.html") {
+      const c = window.LTC_DATA && window.LTC_DATA.courses.find((x) => x.id === url.searchParams.get("c"));
+      const front = c && /assets\/img\/([a-z-]+)\.jpg/.exec(c.image);
+      list = ["fig-pastry", "sourdough", front ? front[1] : "croissants"];
+    }
+    return list.map((n) => "assets/img/m/" + n + ".jpg");
+  };
   let leaving = false;
   document.addEventListener("click", (e) => {
     const a = e.target.closest("a[href]");
@@ -333,11 +346,15 @@
     const name = nameFor(url);
     try { sessionStorage.setItem("ltc:to", name); } catch (err) { /* ignore */ }
     cTitle.textContent = name;
+    const imgs = imgsFor(url);
+    try { sessionStorage.setItem("ltc:imgs", JSON.stringify(imgs)); } catch (err) { /* ignore */ }
+    cImgs.forEach((im, i) => { if (imgs[i]) im.src = imgs[i]; });
     gsap.timeline({ onComplete: () => (location.href = url.href) })
       .set(curtain, { visibility: "visible" })
       .set([cLabel, cTitle], { yPercent: 110, opacity: 1 })
       .fromTo(cLead, { yPercent: 100 }, { yPercent: 0, duration: 0.6, ease: "expo.inOut" }, 0)
       .fromTo(cMain, { yPercent: 100, "--ct": "16vh" }, { yPercent: 0, "--ct": "0vh", duration: 0.7, ease: "expo.inOut" }, 0.08)
+      .fromTo(cCards, { y: () => -window.innerHeight * 0.45, rotation: (i) => [-24, 22, 10][i % 3], opacity: 0 }, { y: 0, rotation: (i) => [-10, 9, -2][i % 3], opacity: 1, duration: 0.55, ease: "back.out(1.3)", stagger: 0.06 }, 0.3)
       .to([cLabel, cTitle], { yPercent: 0, duration: 0.5, ease: "expo.out", stagger: 0.05 }, 0.42)
       .to({}, { duration: 0.12 });
   });
@@ -351,8 +368,8 @@
       splitLines(el);
       const long = el.textContent.trim().length > 64;
       const parts = long ? $$(".w", el) : splitChars(el);
-      gsap.from(parts, { yPercent: 115, rotation: 6, opacity: 0, filter: "blur(10px)", duration: long ? 1.2 : 1.1, stagger: long ? 0.04 : 0.02, ease: "expo.out",
-        clearProps: "transform,opacity,filter", scrollTrigger: { trigger: el, start: "top 86%", once: true } });
+      gsap.from(parts, { yPercent: 115, rotation: 6, opacity: 0, duration: long ? 1.2 : 1.1, stagger: long ? 0.04 : 0.02, ease: "expo.out",
+        clearProps: "transform,opacity", scrollTrigger: { trigger: el, start: "top 86%", once: true } });
     });
     // content rises and tips forward into place
     gsap.set("[data-reveal]", { y: 56, rotationX: 14, transformPerspective: 1200, transformOrigin: "50% 0%" });
@@ -453,7 +470,7 @@
       scrollTrigger: {
         trigger: sec, start: "top top", end: () => "+=" + window.innerHeight * 2.6, pin: true, scrub: 0.5, anticipatePin: 1, invalidateOnRefresh: true,
         onUpdate: (self) => {
-          if (bar) gsap.set(bar, { scaleX: self.progress });
+          if (bar) bar.style.transform = `scaleX(${self.progress.toFixed(4)})`;
           const t = self.progress * Dur;
           const k = t < 1.4 ? 0 : t < 4.6 ? 1 : t < 6.6 ? 2 : 3;
           if (k !== lastStep) {
@@ -512,7 +529,7 @@
         x: () => -dist(), ease: "none",
         scrollTrigger: {
           trigger: sec, start: "top top", end: () => "+=" + dist(), pin: true, scrub: 0.4, invalidateOnRefresh: true, anticipatePin: 1,
-          onUpdate: (s) => { if (bar) gsap.set(bar, { scaleX: s.progress }); curve(); },
+          onUpdate: (s) => { if (bar) bar.style.transform = `scaleX(${s.progress.toFixed(4)})`; curve(); },
           onRefresh: () => { measure(); curve(); },
         },
       });
@@ -520,7 +537,7 @@
       return () => { gsap.set(track, { clearProps: "transform" }); items.forEach((it) => (it.style.transform = "")); };
     });
     mm.add("(max-width: 1000px), (hover: none)", () => {
-      const onS = () => { if (bar) gsap.set(bar, { scaleX: track.scrollLeft / Math.max(1, track.scrollWidth - track.clientWidth) }); curve(track.scrollLeft); };
+      const onS = () => { if (bar) bar.style.transform = `scaleX(${(track.scrollLeft / Math.max(1, track.scrollWidth - track.clientWidth)).toFixed(4)})`; curve(track.scrollLeft); };
       track.addEventListener("scroll", onS, { passive: true });
       onS();
       return () => track.removeEventListener("scroll", onS);
@@ -708,7 +725,7 @@
   /* ---------- Dark sections open from a rounded inset panel to full bleed ---------- */
   function sectionsOpen() {
     const inset = window.innerWidth < 760 ? 3 : 4.5;
-    $$(".lam, .hgal, .quote-band, .footer, main > .section.theme-dark, .j-note, .j-ig").forEach((el) => {
+    $$(".footer").forEach((el) => {
       gsap.fromTo(el, { clipPath: `inset(0% ${inset}% 0% ${inset}% round 44px)` }, {
         clipPath: "inset(0% 0% 0% 0% round 0px)", ease: "none",
         scrollTrigger: { trigger: el, start: "top bottom", end: "top 25%", scrub: true },

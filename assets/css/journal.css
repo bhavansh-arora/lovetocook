@@ -242,3 +242,32 @@ a.pola:hover, a.pola:focus-visible { transform: rotate(0deg) translateY(-6px); b
 
 /* glows never widen the page */
 .j-sam, .j-note, .j-gift, .j-ways, .j-cta, .j-craft { overflow-x: clip; }
+
+/* things that move every frame get their own layer, so the page around them is not repainted */
+.j-pile__card, .hgal__item, .hero-glow, .j-ticker .marquee__track { will-change: transform; }
+
+/* ---------- Page change: a caramel sheet, then a cream curtain with the destination's polaroids ---------- */
+.curtain__main { overflow: hidden; isolation: isolate; gap: 14px; }
+.curtain__main::before { content: ""; position: absolute; z-index: -1; left: 50%; top: 48%; width: min(1000px, 120vw); aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(241, 207, 143, .6), rgba(241, 207, 143, .16) 55%, transparent); }
+.curtain__cards { position: relative; width: clamp(110px, 10vw, 150px); aspect-ratio: 4 / 5.9; margin: 0 auto clamp(12px, 2vw, 26px); }
+.curtain__card { position: absolute; top: 0; width: 100%; margin: 0; padding: 6px 6px 24px; background: #fffdf9; border-radius: 12px;
+  box-shadow: 0 1px 0 rgba(29, 14, 4, .04), 0 26px 50px -24px rgba(29, 14, 4, .5); left: var(--tx); transform: rotate(var(--r)); will-change: transform; }
+.curtain__card img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 8px; background: var(--paper-2); }
+.curtain__label { margin-top: 6px; }
+@media (max-width: 560px) { .curtain__cards { width: 92px; } }
+
+/* ---------- Homepage rhythm: less dead space between and inside sections ---------- */
+.page-home .section { padding-block: clamp(52px, 5.2vw, 78px); }
+.page-home .hero { padding-bottom: clamp(20px, 2.4vw, 36px); }
+.page-home .j-head { margin-bottom: clamp(26px, 3vw, 42px); }
+.page-home .j-head .j-sub { margin-top: 12px; }
+.page-home .j-head--split { gap: 18px var(--gap-lg); }
+.page-home .hgal__head { padding-bottom: clamp(24px, 2.6vw, 36px); }
+.page-home .j-way .pola img { aspect-ratio: 4 / 3.7; }
+.page-home .j-way:nth-child(2) { margin-top: clamp(14px, 1.6vw, 24px); }
+.page-home .j-steps__cta { margin-top: clamp(26px, 2.8vw, 40px); }
+.page-home .j-cta { padding-block: clamp(84px, 9vw, 128px); }
+.page-home .j-cta__inner { gap: 18px; }
+.page-home .toolbar { margin-bottom: 18px; }
+.page-home .j-sam__photos { aspect-ratio: 1 / .92; }
