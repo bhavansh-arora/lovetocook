@@ -14,7 +14,7 @@ A premium, multi-page website for **Love to Cook**, the cook school, bakery and 
 | `class.html?c=<id>` | Class detail: gallery, what you'll make/learn, the day, booking card, Event schema |
 | `private.html` | Private lessons: formats and an interactive planner with an instant estimate |
 | `bakery.html` | Bakery pre-orders with add-to-bag and collection |
-| `gift.html` | Gift voucher builder with a live 3D preview |
+| `gift.html` | Gift voucher builder with a live preview |
 | `about.html` | Sam's story, a 7-chapter timeline, values and credentials |
 | `contact.html` | Contact cards, form, map, policies |
 | `for-sam.html` | Private pitch page for Sam (`noindex`, not linked in the navigation) |
@@ -27,13 +27,8 @@ A premium, multi-page website for **Love to Cook**, the cook school, bakery and 
 - Gift vouchers, bakery pre-orders and class seats all go through one bag
 - Private-class planner that shows an estimate as guests choose options
 - SEO: per-page titles and descriptions, LocalBusiness/Bakery JSON-LD, and Event JSON-LD for every class date
-- 3D experience:
-  - a draggable carousel of Sam's bakes in the hero, with drifting flour dust that moves away from the pointer
-  - a pinned "Butter. Fold. Repeat." scene where an isometric dough stack laminates from 3 to 9 to 27 layers as you scroll
-  - a class preview card that flips in 3D beside the upcoming-classes list
-  - a curved 3D gallery that shows every photo uncropped
-  - pointer-tilt cards with glare, 3D headline line-flips, depth parallax on inner-page heroes, and a marquee that leans with scroll speed
-- Motion: preloader, page-transition curtain, Lenis smooth scroll, scroll-scrubbed text, magnetic buttons, a custom cursor and voucher tilt
+- Design: a bold, modern brand system. Condensed Bricolage Grotesque headlines, flat colour blocks in butter yellow, crust orange and dark chocolate, chunky pill buttons and rounded photo cards
+- Motion, kept subtle: content fades up as it arrives, a slow ticker of bakes, a short "Love to Cook" loader on the first visit and a quick coloured wipe carrying the next page's name between pages. No animation libraries
 - Accessibility: skip link, focus styles, ARIA on controls, `prefers-reduced-motion` support, and content that stays visible if JavaScript fails
 - Responsive at every width (checked at 390, 834 and 1440px), with a sticky mobile booking bar
 
@@ -42,9 +37,9 @@ A premium, multi-page website for **Love to Cook**, the cook school, bakery and 
 ```
 src/partials/   head, header (+ SVG icon sprite), footer (+ drawer, modal)
 src/pages/      page bodies with a <!--meta {...}--> header
-assets/css/     main.css (design tokens and all components)
+assets/css/     main.css (layouts and components), brand.css (the visual design: type, colour, buttons, sections)
 assets/js/      data.js (ALL editable content), site.js (UI), motion.js (animation)
-assets/vendor/  GSAP 3.12.5, ScrollTrigger, Lenis 1.1.13 (self-hosted)
+assets/fonts/   Bricolage Grotesque and Inter Tight (self-hosted)
 assets/img/     Sam's real photos (bakes upscaled 4x with EDSR from the site collage), logo variants, favicon, OG image
 build.py        stitches partials and pages into the root *.html files
 ```
