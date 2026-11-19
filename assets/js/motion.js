@@ -348,7 +348,11 @@
   /* ---------- Reveals ---------- */
   function reveals() {
     $$("[data-split]").forEach((el) => {
-      gsap.from(splitLines(el), { ...lineIn, duration: 1.3, ease, scrollTrigger: { trigger: el, start: "top 88%", once: true } });
+      splitLines(el);
+      const long = el.textContent.trim().length > 64;
+      const parts = long ? $$(".w", el) : splitChars(el);
+      gsap.from(parts, { yPercent: 115, rotation: 6, opacity: 0, filter: "blur(10px)", duration: long ? 1.2 : 1.1, stagger: long ? 0.04 : 0.02, ease: "expo.out",
+        clearProps: "transform,opacity,filter", scrollTrigger: { trigger: el, start: "top 86%", once: true } });
     });
     // content rises and tips forward into place
     gsap.set("[data-reveal]", { y: 56, rotationX: 14, transformPerspective: 1200, transformOrigin: "50% 0%" });
@@ -428,26 +432,20 @@
     });
   }
 
-  /* ---------- Lamination: Sam's photos laid one over another like sheets of pastry, 3 → 9 → 27 ---------- */
+  /* ---------- The craft: Sam's photos dropped onto a pile of polaroids, 3 → 9 → 27 ---------- */
   function lamination() {
     const sec = $("[data-lam]");
     if (!sec) return;
-    const layers = $$("[data-lx-layer]", sec);
-    const imgs = layers.map((l) => $("img", l));
-    const notes = layers.map((l) => $(".lp__note", l));
+    const cards = $$(".j-pile__card", sec);
+    if (!cards.length) return;
     const count = $("[data-lam-count]", sec);
     const steps = $$(".lam__step", sec);
     const dots = $$(".lam__dots i", sec);
     const bar = $(".lam__progress span", sec);
-    let shown = -1, lastStep = -1;
-    const setCount = (v) => {
-      const n = Math.round(v);
-      if (n === shown) return;
-      shown = n;
-      count.textContent = n;
-    };
-    setCount(3);
-    gsap.set(notes[0], { opacity: 1 });
+    const num = (el, k) => parseFloat(el.dataset[k]) || 0;
+    cards.forEach((c, i) => gsap.set(c, { rotation: num(c, "r"), xPercent: num(c, "x"), yPercent: num(c, "y"), zIndex: i + 1 }));
+    let shown = 3, lastStep = -1;
+    const setCount = (v) => { const n = Math.round(v); if (n !== shown) { shown = n; count.textContent = n; } };
     const cnt = { v: 3 };
     const Dur = 10;
     const tl = gsap.timeline({
@@ -466,33 +464,19 @@
         },
       },
     });
-    // a new sheet is laid over the last: it wipes down from the top while the one beneath settles back
-    const edge = $(".lx__edge", sec);
-    // a new sheet is laid down over the last: a straight edge travels top to bottom with a butter rim
-    // and a soft shadow on the photo beneath, which sinks back and dims
-    const lay = (i, at) => {
-      tl.to(notes[i - 1], { opacity: 0, duration: 0.25 }, at)
-        .fromTo(layers[i], { clipPath: "inset(0% 0% 100% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.1, ease: "power3.inOut", immediateRender: i === 1 }, at + 0.1)
-        .set(edge, { top: "0%", opacity: 1 }, at + 0.1)
-        .to(edge, { top: "100%", duration: 1.1, ease: "power3.inOut" }, at + 0.1)
-        .to(edge, { opacity: 0, duration: 0.2 }, at + 1.05)
-        .fromTo(imgs[i], { scale: 1.25, yPercent: -8 }, { scale: 1, yPercent: 0, duration: 1.3, ease: "power3.out", immediateRender: i === 1 }, at + 0.1)
-        .to(imgs[i - 1], { scale: 1.08, yPercent: 4, duration: 1.1 }, at + 0.1)
-        .to(layers[i - 1], { "--dim": 0.6, duration: 1.1 }, at + 0.1)
-        .to(notes[i], { opacity: 1, duration: 0.3 }, at + 1.2);
+    // each new polaroid falls from above, turning as it drops, and lands on the pile;
+    // the pile beneath settles a touch under its weight
+    const drop = (i, at) => {
+      const r = num(cards[i], "r");
+      tl.fromTo(cards[i], { y: () => -window.innerHeight * 0.85, rotation: r + (i % 2 ? 22 : -22), opacity: 0, scale: 1.06 },
+        { y: 0, rotation: r, opacity: 1, scale: 1, duration: 1.1, ease: "power3.out" }, at)
+        .to(cards.slice(0, i), { y: 4, scale: 0.985, duration: 0.5, ease: "power2.out" }, at + 0.75)
+        .to(cards.slice(0, i), { y: 0, scale: 1, duration: 0.6, ease: "power2.inOut" }, at + 1.25);
     };
-    // the frame leans gently towards the pointer
-    const frame = $("[data-lx-frame]", sec);
-    if (finePointer && frame) {
-      gsap.set(frame, { transformPerspective: 1400 });
-      const rx = gsap.quickTo(frame, "rotationX", { duration: 1, ease: "power3" }), ry = gsap.quickTo(frame, "rotationY", { duration: 1, ease: "power3" });
-      sec.addEventListener("mousemove", (e) => { ry((e.clientX / innerWidth - 0.5) * 9); rx(-(e.clientY / innerHeight - 0.5) * 7); });
-      sec.addEventListener("mouseleave", () => { rx(0); ry(0); });
-    }
-    lay(1, 1.45);
-    tl.to(cnt, { v: 9, duration: 0.9, onUpdate: () => setCount(cnt.v) }, 1.7);
-    lay(2, 4.65);
-    lay(3, 6.65);
+    drop(1, 1.45);
+    tl.to(cnt, { v: 9, duration: 0.9, onUpdate: () => setCount(cnt.v) }, 1.8);
+    drop(2, 4.65);
+    drop(3, 6.65);
     tl.to(cnt, { v: 27, duration: 1.0, onUpdate: () => setCount(cnt.v) }, 6.9)
       .set({}, {}, Dur);
   }
@@ -686,10 +670,23 @@
     return out;
   }
 
+  /* ---------- Polaroids are dealt in from above and land at their own tilt ---------- */
+  function deal() {
+    $$("[data-deal]").forEach((group) => {
+      const cards = Array.from(group.children);
+      const tilt = (el) => parseFloat(getComputedStyle(el).getPropertyValue("--r")) || 0;
+      gsap.fromTo(cards, { opacity: 0, y: -110, scale: 0.86, rotation: (i, el) => tilt(el) + (i % 2 ? 14 : -14) }, {
+        opacity: 1, y: 0, scale: 1, rotation: (i, el) => tilt(el), duration: 1.05, stagger: 0.13, ease: "back.out(1.3)", clearProps: "transform",
+        scrollTrigger: { trigger: group, start: "top 82%", once: true },
+      });
+    });
+  }
+
   /* ---------- Hand-drawn flourish under each heading's italic word ---------- */
   function swashes() {
     const paths = ["M3 13 C 42 5, 92 3, 132 8 S 184 15, 197 6", "M2 9 C 50 15, 104 4, 150 9 S 190 12, 198 7", "M4 12 C 36 7, 70 13, 112 8 S 176 4, 196 10"];
-    $$(".h1 em, .h2 em, .display em").forEach((em, i) => {
+    const lastEm = $$(".h1, .h2, .display, .j-title, .j-note__text").map((h) => { const ems = $$("em", h); return ems[ems.length - 1]; }).filter(Boolean);
+    lastEm.forEach((em, i) => {
       if ($(".swash", em)) return;
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.setAttribute("class", "swash");
@@ -701,7 +698,7 @@
       path.setAttribute("pathLength", "1");
       svg.appendChild(path);
       em.appendChild(svg);
-      const inHero = em.closest(".hero, .page-hero");
+      const inHero = em.closest(".hero, .page-hero, .loader");
       gsap.fromTo(path, { strokeDashoffset: 1 }, inHero
         ? { strokeDashoffset: 0, duration: 1.2, ease: "power2.inOut", delay: firstVisit ? 4.9 : 1.5 }
         : { strokeDashoffset: 0, duration: 1.1, ease: "power2.inOut", delay: 0.5, scrollTrigger: { trigger: em, start: "top 85%", once: true } });
@@ -711,7 +708,7 @@
   /* ---------- Dark sections open from a rounded inset panel to full bleed ---------- */
   function sectionsOpen() {
     const inset = window.innerWidth < 760 ? 3 : 4.5;
-    $$(".lam, .hgal, .quote-band, .footer, main > .section.theme-dark").forEach((el) => {
+    $$(".lam, .hgal, .quote-band, .footer, main > .section.theme-dark, .j-note, .j-ig").forEach((el) => {
       gsap.fromTo(el, { clipPath: `inset(0% ${inset}% 0% ${inset}% round 44px)` }, {
         clipPath: "inset(0% 0% 0% 0% round 0px)", ease: "none",
         scrollTrigger: { trigger: el, start: "top bottom", end: "top 25%", scrub: true },
@@ -721,7 +718,7 @@
 
   /* ---------- Photos unveil with a soft wipe, settle from a slight zoom, then drift ---------- */
   function photos() {
-    $$(".path__media, .split__media .media, .about-hero__img .media, .ig-grid a").forEach((wrap) => {
+    $$(".path__media, .ig-grid a").forEach((wrap) => {
       const img = $("img", wrap);
       if (!img) return;
       const r = getComputedStyle(wrap).borderTopLeftRadius || "0px";
@@ -761,6 +758,7 @@
     footerMega();
     sectionsOpen();
     photos();
+    deal();
     runIntro();
     swashes();
     heroGlow();

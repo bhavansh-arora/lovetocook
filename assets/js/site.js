@@ -225,6 +225,7 @@
   function rowHTML(s) {
     const c = s.course, left = seatsLeft(s);
     return `<article class="row-class" data-sid="${s.id}">
+      <a class="row-class__thumb" href="class.html?c=${c.id}&s=${s.id}" tabindex="-1" aria-hidden="true"><img src="${sm(c.image)}" alt="" loading="lazy" style="object-position:${c.imagePos || "center"}"></a>
       <div class="row-class__date"><b>${String(s.d.getDate()).padStart(2, "0")}</b><span>${monShort(s.d)} · ${dayShort(s.d)}</span></div>
       <div class="row-class__info"><span class="label" style="color:var(--caramel)">${catLabel(c.category)}</span>
         <h3 class="row-class__title"><a href="class.html?c=${c.id}&s=${s.id}">${esc(c.title)}</a></h3>

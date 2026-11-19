@@ -1,0 +1,244 @@
+/* ==========================================================================
+   Love to Cook: journal layer
+   Everything below the hero speaks the hero's and loader's language:
+   warm cream, soft butter glows, serif titles with caramel italics,
+   and Sam's real photos as gently tilted polaroids.
+   Built by Code Bunny
+   ========================================================================== */
+
+:root { --polaroid: #fffdf9; --pola-shadow: 0 1px 0 rgba(29, 14, 4, .04), 0 28px 60px -30px rgba(29, 14, 4, .5); }
+
+/* ---------- Polaroid ---------- */
+.pola { position: relative; display: block; margin: 0; padding: 10px 10px 0; background: var(--polaroid); border-radius: 16px; box-shadow: var(--pola-shadow);
+  transform: rotate(var(--r, 0deg)); transition: transform .7s var(--ease), box-shadow .7s var(--ease); color: var(--ink); }
+.pola img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 10px; background: var(--paper-2); }
+.pola figcaption, .pola .pola__cap { display: block; padding: 12px 8px 14px; text-align: center; font-family: var(--f-display); font-style: italic; font-size: clamp(.95rem, 1.1vw, 1.1rem); line-height: 1.25; color: var(--ink); }
+a.pola:hover, a.pola:focus-visible { transform: rotate(0deg) translateY(-6px); box-shadow: 0 1px 0 rgba(29, 14, 4, .04), 0 44px 80px -34px rgba(29, 14, 4, .55); }
+
+/* ---------- Section heads in the hero's voice ---------- */
+.j-chip { display: inline-flex; align-items: center; gap: 10px; padding: 9px 16px; border-radius: var(--r-pill); background: var(--white); box-shadow: var(--shadow-sm);
+  font-size: var(--fs-label); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--text); width: max-content; max-width: 100%; }
+.j-chip i { width: 7px; height: 7px; border-radius: 50%; background: var(--caramel); }
+.j-title { margin-top: 18px; font-family: var(--f-display); font-weight: 360; font-variation-settings: "SOFT" 60, "opsz" 144; font-size: clamp(2.5rem, 5vw, 5.2rem); line-height: .98; letter-spacing: -.035em; text-wrap: balance; }
+.j-title em, .j-note__text em, .j-cta__title em { font-style: italic; color: var(--caramel); font-variation-settings: "SOFT" 100, "opsz" 144; }
+.j-lead { font-size: var(--fs-lead); line-height: 1.55; color: var(--muted); max-width: 46ch; }
+.j-sub { color: var(--muted); max-width: 52ch; }
+.j-head { display: grid; gap: 4px; margin-bottom: clamp(36px, 4.4vw, 60px); }
+.j-head .j-sub { margin-top: 18px; }
+.j-head--center { justify-items: center; text-align: center; }
+.j-head--center .j-title { max-width: 16ch; }
+.j-head--split { grid-template-columns: minmax(0, 1fr) minmax(240px, 380px); align-items: end; gap: 24px var(--gap-lg); }
+.j-head__aside { display: grid; gap: 14px; justify-items: start; color: var(--muted); padding-bottom: .6em; }
+@media (max-width: 900px) { .j-head--split { grid-template-columns: 1fr; } }
+
+/* warm glows, like the light behind the hero */
+.j-sam, .j-craft, .j-note, .j-gift, .j-cta, .j-ways { position: relative; isolation: isolate; }
+.j-sam::before, .j-craft::before, .j-note::before, .j-gift::before, .j-cta::before, .j-ways::before {
+  content: ""; position: absolute; z-index: -1; width: min(900px, 90vw); aspect-ratio: 1; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(241, 207, 143, .5), rgba(241, 207, 143, .14) 55%, transparent); }
+.j-sam::before { left: -10%; top: 50%; transform: translateY(-50%); }
+.j-craft::before { right: 5%; top: 50%; transform: translateY(-50%); }
+.j-note::before { left: 0; top: 50%; transform: translateY(-50%); }
+.j-gift::before { right: -5%; top: 50%; transform: translateY(-50%); }
+.j-cta::before { left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(1100px, 110vw); }
+.j-ways::before { left: 50%; top: 0; transform: translate(-50%, -30%); opacity: .7; }
+
+/* ---------- Ticker ---------- */
+.j-ticker { background: transparent; color: var(--ink); border-block: 1px solid var(--line); padding-block: clamp(16px, 1.8vw, 24px); }
+.j-ticker .marquee__item { font-family: var(--f-display); font-style: italic; font-weight: 340; font-size: clamp(1.4rem, 2.4vw, 2.3rem); letter-spacing: -.02em; color: var(--ink); -webkit-text-stroke: 0; padding-right: clamp(20px, 2.4vw, 36px); }
+.j-ticker__dot { color: var(--caramel); font-size: clamp(.9rem, 1.2vw, 1.2rem); padding-right: clamp(20px, 2.4vw, 36px); }
+
+/* ---------- Meet Sam ---------- */
+.j-sam__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); align-items: center; }
+.j-sam__photos { grid-column: 1 / span 6; position: relative; aspect-ratio: 1 / .98; }
+.j-sam__photos .pola { position: absolute; }
+.j-sam__p1 { left: 3%; top: 3%; width: 54%; z-index: 2; }
+.j-sam__p2 { right: 2%; top: 0; width: 42%; z-index: 1; }
+.j-sam__p3 { right: 9%; bottom: 0; width: 39%; z-index: 3; }
+.j-sam__photos .pola:hover { z-index: 4; transform: rotate(0deg) scale(1.03); }
+.j-sam__copy { grid-column: 8 / span 5; display: grid; gap: 22px; justify-items: start; }
+.j-sam__copy .j-title { margin-top: 0; }
+.j-facts { width: 100%; display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); }
+.j-facts > div { padding: 16px 16px 16px 0; border-bottom: 1px solid var(--line); }
+.j-facts > div:nth-child(even) { padding-left: 16px; border-left: 1px solid var(--line); }
+.j-facts b { display: block; font-family: var(--f-display); font-style: italic; font-weight: 340; font-size: clamp(1.7rem, 2.4vw, 2.3rem); line-height: 1; color: var(--caramel); }
+.j-facts span { display: block; margin-top: 6px; font-size: var(--fs-xs); color: var(--muted); }
+@media (max-width: 900px) {
+  .j-sam__photos, .j-sam__copy { grid-column: 1 / -1; }
+  .j-sam__photos { max-width: 560px; width: 100%; margin: 0 auto 12px; }
+}
+
+/* ---------- The craft: a pile of polaroids ---------- */
+.lam.j-craft { background: var(--paper); color: var(--ink); --text: var(--ink); --muted: rgba(29, 14, 4, .62); --line: rgba(29, 14, 4, .14); --line-strong: rgba(29, 14, 4, .28); }
+.j-craft .lam__step .label { color: var(--caramel); }
+.j-craft .lam__dots i.is-on { background: var(--caramel); }
+.j-craft .lam__progress span { background: var(--caramel); }
+.j-craft .lam__count b { color: var(--caramel); }
+.j-craft .lam__copy .j-title { margin-top: 0; }
+.j-pile { position: absolute; left: 6%; top: 50%; transform: translateY(-50%); width: min(calc(min(72vh, 660px) * .6), 54%); aspect-ratio: .78; }
+.j-pile__card { position: absolute; left: 0; top: 0; width: 100%; transform: none; transition: none; }
+.j-pile__card figcaption { font-size: clamp(1rem, 1.3vw, 1.25rem); }
+@media (max-width: 900px) {
+  .j-pile { left: 4%; width: min(calc(max(34vh, 230px) * .62), 52%); }
+  .j-pile__card figcaption { font-size: .9rem; padding: 8px 6px 10px; }
+}
+
+/* ---------- Three ways in ---------- */
+.j-ways__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(28px, 4vw, 64px); align-items: start; }
+.j-way { display: flex; flex-direction: column; gap: 18px; transform: rotate(var(--r, 0deg)); transition: transform .7s var(--ease); }
+.j-way:nth-child(2) { margin-top: clamp(24px, 3vw, 48px); }
+.j-way .pola img { aspect-ratio: 4 / 4.4; }
+.j-way .pola figcaption { font-size: clamp(1.25rem, 1.8vw, 1.7rem); font-style: normal; letter-spacing: -.02em; }
+.j-way p { color: var(--muted); padding-inline: 4px; }
+.j-way__meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 4px 0; border-top: 1px solid var(--line); }
+.j-way__meta .label { color: var(--caramel); }
+.j-way__go { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: var(--fs-sm); }
+.j-way__go svg { width: 16px; height: 16px; transition: transform .5s var(--ease); }
+.j-way:hover { transform: rotate(0deg) translateY(-6px); }
+.j-way:hover .pola { box-shadow: 0 1px 0 rgba(29, 14, 4, .04), 0 44px 80px -34px rgba(29, 14, 4, .55); }
+.j-way:hover .j-way__go svg { transform: translateX(5px); }
+@media (max-width: 900px) { .j-ways__grid { grid-template-columns: 1fr; max-width: 520px; margin-inline: auto; } .j-way:nth-child(2) { margin-top: 0; } }
+
+/* ---------- Upcoming: rows with a polaroid thumbnail ---------- */
+.j-up .rows { display: grid; gap: 14px; border-top: 0; }
+.row-class { grid-template-columns: 92px 84px minmax(0, 1fr) auto auto; gap: 24px; padding: 16px 22px 16px 18px; border: 0; border-radius: 20px; background: var(--polaroid);
+  box-shadow: 0 1px 0 rgba(29, 14, 4, .04), 0 18px 40px -30px rgba(29, 14, 4, .45); transition: transform .5s var(--ease), box-shadow .5s var(--ease); }
+.row-class::before { display: none; }
+.row-class:hover { transform: translateY(-3px); box-shadow: 0 1px 0 rgba(29, 14, 4, .04), 0 30px 60px -34px rgba(29, 14, 4, .5); }
+.row-class__thumb { display: block; padding: 5px 5px 14px; background: #fff; border-radius: 10px; box-shadow: 0 14px 28px -16px rgba(29, 14, 4, .5); transform: rotate(-4deg); transition: transform .6s var(--ease); }
+.row-class:nth-child(even) .row-class__thumb { transform: rotate(3deg); }
+.row-class__thumb img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 6px; }
+.row-class:hover .row-class__thumb { transform: rotate(0deg) scale(1.06); }
+.row-class__date { padding-left: 4px; }
+.row-class__date b { font-style: italic; color: var(--caramel); }
+@media (max-width: 760px) {
+  .row-class { grid-template-columns: 64px minmax(0, 1fr); padding: 16px; }
+  .row-class__thumb { display: none; }
+}
+
+/* ---------- Curved gallery, now of polaroids ---------- */
+.j-gal { background: var(--paper); color: var(--ink); }
+.j-gal .hgal__head .j-title { margin-top: 18px; }
+.j-gal .hgal__item { gap: 14px; align-items: flex-start; }
+.j-gal .hgal__item .pola { padding: 10px 10px 0; }
+.j-gal .hgal__item .pola img { height: clamp(250px, 42vh, 420px); width: auto; aspect-ratio: var(--ar, 4 / 3); }
+.j-gal .hgal__item .pola__cap { font-size: clamp(1.05rem, 1.4vw, 1.3rem); }
+.hgal__link { display: inline-flex; align-items: center; gap: 8px; padding-left: 6px; font-size: var(--fs-xs); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--caramel); }
+.hgal__link svg { width: 14px; height: 14px; }
+@media (max-width: 1000px), (hover: none) { .j-gal .hgal__item .pola img { height: 280px; } }
+
+/* ---------- Booking: recipe index cards ---------- */
+.j-steps__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(18px, 2vw, 28px); padding: 0; margin: 0; list-style: none; }
+.j-step { position: relative; display: grid; gap: 12px; align-content: start; padding: 30px 24px 26px; border-radius: 18px; background-color: var(--polaroid);
+  background-image: repeating-linear-gradient(to bottom, transparent 0 31px, rgba(196, 122, 44, .13) 31px 32px); background-position: 0 70px;
+  box-shadow: 0 1px 0 rgba(29, 14, 4, .04), 0 24px 50px -32px rgba(29, 14, 4, .5); transform: rotate(var(--r, 0deg)); transition: transform .6s var(--ease); }
+.j-step::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 5px; border-radius: 18px 18px 0 0; background: var(--caramel); }
+.j-step:hover { transform: rotate(0deg) translateY(-6px); }
+.j-step__n { font-family: var(--f-display); font-style: italic; font-weight: 340; font-size: 2.6rem; line-height: 1; color: var(--caramel); }
+.j-step h3 { font-family: var(--f-display); font-weight: 400; font-size: 1.45rem; letter-spacing: -.02em; line-height: 1.1; }
+.j-step p { color: var(--muted); font-size: var(--fs-sm); }
+.j-step__ui { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.j-step__ui .pay-pill { background: var(--white); box-shadow: inset 0 0 0 1px var(--line); }
+.j-steps__cta { display: flex; justify-content: center; margin-top: clamp(36px, 4vw, 56px); }
+@media (max-width: 1000px) { .j-steps__grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .j-steps__grid { grid-template-columns: 1fr; } }
+
+/* ---------- A note from Sam ---------- */
+.j-note { background: var(--paper); }
+.j-note__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); align-items: center; }
+.j-note__photo { grid-column: 2 / span 3; }
+.j-note__photo .pola img { aspect-ratio: 1; }
+.j-note__quote { grid-column: 6 / span 7; margin: 0; }
+.j-note__text { font-family: var(--f-display); font-weight: 360; font-variation-settings: "SOFT" 60, "opsz" 144; font-size: clamp(1.9rem, 3.4vw, 3.5rem); line-height: 1.1; letter-spacing: -.03em; text-wrap: balance; }
+.j-note__quote footer { display: flex; align-items: center; gap: 14px; margin-top: 30px; }
+.j-note__quote footer::before { content: ""; width: 40px; height: 1px; background: var(--caramel); }
+.j-note__quote footer b { font-weight: 600; }
+.j-note__quote footer span { color: var(--muted); font-size: var(--fs-sm); }
+@media (max-width: 900px) { .j-note__photo { grid-column: 1 / -1; max-width: 260px; } .j-note__quote { grid-column: 1 / -1; } }
+
+/* ---------- Kind words ---------- */
+.reviews__pola { grid-column: 1 / span 4; align-self: center; }
+.reviews__pola .pola img { aspect-ratio: 4 / 4.6; }
+.reviews__slider { background: var(--polaroid); box-shadow: 0 1px 0 rgba(29, 14, 4, .04), 0 24px 60px -36px rgba(29, 14, 4, .45); }
+@media (max-width: 1000px) { .reviews__pola { grid-column: 1 / -1; max-width: 360px; justify-self: center; } }
+
+/* ---------- Gift ---------- */
+.j-gift__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); align-items: center; }
+.j-gift__copy { grid-column: 1 / span 6; display: grid; gap: 22px; justify-items: start; }
+.j-gift__copy .j-title { margin-top: 0; }
+.j-gift__stage { grid-column: 8 / span 5; position: relative; min-height: clamp(380px, 34vw, 480px); }
+.j-gift__pola { position: absolute; right: 2%; top: 0; width: 46%; z-index: 1; }
+.j-gift__voucher { position: absolute; left: 0; bottom: 0; width: 88%; z-index: 2; perspective: 1000px; }
+@media (max-width: 900px) { .j-gift__copy, .j-gift__stage { grid-column: 1 / -1; } .j-gift__stage { min-height: 420px; } }
+
+/* ---------- Instagram wall ---------- */
+.j-ig { background: var(--paper); }
+.j-ig__wall { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: clamp(12px, 1.6vw, 22px); }
+.j-ig__wall .pola { padding: 8px 8px 0; }
+.j-ig__wall .pola img { aspect-ratio: 1; }
+.j-ig__wall .pola__cap { font-size: .95rem; padding: 10px 6px 12px; }
+@media (max-width: 900px) { .j-ig__wall { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* ---------- Final call to action: a bookend to the loader ---------- */
+.j-cta { overflow: hidden; text-align: center; padding-block: clamp(110px, 12vw, 190px); }
+.j-cta__cards .pola { position: absolute; z-index: 0; width: clamp(110px, 10.5vw, 168px); padding: 7px 7px 26px;
+  left: calc(50% + var(--x) * 1vw - clamp(110px, 10.5vw, 168px) / 2); top: calc(50% + var(--y) * 1% - clamp(110px, 10.5vw, 168px) * .65); }
+.j-cta__cards .pola img { border-radius: 8px; }
+.j-cta__inner { position: relative; z-index: 1; display: grid; justify-items: center; gap: 22px; }
+.j-cta__title { margin-top: 6px; }
+.j-cta .j-lead { max-width: 44ch; }
+.j-cta .btn-row { justify-content: center; }
+@media (max-width: 900px) { .j-cta__cards { display: none; } }
+
+/* ---------- Deal-in: polaroids start hidden and are dealt in from above ---------- */
+.js [data-deal] > * { opacity: 0; }
+.no-motion [data-deal] > *, .reduce-motion [data-deal] > * { opacity: 1 !important; }
+
+/* the hand-drawn flourish sits under its own word */
+.j-title em, .j-note__text em, .j-cta__title em { position: relative; }
+@media (max-width: 760px) { .j-gal .hgal__head { flex-direction: column; align-items: flex-start; gap: 14px; } }
+
+/* ==========================================================================
+   Inner pages in the same language
+   ========================================================================== */
+/* section labels become the hero's white chip */
+.eyebrow { padding: 9px 16px; border-radius: var(--r-pill); background: var(--white); box-shadow: var(--shadow-sm); color: var(--text); width: max-content; max-width: 100%; gap: 10px; }
+.eyebrow::before { width: 7px; height: 7px; }
+.theme-dark .eyebrow, .theme-choc .eyebrow { background: rgba(247, 240, 230, .08); box-shadow: inset 0 0 0 1px rgba(247, 240, 230, .14); color: var(--cream); }
+/* the italic word in every heading keeps the hero's caramel */
+.h1 em, .h2 em, .h3 em { color: var(--caramel); }
+.theme-dark .h2 em, .theme-choc .h2 em, .theme-dark .h1 em { color: var(--butter); }
+
+/* warm paper sections and cards */
+.j-paper { background: var(--paper); }
+.cta-card.j-warm { background: var(--polaroid); box-shadow: 0 1px 0 rgba(29, 14, 4, .04), 0 30px 70px -40px rgba(29, 14, 4, .45); position: relative; overflow: hidden; isolation: isolate; }
+.cta-card.j-warm::before { content: ""; position: absolute; z-index: -1; right: -10%; top: -40%; width: 60%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(closest-side, rgba(241, 207, 143, .55), transparent); }
+
+/* inner hero photo fans become polaroids */
+.deck__face:not(.deck__face--voucher) { padding: 10px 10px 40px; background: var(--polaroid); box-shadow: 0 1px 0 rgba(29, 14, 4, .04), 0 40px 80px -36px rgba(29, 14, 4, .55); }
+.deck__face:not(.deck__face--voucher) > img { border-radius: 10px; }
+.deck__card:not(:last-child) .deck__face::after { inset: 10px 10px 40px; border-radius: 10px; }
+
+/* class and bakery cards: photos in a white frame */
+.ccard__media, .bake__media { padding: 8px; background: var(--polaroid); box-shadow: 0 1px 0 rgba(29, 14, 4, .04), 0 22px 50px -32px rgba(29, 14, 4, .5); }
+.ccard__media img, .bake__media img { border-radius: 14px; }
+.ccard:hover .ccard__media, .bake:hover .bake__media { transform: rotate(-1deg); transition: transform .6s var(--ease); }
+
+/* story images on About and Bakery: tilted polaroids */
+.split__media .media, .about-hero__img .media { padding: 10px 10px 44px; background: var(--polaroid); border-radius: 18px; box-shadow: 0 1px 0 rgba(29, 14, 4, .04), 0 40px 80px -40px rgba(29, 14, 4, .55); }
+.split__media .media { transform: rotate(-2deg); }
+.split--rev .split__media .media { transform: rotate(2deg); }
+.about-hero__img .media { transform: rotate(2.5deg); }
+.split__media .media img, .about-hero__img .media img { border-radius: 12px; }
+
+/* grid cards: soft white cards with space between, not boxes in a table */
+.features { border: 0; gap: clamp(14px, 1.6vw, 22px); }
+.feature { border: 0; border-radius: 20px; background: var(--polaroid); box-shadow: 0 1px 0 rgba(29, 14, 4, .04), 0 22px 50px -34px rgba(29, 14, 4, .45); }
+.value, .format, .ccard-contact { background: var(--polaroid); box-shadow: 0 1px 0 rgba(29, 14, 4, .04), 0 22px 50px -34px rgba(29, 14, 4, .45); }
+
+/* the photo ribbon on inner pages: a strip of polaroids */
+.ribbon figure { padding: 8px 8px 28px; background: var(--polaroid); border-radius: 14px; overflow: visible; aspect-ratio: auto; }
+.ribbon img { aspect-ratio: 4 / 5; height: auto; border-radius: 8px; }
+
+/* glows never widen the page */
+.j-sam, .j-note, .j-gift, .j-ways, .j-cta, .j-craft { overflow-x: clip; }

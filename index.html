@@ -27,7 +27,8 @@
   @font-face { font-family: "Fraunces"; font-style: italic; font-weight: 300 700; font-display: block; src: url("assets/fonts/fraunces-italic-v2.woff2") format("woff2"); }
   @font-face { font-family: "Inter Tight"; font-style: normal; font-weight: 400 700; font-display: swap; src: url("assets/fonts/inter-tight.woff2") format("woff2"); }
 </style>
-<link rel="stylesheet" href="assets/css/main.css?v=202611191227">
+<link rel="stylesheet" href="assets/css/main.css?v=202611191256">
+<link rel="stylesheet" href="assets/css/journal.css?v=202611191256">
 <script>
   (function (h) {
     h.classList.remove("no-js"); h.classList.add("js");
@@ -201,65 +202,67 @@
   </div>
 </section>
 
-<!-- ============ MARQUEE ============ -->
-<div class="marquee theme-choc" data-marquee data-header-dark aria-label="What we bake">
+<!-- ============ TICKER ============ -->
+<div class="marquee j-ticker" data-marquee aria-label="What we bake">
   <div class="marquee__track">
     <div class="marquee__group">
-      <span class="marquee__item">Croissants</span><svg class="marquee__star" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-spark"/></svg>
-      <span class="marquee__item">Sourdough</span><svg class="marquee__star" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-spark"/></svg>
-      <span class="marquee__item">Choux</span><svg class="marquee__star" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-spark"/></svg>
-      <span class="marquee__item">Danish</span><svg class="marquee__star" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-spark"/></svg>
-      <span class="marquee__item">Focaccia</span><svg class="marquee__star" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-spark"/></svg>
-      <span class="marquee__item">Tarte au chocolat</span><svg class="marquee__star" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-spark"/></svg>
+      <span class="marquee__item">Croissants</span><span class="j-ticker__dot" aria-hidden="true">✺</span>
+      <span class="marquee__item">Sourdough</span><span class="j-ticker__dot" aria-hidden="true">✺</span>
+      <span class="marquee__item">Choux</span><span class="j-ticker__dot" aria-hidden="true">✺</span>
+      <span class="marquee__item">Danish</span><span class="j-ticker__dot" aria-hidden="true">✺</span>
+      <span class="marquee__item">Focaccia</span><span class="j-ticker__dot" aria-hidden="true">✺</span>
+      <span class="marquee__item">Tarte au chocolat</span><span class="j-ticker__dot" aria-hidden="true">✺</span>
     </div>
   </div>
 </div>
 
-<!-- ============ 01 HELLO ============ -->
-<section class="section" id="hello">
-  <div class="container">
-    <span class="eyebrow label" data-reveal><span class="num">(01)</span><span class="dash"></span>Hello, I'm Sam</span>
-    <p class="hello__text" style="margin-top:clamp(28px,3vw,44px)" data-scrub-words>
-      Chef, pâtissier and artisan baker. I trained at <em>Le Cordon Bleu</em> and The School of Artisan Food, taught as a Pâtisserie Chef Lecturer, and cooked my way across the UK, Europe and New Zealand. Now I've brought it all <em>home to Crieff</em>, to share with you.
-    </p>
-    <div class="hello__foot">
-      <div class="stats">
-        <div class="stat" data-reveal><div class="stat__num"><em>Dist.</em></div><p class="stat__label">Le Cordon Bleu, Diploma in Pâtisserie with distinction</p></div>
-        <div class="stat" data-reveal><div class="stat__num"><em>Dist.</em></div><p class="stat__label">Advanced Diploma in Artisan Bakery, The School of Artisan Food</p></div>
-        <div class="stat" data-reveal><div class="stat__num" data-count="8">8</div><p class="stat__label">Maximum students per class, so you're actually taught</p></div>
-        <div class="stat" data-reveal><div class="stat__num" data-count="3">3</div><p class="stat__label">Countries cooked and taught in: UK, Europe &amp; New Zealand</p></div>
+<!-- ============ MEET SAM ============ -->
+<section class="section j-sam" id="hello">
+  <div class="container j-sam__grid">
+    <div class="j-sam__photos" data-deal>
+      <figure class="pola j-sam__p1" style="--r:-4deg"><img src="assets/img/sam.jpg" alt="Sam Heeney-Governo in chef's whites, holding a craquelin choux bun" loading="lazy" style="object-position:50% 22%"><figcaption>Sam, at the bench</figcaption></figure>
+      <figure class="pola j-sam__p2" style="--r:7deg"><img src="assets/img/m/croissants.jpg" alt="" loading="lazy"><figcaption>This morning's croissants</figcaption></figure>
+      <figure class="pola j-sam__p3" style="--r:-7deg"><img src="assets/img/m/crumb.jpg" alt="" loading="lazy"><figcaption>48-hour sourdough</figcaption></figure>
+    </div>
+    <div class="j-sam__copy">
+      <span class="j-chip" data-reveal><i></i>Hello, I'm Sam</span>
+      <h2 class="j-title" data-split>Chef, pâtissier and <em>artisan baker.</em></h2>
+      <p class="j-lead" data-reveal>I trained at Le Cordon Bleu and The School of Artisan Food, taught as a Pâtisserie Chef Lecturer, and cooked my way across the UK, Europe and New Zealand. Now I've brought it all home to Crieff, to share with you.</p>
+      <div class="j-facts" data-reveal>
+        <div><b>Distinction</b><span>Le Cordon Bleu, Diploma in Pâtisserie</span></div>
+        <div><b>Distinction</b><span>Advanced Diploma in Artisan Bakery</span></div>
+        <div><b data-count="8">8</b><span>Students at most, so you're actually taught</span></div>
+        <div><b data-count="3">3</b><span>Countries cooked and taught in</span></div>
       </div>
-      <div class="hello__cta" data-reveal><a class="btn btn--ghost" href="about.html">Read Sam's story <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a></div>
+      <div class="btn-row" data-reveal><a class="btn btn--ghost" href="about.html">Read Sam's story <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a></div>
     </div>
   </div>
 </section>
 
-<!-- ============ THE CRAFT: 27 LAYERS ============ -->
-<section class="lam theme-dark" data-lam data-header-dark>
+<!-- ============ THE CRAFT: a pile of polaroids, 3 → 9 → 27 ============ -->
+<section class="lam j-craft" data-lam>
   <div class="lam__pin">
     <div class="container">
       <div class="lam__grid">
         <div class="lam__copy">
-          <span class="eyebrow label"><span class="num">(✺)</span><span class="dash"></span>The craft, up close</span>
-          <h2 class="h2" data-split>Butter. Fold. <em>Repeat.</em></h2>
+          <span class="j-chip"><i></i>The craft, up close</span>
+          <h2 class="j-title" data-split>Butter. Fold. <em>Repeat.</em></h2>
           <div class="lam__steps">
             <div class="lam__step is-active"><span class="label">Step 01 · Lock-in</span><h3>A cold slab of butter</h3><p>French butter wrapped in a soft détrempe dough. Three layers: dough, butter, dough.</p></div>
             <div class="lam__step"><span class="label">Step 02 · First fold</span><h3>Roll, fold in three</h3><p>Every letter fold triples the layers. Temperature is everything: too warm and the butter melts in.</p></div>
             <div class="lam__step"><span class="label">Step 03 · Rest &amp; roll</span><h3>Nine thin sheets</h3><p>Rest, chill, roll again. The dough relaxes and the butter stays in perfect, unbroken sheets.</p></div>
             <div class="lam__step"><span class="label">Step 04 · Second fold</span><h3>Twenty-seven layers</h3><p>In the oven, steam lifts every layer apart. That's the shatter, the honeycomb and the sound of a proper croissant.</p></div>
           </div>
-          <div class="btn-row"><a class="btn btn--butter" href="class.html?c=croissant">Learn it in the Croissant Masterclass <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a></div>
+          <div class="btn-row"><a class="btn" href="class.html?c=croissant">Learn it in the Croissant Masterclass <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a></div>
           <div class="lam__dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i></div>
         </div>
         <div class="lam__stage" aria-hidden="true">
           <div class="lam__count"><b data-lam-count>3</b><span class="label">layers of butter &amp; dough</span></div>
-          <div class="lx" data-lx>
-            <div class="lx__frame" data-lx-frame><i class="lx__edge" aria-hidden="true"></i>
-            <figure class="lx__layer" data-lx-layer><img src="assets/img/sam.jpg" alt="" loading="lazy" decoding="async" style="object-position:50% 22%"><figcaption class="lx__cap">Sam at the bench</figcaption><span class="lp__note lp__note--l" style="--x:72%;--y:50%"><i></i><b>Sam: Le Cordon Bleu pâtissier</b></span></figure>
-            <figure class="lx__layer" data-lx-layer><img src="assets/img/fig-pastry.jpg" alt="" loading="lazy" decoding="async" style="object-position:27% 50%"><figcaption class="lx__cap">Fig supreme</figcaption><span class="lp__note lp__note--r" style="--x:20%;--y:70%"><i></i><b>Count the layers on the side</b></span></figure>
-            <figure class="lx__layer" data-lx-layer><img src="assets/img/plum-danish.jpg" alt="" loading="lazy" decoding="async" style="object-position:46% 50%"><figcaption class="lx__cap">Plum Danish</figcaption><span class="lp__note lp__note--r" style="--x:18%;--y:74%"><i></i><b>Butter sheets lift the rim</b></span></figure>
-            <figure class="lx__layer" data-lx-layer><img src="assets/img/croissants.jpg" alt="" loading="lazy" decoding="async" style="object-position:50% 50%"><figcaption class="lx__cap">Croissants, this morning</figcaption><span class="lp__note lp__note--r" style="--x:22%;--y:58%"><i></i><b>27 layers of butter &amp; dough</b></span></figure>
-            </div>
+          <div class="j-pile">
+            <figure class="pola j-pile__card" data-r="-5" data-x="-4" data-y="2"><img src="assets/img/sam.jpg" alt="" loading="lazy" style="object-position:50% 22%"><figcaption>Sam at the bench</figcaption></figure>
+            <figure class="pola j-pile__card" data-r="6" data-x="5" data-y="-1"><img src="assets/img/fig-pastry.jpg" alt="" loading="lazy" style="object-position:30% 50%"><figcaption>Fig supreme, layers on show</figcaption></figure>
+            <figure class="pola j-pile__card" data-r="-3" data-x="-2" data-y="-3"><img src="assets/img/plum-danish.jpg" alt="" loading="lazy" style="object-position:46% 50%"><figcaption>Plum Danish</figcaption></figure>
+            <figure class="pola j-pile__card" data-r="3" data-x="3" data-y="1"><img src="assets/img/croissants.jpg" alt="" loading="lazy"><figcaption>27 layers, this morning</figcaption></figure>
           </div>
         </div>
       </div>
@@ -268,57 +271,43 @@
   </div>
 </section>
 
-<!-- ============ 02 THREE WAYS ============ -->
-<section class="section theme-paper">
+<!-- ============ THREE WAYS IN ============ -->
+<section class="section j-ways">
   <div class="container">
-    <div class="sec-head">
-      <div>
-        <span class="eyebrow label"><span class="num">(02)</span><span class="dash"></span>Three ways in</span>
-        <h2 class="h2" data-split>Cook with me, <em>bake</em> with me, or simply eat.</h2>
-      </div>
-      <div class="sec-head__aside" data-reveal><p>Whether you want to master lamination, celebrate with friends or just collect a box of croissants, there's a way in for you.</p></div>
+    <div class="j-head j-head--center">
+      <span class="j-chip" data-reveal><i></i>Three ways in</span>
+      <h2 class="j-title" data-split>Cook with me, <em>bake</em> with me, or simply eat.</h2>
+      <p class="j-sub" data-reveal>Master lamination, celebrate with friends or just collect a box of croissants. There's a way in for you.</p>
     </div>
-    <div class="paths">
-      <a class="path" href="classes.html" data-reveal data-tilt3d data-cursor="Book">
-        <div class="path__media"><span class="path__num">01</span><img src="assets/img/almond-croissant.jpg" alt="Almond croissants" loading="lazy"></div>
-        <div class="path__body">
-          <span class="label" style="color:var(--caramel)">From <span data-from-price>£68</span> pp</span>
-          <h3 class="h3">Classes &amp; Events</h3>
-          <p>Hands-on sessions in cuisine and pâtisserie, designed to be engaging, confidence-building, creative and fun.</p>
-          <div class="path__foot"><span class="label"><span data-count-sessions>20</span> dates open</span><span class="path__arrow"><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></div>
-        </div>
+    <div class="j-ways__grid" data-deal>
+      <a class="j-way" href="classes.html" style="--r:-2.5deg">
+        <figure class="pola"><img src="assets/img/almond-croissant.jpg" alt="Almond croissants" loading="lazy"><figcaption>Classes &amp; Events</figcaption></figure>
+        <p>Hands-on sessions in cuisine and pâtisserie, designed to be engaging, confidence-building and fun.</p>
+        <span class="j-way__meta"><span class="label">From <span data-from-price>£68</span> · <span data-count-sessions>20</span> dates open</span><span class="j-way__go">Book <svg aria-hidden="true"><use href="#i-arrow"/></svg></span></span>
       </a>
-      <a class="path" href="private.html" data-reveal data-tilt3d data-cursor="Enquire">
-        <div class="path__media"><span class="path__num">02</span><img src="assets/img/sam.jpg" alt="Sam teaching choux pastry" loading="lazy" style="object-position:50% 30%"></div>
-        <div class="path__body">
-          <span class="label" style="color:var(--caramel)">Your date, your menu</span>
-          <h3 class="h3">Private Lessons</h3>
-          <p>One-to-one masterclasses, celebrations and team days, built entirely around what you want to make.</p>
-          <div class="path__foot"><span class="label">1–8 guests</span><span class="path__arrow"><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></div>
-        </div>
+      <a class="j-way" href="private.html" style="--r:2deg">
+        <figure class="pola"><img src="assets/img/sam.jpg" alt="Sam teaching choux pastry" loading="lazy" style="object-position:50% 25%"><figcaption>Private Lessons</figcaption></figure>
+        <p>One-to-one masterclasses, celebrations and team days, built entirely around what you want to make.</p>
+        <span class="j-way__meta"><span class="label">1–8 guests · your date</span><span class="j-way__go">Enquire <svg aria-hidden="true"><use href="#i-arrow"/></svg></span></span>
       </a>
-      <a class="path" href="bakery.html" data-reveal data-tilt3d data-cursor="Order">
-        <div class="path__media"><span class="path__num">03</span><img src="assets/img/plum-danish.jpg" alt="Poached plum Danish" loading="lazy"></div>
-        <div class="path__body">
-          <span class="label" style="color:var(--caramel)">Pre-order &amp; collect</span>
-          <h3 class="h3">Bakery &amp; Pâtisserie</h3>
-          <p>Naturally-leavened bread, viennoiserie and pâtisserie, baked in small batches for collection in Crieff.</p>
-          <div class="path__foot"><span class="label">Fri &amp; Sat collection</span><span class="path__arrow"><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></div>
-        </div>
+      <a class="j-way" href="bakery.html" style="--r:-1.5deg">
+        <figure class="pola"><img src="assets/img/plum-danish.jpg" alt="Poached plum Danish" loading="lazy"><figcaption>Bakery &amp; Pâtisserie</figcaption></figure>
+        <p>Naturally-leavened bread, viennoiserie and pâtisserie, baked in small batches for collection in Crieff.</p>
+        <span class="j-way__meta"><span class="label">Fri &amp; Sat collection</span><span class="j-way__go">Pre-order <svg aria-hidden="true"><use href="#i-arrow"/></svg></span></span>
       </a>
     </div>
   </div>
 </section>
 
-<!-- ============ 03 UPCOMING ============ -->
-<section class="section" id="upcoming">
+<!-- ============ UPCOMING ============ -->
+<section class="section j-up" id="upcoming">
   <div class="container">
-    <div class="sec-head">
+    <div class="j-head j-head--split">
       <div>
-        <span class="eyebrow label"><span class="num">(03)</span><span class="dash"></span>On the calendar</span>
-        <h2 class="h2" data-split>Upcoming <em>classes</em>.</h2>
+        <span class="j-chip" data-reveal><i></i>On the calendar</span>
+        <h2 class="j-title" data-split>Upcoming <em>classes</em>.</h2>
       </div>
-      <div class="sec-head__aside" data-reveal><p>Live availability, updated the moment someone books. Grab a seat in under a minute, or join the waitlist if it's full.</p><a class="link" href="classes.html">See the full calendar <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+      <div class="j-head__aside" data-reveal><p>Live availability, updated the moment someone books. Grab a seat in under a minute, or join the waitlist if it's full.</p><a class="link" href="classes.html">See the full calendar <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
     </div>
     <div class="toolbar" data-reveal>
       <div class="chips" role="group" aria-label="Filter classes">
@@ -329,92 +318,76 @@
       </div>
       <span class="label muted">Prices per person · all ingredients included</span>
     </div>
-    <div class="upcoming">
-      <aside class="upv" aria-hidden="true">
-        <div class="upv__card" data-upv>
-          <img loading="lazy" decoding="async" src="assets/img/croissants.jpg" alt="" data-upv-img>
-          <span class="upv__date"><b data-upv-day>28</b><small data-upv-mon>Nov · Sat</small></span>
-          <div class="upv__body"><span class="label" data-upv-cat>Pâtisserie</span><b data-upv-title>Croissant &amp; Viennoiserie Masterclass</b><span data-upv-seats></span></div>
-        </div>
-        <p class="upv__hint label">Hover a class to preview it</p>
-      </aside>
-      <div class="upcoming__list"><div class="rows" data-upcoming data-limit="6"></div></div>
-    </div>
+    <div class="rows" data-upcoming data-limit="5"></div>
   </div>
 </section>
 
-<!-- ============ 04 HORIZONTAL GALLERY ============ -->
-<section class="section theme-dark hgal" data-hscroll data-header-dark>
+<!-- ============ THINGS YOU'LL MAKE (curved gallery) ============ -->
+<section class="section hgal j-gal" data-hscroll>
   <div class="container hgal__head">
     <div>
-      <span class="eyebrow label"><span class="num">(04)</span><span class="dash"></span>From Sam's bench</span>
-      <h2 class="h2" style="margin-top:28px" data-split>Things you'll <em>learn</em> to make.</h2>
+      <span class="j-chip"><i></i>From Sam's bench</span>
+      <h2 class="j-title" data-split>Things you'll <em>learn</em> to make.</h2>
     </div>
-    <p class="muted" style="max-width:34ch" data-reveal>Every bake below is taught in a class. Real photos from the Love to Cook kitchen.</p>
+    <p class="j-sub" data-reveal>Every bake below is taught in a class. Real photos from the Love to Cook kitchen.</p>
   </div>
   <div class="hgal__viewport">
     <div class="hgal__track">
-      <div class="hgal__intro"><p class="lead">Scroll through the counter. Each one comes with a class, a recipe and a box to take home.</p><a class="btn btn--light" href="classes.html">All classes <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a></div>
-      <figure class="hgal__item"><div class="media" style="--ar:430 / 275"><img src="assets/img/croissants.jpg" alt="Butter croissants" loading="lazy"></div><figcaption class="hgal__cap"><h3>Butter croissants</h3><a href="class.html?c=croissant">Croissant Masterclass →</a></figcaption></figure>
-      <figure class="hgal__item"><div class="media" style="--ar:360 / 275"><img src="assets/img/fig-pastry.jpg" alt="Fig & frangipane supreme" loading="lazy"></div><figcaption class="hgal__cap"><h3>Fig &amp; frangipane supreme</h3><a href="class.html?c=laminated">Showstoppers →</a></figcaption></figure>
-      <figure class="hgal__item"><div class="media" style="--ar:350 / 365"><img src="assets/img/crumb.jpg" alt="Open-crumb sourdough" loading="lazy"></div><figcaption class="hgal__cap"><h3>Open-crumb sourdough</h3><a href="class.html?c=sourdough">Sourdough →</a></figcaption></figure>
-      <figure class="hgal__item"><div class="media" style="--ar:350 / 225"><img src="assets/img/plum-danish.jpg" alt="Poached plum Danish" loading="lazy"></div><figcaption class="hgal__cap"><h3>Poached plum Danish</h3><a href="class.html?c=danish">Danish →</a></figcaption></figure>
-      <figure class="hgal__item"><div class="media" style="--ar:435 / 335"><img src="assets/img/chocolate-tart.jpg" alt="Tarte au chocolat" loading="lazy"></div><figcaption class="hgal__cap"><h3>Tarte au chocolat</h3><a href="class.html?c=festive">Festive Chocolate →</a></figcaption></figure>
-      <figure class="hgal__item"><div class="media" style="--ar:390 / 330"><img src="assets/img/almond-croissant.jpg" alt="Almond croissants" loading="lazy"></div><figcaption class="hgal__cap"><h3>Almond croissants</h3><a href="class.html?c=croissant">Croissant Masterclass →</a></figcaption></figure>
-      <figure class="hgal__item"><div class="media" style="--ar:670 / 365"><img src="assets/img/focaccia.jpg" alt="Rosemary focaccia" loading="lazy"></div><figcaption class="hgal__cap"><h3>Rosemary focaccia</h3><a href="class.html?c=focaccia">Focaccia Night →</a></figcaption></figure>
-      <figure class="hgal__item"><div class="media" style="--ar:470 / 260"><img src="assets/img/sourdough.jpg" alt="Country loaves" loading="lazy"></div><figcaption class="hgal__cap"><h3>Country loaves</h3><a href="class.html?c=sourdough">Sourdough →</a></figcaption></figure>
+      <div class="hgal__intro"><p class="lead">Scroll through the counter. Each one comes with a class, a recipe and a box to take home.</p><a class="btn" href="classes.html">All classes <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a></div>
+      <figure class="hgal__item"><a class="pola" href="class.html?c=croissant" style="--ar:430 / 275;--r:-2deg"><img src="assets/img/croissants.jpg" alt="Butter croissants" loading="lazy"><span class="pola__cap">Butter croissants</span></a><a class="hgal__link" href="class.html?c=croissant">Croissant Masterclass <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></figure>
+      <figure class="hgal__item"><a class="pola" href="class.html?c=laminated" style="--ar:360 / 275;--r:2deg"><img src="assets/img/fig-pastry.jpg" alt="Fig & frangipane supreme" loading="lazy"><span class="pola__cap">Fig &amp; frangipane supreme</span></a><a class="hgal__link" href="class.html?c=laminated">Showstoppers <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></figure>
+      <figure class="hgal__item"><a class="pola" href="class.html?c=sourdough" style="--ar:350 / 365;--r:-1.5deg"><img src="assets/img/crumb.jpg" alt="Open-crumb sourdough" loading="lazy"><span class="pola__cap">Open-crumb sourdough</span></a><a class="hgal__link" href="class.html?c=sourdough">Sourdough <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></figure>
+      <figure class="hgal__item"><a class="pola" href="class.html?c=danish" style="--ar:350 / 225;--r:2.5deg"><img src="assets/img/plum-danish.jpg" alt="Poached plum Danish" loading="lazy"><span class="pola__cap">Poached plum Danish</span></a><a class="hgal__link" href="class.html?c=danish">Danish <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></figure>
+      <figure class="hgal__item"><a class="pola" href="class.html?c=festive" style="--ar:435 / 335;--r:-2deg"><img src="assets/img/chocolate-tart.jpg" alt="Tarte au chocolat" loading="lazy"><span class="pola__cap">Tarte au chocolat</span></a><a class="hgal__link" href="class.html?c=festive">Festive Chocolate <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></figure>
+      <figure class="hgal__item"><a class="pola" href="class.html?c=croissant" style="--ar:390 / 330;--r:1.5deg"><img src="assets/img/almond-croissant.jpg" alt="Almond croissants" loading="lazy"><span class="pola__cap">Almond croissants</span></a><a class="hgal__link" href="class.html?c=croissant">Croissant Masterclass <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></figure>
+      <figure class="hgal__item"><a class="pola" href="class.html?c=focaccia" style="--ar:670 / 365;--r:-1.5deg"><img src="assets/img/focaccia.jpg" alt="Rosemary focaccia" loading="lazy"><span class="pola__cap">Rosemary focaccia</span></a><a class="hgal__link" href="class.html?c=focaccia">Focaccia Night <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></figure>
+      <figure class="hgal__item"><a class="pola" href="class.html?c=sourdough" style="--ar:470 / 260;--r:2deg"><img src="assets/img/sourdough.jpg" alt="Country loaves" loading="lazy"><span class="pola__cap">Country loaves</span></a><a class="hgal__link" href="class.html?c=sourdough">Sourdough <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></figure>
     </div>
   </div>
   <div class="container"><div class="hgal__progress"><span></span></div></div>
 </section>
 
-<!-- ============ 05 HOW BOOKING WORKS ============ -->
-<section class="section">
-  <div class="container steps-wrap">
-    <div class="steps-wrap__aside">
-      <div class="steps-wrap__sticky">
-        <span class="eyebrow label"><span class="num">(05)</span><span class="dash"></span>Booking, made easy</span>
-        <h2 class="h2" data-split>From browsing to <em>baking</em> in four steps.</h2>
-        <p class="muted" data-reveal style="max-width:40ch">No back-and-forth messages, no waiting for a reply. Pick a date, pay securely and it's in your calendar before the kettle boils.</p>
-        <div data-reveal><a class="btn" href="classes.html">Find your class <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a></div>
-      </div>
-    </div>
-    <div class="steps-wrap__list" data-steps role="list">
-      <span class="steps-line" aria-hidden="true"><span></span></span>
-      <div class="step" role="listitem"><span class="step__num">01</span><div><h3 class="h3">Choose your class</h3><p>Browse by list or calendar. Every date shows live seats left, so you'll never ask "is there space?" again.</p><div class="step__ui"><span class="seats is-low"><span class="seats__bar"><i class="is-taken"></i><i class="is-taken"></i><i class="is-taken"></i><i class="is-taken"></i><i class="is-taken"></i><i class="is-taken"></i><i></i><i></i></span><span class="seats__txt">2 of 8 seats left</span></span></div></div></div>
-      <div class="step" role="listitem"><span class="step__num">02</span><div><h3 class="h3">Bring your people</h3><p>Book one seat or several in the same checkout. Add a gift voucher or a box of croissants while you're there.</p><div class="step__ui"><span class="tag tag--butter">2 × Croissant Masterclass</span><span class="tag">+ Gift voucher</span></div></div></div>
-      <div class="step" role="listitem"><span class="step__num">03</span><div><h3 class="h3">Pay securely</h3><p>Apple Pay, Google Pay or card, processed by Square. Instant, encrypted and familiar.</p><div class="step__ui"><span class="pay-pill"><svg aria-hidden="true"><use href="#i-apple"/></svg> Pay</span><span class="pay-pill"><svg aria-hidden="true"><use href="#i-google"/></svg> Pay</span><span class="pay-pill">VISA</span><span class="pay-pill">Mastercard</span></div></div></div>
-      <div class="step" role="listitem"><span class="step__num">04</span><div><h3 class="h3">It's in your calendar</h3><p>Instant confirmation, a one-tap "add to calendar", and a friendly reminder with directions 48 hours before.</p><div class="step__ui"><span class="tag tag--dark">✓ Confirmed · LTC-8F2KQ</span><span class="tag">Reminder 48h before</span></div></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ QUOTE BAND ============ -->
-<section class="quote-band" data-header-dark>
-  <div class="quote-band__bg" data-parallax="8"><img src="assets/img/collage.jpg" alt="" loading="lazy"></div>
-  <div class="container quote-band__inner">
-    <figure>
-      <blockquote data-split>Growing up in a Scottish–Portuguese family, meals were more than nourishment. They were <em>where life happened.</em></blockquote>
-      <figcaption data-reveal><img loading="lazy" decoding="async" src="assets/img/sam-square.jpg" alt=""><span><b>Sam Heeney-Governo</b><small>Founder, Love to Cook</small></span></figcaption>
-    </figure>
-  </div>
-</section>
-
-<!-- ============ 06 KIND WORDS ============ -->
-<section class="section">
+<!-- ============ BOOKING: four recipe cards ============ -->
+<section class="section j-steps">
   <div class="container">
-    <div class="sec-head">
+    <div class="j-head j-head--center">
+      <span class="j-chip" data-reveal><i></i>Booking, made easy</span>
+      <h2 class="j-title" data-split>From browsing to <em>baking</em> in four steps.</h2>
+      <p class="j-sub" data-reveal>No back-and-forth messages, no waiting for a reply. Pick a date, pay securely and it's in your calendar before the kettle boils.</p>
+    </div>
+    <ol class="j-steps__grid" data-deal>
+      <li class="j-step" style="--r:-1.5deg"><span class="j-step__n">01</span><h3>Choose your class</h3><p>Browse by list or calendar. Every date shows live seats left, so you'll never ask "is there space?" again.</p><div class="j-step__ui"><span class="seats is-low"><span class="seats__bar"><i class="is-taken"></i><i class="is-taken"></i><i class="is-taken"></i><i class="is-taken"></i><i class="is-taken"></i><i class="is-taken"></i><i></i><i></i></span><span class="seats__txt">2 of 8 seats left</span></span></div></li>
+      <li class="j-step" style="--r:1deg"><span class="j-step__n">02</span><h3>Bring your people</h3><p>Book one seat or several in the same checkout. Add a gift voucher or a box of croissants while you're there.</p><div class="j-step__ui"><span class="tag tag--butter">2 × Croissant Masterclass</span><span class="tag">+ Gift voucher</span></div></li>
+      <li class="j-step" style="--r:-1deg"><span class="j-step__n">03</span><h3>Pay securely</h3><p>Apple Pay, Google Pay or card, processed by Square. Instant, encrypted and familiar.</p><div class="j-step__ui"><span class="pay-pill"><svg aria-hidden="true"><use href="#i-apple"/></svg> Pay</span><span class="pay-pill"><svg aria-hidden="true"><use href="#i-google"/></svg> Pay</span><span class="pay-pill">VISA</span></div></li>
+      <li class="j-step" style="--r:1.5deg"><span class="j-step__n">04</span><h3>It's in your calendar</h3><p>Instant confirmation, one-tap "add to calendar", and a friendly reminder with directions 48 hours before.</p><div class="j-step__ui"><span class="tag tag--dark">✓ Confirmed · LTC-8F2KQ</span></div></li>
+    </ol>
+    <div class="j-steps__cta" data-reveal><a class="btn" href="classes.html">Find your class <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a></div>
+  </div>
+</section>
+
+<!-- ============ A NOTE FROM SAM ============ -->
+<section class="section j-note">
+  <div class="container j-note__grid">
+    <div class="j-note__photo" data-deal><figure class="pola" style="--r:-5deg"><img src="assets/img/sam-square.jpg" alt="Sam Heeney-Governo" loading="lazy"><figcaption>Sam, Crieff</figcaption></figure></div>
+    <blockquote class="j-note__quote">
+      <p class="j-note__text" data-split>Growing up in a Scottish–Portuguese family, meals were more than nourishment. They were <em>where life happened.</em></p>
+      <footer data-reveal><b>Sam Heeney-Governo</b><span>Founder, Love to Cook</span></footer>
+    </blockquote>
+  </div>
+</section>
+
+<!-- ============ KIND WORDS ============ -->
+<section class="section j-kind">
+  <div class="container">
+    <div class="j-head j-head--split">
       <div>
-        <span class="eyebrow label"><span class="num">(06)</span><span class="dash"></span>Kind words</span>
-        <h2 class="h2" data-split>Straight from <em>the bench</em>.</h2>
+        <span class="j-chip" data-reveal><i></i>Kind words</span>
+        <h2 class="j-title" data-split>Straight from <em>the bench</em>.</h2>
       </div>
-      <div class="sec-head__aside" data-reveal><span class="stars"><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg></span><p style="margin-top:12px">Reviews from students, gift recipients and private-class hosts.</p></div>
+      <div class="j-head__aside" data-reveal><span class="stars"><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg></span><p>Reviews from students, gift recipients and private-class hosts.</p></div>
     </div>
     <div class="reviews">
-      <a class="reviews__photo" href="classes.html" data-reveal-img>
-        <img src="assets/img/almond-croissant.jpg" alt="Almond croissants made in a Love to Cook class" loading="lazy">
-        <span class="reviews__tag"><span class="label">Every class ends with</span><b>a box of your own bakes</b><span class="reviews__go">Find a class <svg aria-hidden="true"><use href="#i-arrow"/></svg></span></span>
-      </a>
+      <div class="reviews__pola" data-deal><a class="pola" href="classes.html" style="--r:-3deg"><img src="assets/img/almond-croissant.jpg" alt="Almond croissants made in a Love to Cook class" loading="lazy"><span class="pola__cap">Every class ends with a box of your own bakes</span></a></div>
       <div class="tslider reviews__slider" data-testimonials data-reveal>
         <div class="tslider__viewport"><div class="tslider__track"></div></div>
         <div class="tslider__nav">
@@ -426,17 +399,18 @@
   </div>
 </section>
 
-<!-- ============ 07 GIFT ============ -->
-<section class="section section--flush-top">
-  <div class="container">
-    <div class="gift-band theme-choc" data-header-dark>
-      <div class="gift-band__copy">
-        <span class="eyebrow label"><span class="num">(07)</span><span class="dash"></span>Gift vouchers</span>
-        <h2 class="h2" data-split>The gift that comes back as <em>croissants</em>.</h2>
-        <p class="muted" style="max-width:42ch" data-reveal>Choose an amount or a specific class, add a personal note, and it lands in their inbox beautifully designed. Instantly or on the day you choose.</p>
-        <div class="btn-row" data-reveal><a class="btn btn--butter" href="gift.html">Create a voucher <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a><span class="muted" style="font-size:var(--fs-xs)">Valid 12 months · any class or bake</span></div>
-      </div>
-      <div class="gift-band__visual" data-reveal>
+<!-- ============ GIFT ============ -->
+<section class="section j-gift">
+  <div class="container j-gift__grid">
+    <div class="j-gift__copy">
+      <span class="j-chip" data-reveal><i></i>Gift vouchers</span>
+      <h2 class="j-title" data-split>The gift that comes back as <em>croissants</em>.</h2>
+      <p class="j-lead" data-reveal>Choose an amount or a specific class, add a personal note, and it lands in their inbox beautifully designed. Instantly, or on the day you choose.</p>
+      <div class="btn-row" data-reveal><a class="btn" href="gift.html">Create a voucher <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a><span class="label muted">Valid 12 months · any class or bake</span></div>
+    </div>
+    <div class="j-gift__stage">
+      <div class="j-gift__pola" data-deal><figure class="pola" style="--r:8deg"><img src="assets/img/m/fruit-danish.jpg" alt="" loading="lazy"><figcaption>For the one who loves Danish</figcaption></figure></div>
+      <div class="j-gift__voucher" data-reveal>
         <div class="voucher" data-tilt>
           <svg class="voucher__whisk" viewBox="0 0 64 64" aria-hidden="true"><use href="#i-whisk"/></svg>
           <div class="voucher__top"><img src="assets/img/logo-cream.png" alt="" loading="lazy"><span class="label" style="color:var(--butter)">Gift voucher</span></div>
@@ -448,34 +422,34 @@
   </div>
 </section>
 
-<!-- ============ 08 INSTAGRAM ============ -->
-<section class="section theme-paper">
+<!-- ============ INSTAGRAM WALL ============ -->
+<section class="section j-ig">
   <div class="container">
-    <div class="sec-head">
+    <div class="j-head j-head--split">
       <div>
-        <span class="eyebrow label"><span class="num">(08)</span><span class="dash"></span>Follow along</span>
-        <h2 class="h2" data-split>Fresh out the oven on <em>@lovetocook.uk</em></h2>
+        <span class="j-chip" data-reveal><i></i>Follow along</span>
+        <h2 class="j-title" data-split>Fresh out the oven on <em>@lovetocook.uk</em></h2>
       </div>
-      <div class="sec-head__aside" data-reveal><p>Daily bakes, behind-the-scenes and the first look at new class dates.</p><a class="link" href="https://www.instagram.com/lovetocook.uk" target="_blank" rel="noopener">Follow on Instagram <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+      <div class="j-head__aside" data-reveal><p>Daily bakes, behind-the-scenes and the first look at new class dates.</p><a class="link" href="https://www.instagram.com/lovetocook.uk" target="_blank" rel="noopener">Follow on Instagram <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
     </div>
-    <div class="ig-grid">
-      <a href="https://www.instagram.com/lovetocook.uk" target="_blank" rel="noopener" data-reveal aria-label="Instagram post: croissants"><img src="assets/img/croissants.jpg" alt="" loading="lazy"><svg aria-hidden="true"><use href="#i-ig"/></svg></a>
-      <a href="https://www.instagram.com/lovetocook.uk" target="_blank" rel="noopener" data-reveal aria-label="Instagram post: plum Danish"><img src="assets/img/plum-danish.jpg" alt="" loading="lazy"><svg aria-hidden="true"><use href="#i-ig"/></svg></a>
-      <a href="https://www.instagram.com/lovetocook.uk" target="_blank" rel="noopener" data-reveal aria-label="Instagram post: sourdough"><img src="assets/img/sourdough.jpg" alt="" loading="lazy"><svg aria-hidden="true"><use href="#i-ig"/></svg></a>
-      <a href="https://www.instagram.com/lovetocook.uk" target="_blank" rel="noopener" data-reveal aria-label="Instagram post: chocolate tart"><img src="assets/img/chocolate-tart.jpg" alt="" loading="lazy"><svg aria-hidden="true"><use href="#i-ig"/></svg></a>
-      <a href="https://www.instagram.com/lovetocook.uk" target="_blank" rel="noopener" data-reveal aria-label="Instagram post: fig pastry"><img src="assets/img/fig-pastry.jpg" alt="" loading="lazy"><svg aria-hidden="true"><use href="#i-ig"/></svg></a>
-      <a href="https://www.instagram.com/lovetocook.uk" target="_blank" rel="noopener" data-reveal aria-label="Instagram post: focaccia"><img src="assets/img/focaccia.jpg" alt="" loading="lazy"><svg aria-hidden="true"><use href="#i-ig"/></svg></a>
+    <div class="j-ig__wall" data-deal>
+      <a class="pola" href="https://www.instagram.com/lovetocook.uk" target="_blank" rel="noopener" style="--r:-4deg" aria-label="Instagram post: croissants"><img src="assets/img/m/croissants.jpg" alt="" loading="lazy"><span class="pola__cap">Croissants</span></a>
+      <a class="pola" href="https://www.instagram.com/lovetocook.uk" target="_blank" rel="noopener" style="--r:3deg" aria-label="Instagram post: plum Danish"><img src="assets/img/m/plum-danish.jpg" alt="" loading="lazy"><span class="pola__cap">Plum Danish</span></a>
+      <a class="pola" href="https://www.instagram.com/lovetocook.uk" target="_blank" rel="noopener" style="--r:-2deg" aria-label="Instagram post: sourdough"><img src="assets/img/m/sourdough.jpg" alt="" loading="lazy"><span class="pola__cap">Country loaves</span></a>
+      <a class="pola" href="https://www.instagram.com/lovetocook.uk" target="_blank" rel="noopener" style="--r:4deg" aria-label="Instagram post: chocolate tart"><img src="assets/img/m/chocolate-tart.jpg" alt="" loading="lazy"><span class="pola__cap">Tarte au chocolat</span></a>
+      <a class="pola" href="https://www.instagram.com/lovetocook.uk" target="_blank" rel="noopener" style="--r:-3deg" aria-label="Instagram post: fig pastry"><img src="assets/img/m/fig-pastry.jpg" alt="" loading="lazy"><span class="pola__cap">Fig supreme</span></a>
+      <a class="pola" href="https://www.instagram.com/lovetocook.uk" target="_blank" rel="noopener" style="--r:2deg" aria-label="Instagram post: focaccia"><img src="assets/img/m/focaccia.jpg" alt="" loading="lazy"><span class="pola__cap">Focaccia</span></a>
     </div>
   </div>
 </section>
 
-<!-- ============ 09 FAQ ============ -->
-<section class="section">
+<!-- ============ FAQ ============ -->
+<section class="section j-faq">
   <div class="container faq-wrap">
     <div class="faq-wrap__aside">
       <div class="sticky">
-        <span class="eyebrow label"><span class="num">(09)</span><span class="dash"></span>Good to know</span>
-        <h2 class="h2" data-split>Questions, <em>answered</em>.</h2>
+        <span class="j-chip" data-reveal><i></i>Good to know</span>
+        <h2 class="j-title" data-split>Questions, <em>answered</em>.</h2>
         <p class="muted" data-reveal>Can't find it here? Sam's always happy to help.</p>
         <div data-reveal><a class="btn btn--ghost" href="contact.html">Ask a question <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a></div>
       </div>
@@ -484,13 +458,19 @@
   </div>
 </section>
 
-<!-- ============ CTA ============ -->
-<section class="section cta-final theme-paper">
-  <div class="container">
-    <span class="eyebrow label" data-reveal><span class="num">(✺)</span><span class="dash"></span>Your seat is waiting</span>
-    <h2 class="display" style="margin-top:28px" data-split>Let's get <em>baking.</em></h2>
-    <p data-reveal>Eight places a class. Real technique. A box of your own bakes to take home. See you at the bench.</p>
-    <div class="btn-row" data-reveal><a class="btn" href="classes.html">Book a class <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a><a class="btn btn--ghost" href="gift.html">Give as a gift <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a></div>
+<!-- ============ CTA: a bookend to the loader ============ -->
+<section class="section j-cta">
+  <div class="j-cta__cards" data-deal aria-hidden="true">
+    <figure class="pola" style="--r:-8deg;--x:-36;--y:-30"><img src="assets/img/m/croissants.jpg" alt="" loading="lazy"></figure>
+    <figure class="pola" style="--r:6deg;--x:34;--y:-32"><img src="assets/img/m/fig-pastry.jpg" alt="" loading="lazy"></figure>
+    <figure class="pola" style="--r:7deg;--x:-40;--y:22"><img src="assets/img/m/plum-danish.jpg" alt="" loading="lazy"></figure>
+    <figure class="pola" style="--r:-6deg;--x:38;--y:20"><img src="assets/img/m/chocolate-tart.jpg" alt="" loading="lazy"></figure>
+  </div>
+  <div class="container j-cta__inner">
+    <span class="j-chip" data-reveal><i></i>Your seat is waiting</span>
+    <h2 class="display j-cta__title" data-split>Let's get <em>baking.</em></h2>
+    <p class="j-lead" data-reveal>Eight places a class. Real technique. A box of your own bakes to take home. See you at the bench.</p>
+    <div class="btn-row" data-reveal><a class="btn" href="classes.html">Book a class <span class="btn__icon"><svg aria-hidden="true"><use href="#i-arrow"/></svg><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a><a class="btn btn--ghost btn--plain" href="gift.html">Give as a gift</a></div>
   </div>
 </section>
 </main>
@@ -592,8 +572,8 @@
 <script src="assets/vendor/gsap.min.js" defer></script>
 <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
 <script src="assets/vendor/lenis.min.js" defer></script>
-<script src="assets/js/data.js?v=202611191227" defer></script>
-<script src="assets/js/site.js?v=202611191227" defer></script>
-<script src="assets/js/motion.js?v=202611191227" defer></script>
+<script src="assets/js/data.js?v=202611191256" defer></script>
+<script src="assets/js/site.js?v=202611191256" defer></script>
+<script src="assets/js/motion.js?v=202611191256" defer></script>
 </body>
 </html>
