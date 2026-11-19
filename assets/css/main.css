@@ -1569,3 +1569,7 @@ form.is-sent .form-success { display: block; animation: cardIn .8s var(--ease); 
 .footer { padding-top: clamp(64px, 7vw, 112px); }
 .footer__news { padding-bottom: clamp(44px, 5vw, 76px); }
 .footer__cols { padding-block: clamp(44px, 5vw, 72px); }
+
+/* Any button without an arrow pads evenly and centres its label */
+.btn:not(:has(.btn__icon)) { padding: 0 28px; justify-content: center; }
+.btn--sm:not(:has(.btn__icon)) { padding: 0 22px; }
