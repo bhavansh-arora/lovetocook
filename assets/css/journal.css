@@ -419,3 +419,21 @@ a.pola:hover, a.pola:focus-visible { transform: rotate(0deg) translateY(-6px); b
 /* ---------- Smoothness: each photo section is its own stacking context, so a moving piece in one
    never forces the next section onto extra GPU layers ---------- */
 main > section, main > .marquee, .footer { isolation: isolate; }
+/* nothing tilted or waiting off to the side may widen the page on a phone */
+main > section, main > .marquee, main > div, .footer { overflow-x: clip; }
+
+/* ---------- Phones: the menu bar floats as a rounded pill, inset from the screen edges ---------- */
+@media (max-width: 760px) {
+  .header { inset: 10px 10px auto 10px; height: 58px; border-radius: var(--r-pill);
+    background: color-mix(in srgb, var(--white) 88%, transparent);
+    box-shadow: inset 0 0 0 1px rgba(29, 14, 4, .07), 0 16px 36px -20px rgba(29, 14, 4, .5); }
+  .header.is-scrolled { background: color-mix(in srgb, var(--white) 96%, transparent);
+    box-shadow: inset 0 0 0 1px rgba(29, 14, 4, .07), 0 18px 40px -18px rgba(29, 14, 4, .55); }
+  .header.is-dark, .header.is-scrolled.is-dark { background: color-mix(in srgb, var(--ink) 94%, transparent);
+    box-shadow: inset 0 0 0 1px rgba(247, 240, 230, .12), 0 18px 40px -18px rgba(0, 0, 0, .6); }
+  .header.is-hidden { transform: translateY(calc(-100% - 18px)); }
+  .header__inner { width: auto; padding: 0 7px 0 18px; }
+  .header__logo { width: 70px; }
+  .header .bag-btn { width: 44px; height: 44px; }
+  .header .menu-btn { height: 44px; }
+}
