@@ -2,54 +2,38 @@
 
 <!-- ============ HERO ============ -->
 <section class="hero">
-  <canvas class="flour" data-flour aria-hidden="true"></canvas>
-  <div class="container">
-    <div class="hero__top" data-hero-fade>
-      <span class="label"><span class="dot-live"></span>Now booking · Winter 2026–27</span>
-      <span class="label hide-sm">Cook School · Bakery · Pâtisserie</span>
-      <span class="label hide-sm">16 King Street, Crieff</span>
-    </div>
-
-    <h1 class="display hero__title">
-      <span class="row" data-hero-split>Made by hand,</span>
-      <span class="row row--indent" data-hero-split><em>shared</em> <span class="inline-media"><img src="assets/img/croissants.jpg" alt=""></span> with love.</span>
-    </h1>
-
-    <div class="hero__grid">
-      <div class="hero__intro">
-        <p class="lead" data-hero-fade>Hands-on pâtisserie, bread and cookery classes in the heart of Perthshire, taught by Le Cordon Bleu–trained chef <strong>Sam Heeney-Governo</strong>. Never more than eight at the bench.</p>
-        <div class="btn-row" data-hero-fade>
-          <a class="btn" href="classes.html">Browse classes {{arrow}}</a>
-          <a class="btn btn--ghost btn--plain" href="private.html">Private lessons</a>
-        </div>
-        <a class="next-card" data-next-class href="classes.html" data-hero-fade aria-label="Next available class"></a>
+  <div class="container hero__wrap">
+    <div class="hero__text">
+      <span class="hero__chip label" data-hero-fade><span class="dot-live"></span>Now booking · Winter 2026–27</span>
+      <h1 class="display hero__title">
+        <span class="row" data-hero-split>Made by hand,</span>
+        <span class="row" data-hero-split><em>shared</em> with love.</span>
+      </h1>
+      <p class="lead" data-hero-fade>Hands-on pâtisserie, bread and cookery classes in Crieff, Perthshire, taught by Le Cordon Bleu–trained chef <strong>Sam Heeney-Governo</strong>. Never more than eight at the bench.</p>
+      <div class="btn-row" data-hero-fade>
+        <a class="btn" href="classes.html">Browse classes {{arrow}}</a>
+        <a class="btn btn--ghost" href="private.html">Private lessons</a>
       </div>
-
-      <div class="hero__visual">
-        <div class="hero__badge" data-hero-pop>
-          <div class="badge-spin">
-            <svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><defs><path id="circ" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0"/></defs><text><textPath href="#circ" textLength="236" lengthAdjust="spacing">Max 8 per class · Hands-on · Crieff ·</textPath></text></svg>
-            <span class="badge-core">8</span>
+      <a class="next-card" data-next-class href="classes.html" data-hero-fade aria-label="Next available class"></a>
+    </div>
+    <div class="hero__visual">
+        <div class="ring3d" data-ring data-hero-media data-cursor="Drag">
+        <div class="ring3d__floor" aria-hidden="true"></div>
+        <div class="ring3d__tilt">
+          <div class="ring3d__spin">
+            <a class="ring3d__card" style="--i:0" href="class.html?c=croissant" data-cap="Croissants" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/m/croissants.jpg" decoding="async" alt="Croissants" style="" draggable="false"><span>Croissants</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo.png" alt="" draggable="false"></span></a>
+            <a class="ring3d__card" style="--i:1" href="class.html?c=laminated" data-cap="Fig supreme" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/m/fig-pastry.jpg" decoding="async" alt="Fig supreme" style="" draggable="false"><span>Fig supreme</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo.png" alt="" draggable="false"></span></a>
+            <a class="ring3d__card" style="--i:2" href="class.html?c=sourdough" data-cap="Sourdough" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/m/sourdough.jpg" decoding="async" alt="Sourdough" style="" draggable="false"><span>Sourdough</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo.png" alt="" draggable="false"></span></a>
+            <a class="ring3d__card" style="--i:3" href="class.html?c=danish" data-cap="Berry Danish" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/m/fruit-danish.jpg" decoding="async" alt="Berry Danish" style="" draggable="false"><span>Berry Danish</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo.png" alt="" draggable="false"></span></a>
+            <a class="ring3d__card" style="--i:4" href="class.html?c=choux" data-cap="Craquelin choux" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/m/sam.jpg" decoding="async" alt="Craquelin choux" style="object-position:50% 28%" draggable="false"><span>Craquelin choux</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo.png" alt="" draggable="false"></span></a>
+            <a class="ring3d__card" style="--i:5" href="class.html?c=festive" data-cap="Tarte au chocolat" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/m/chocolate-tart.jpg" decoding="async" alt="Tarte au chocolat" style="" draggable="false"><span>Tarte au chocolat</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo.png" alt="" draggable="false"></span></a>
+            <a class="ring3d__card" style="--i:6" href="class.html?c=focaccia" data-cap="Focaccia" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/m/focaccia.jpg" decoding="async" alt="Focaccia" style="" draggable="false"><span>Focaccia</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo.png" alt="" draggable="false"></span></a>
+            <a class="ring3d__card" style="--i:7" href="class.html?c=croissant" data-cap="Almond croissants" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/m/almond-croissant.jpg" decoding="async" alt="Almond croissants" style="" draggable="false"><span>Almond croissants</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo.png" alt="" draggable="false"></span></a>
           </div>
         </div>
-        <div class="ring3d" data-ring data-hero-media data-cursor="Drag">
-          <div class="ring3d__floor" aria-hidden="true"></div>
-          <div class="ring3d__tilt">
-            <div class="ring3d__spin">
-              <a class="ring3d__card" style="--i:0" href="class.html?c=croissant" data-cap="Croissants" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/m/croissants.jpg" decoding="async" alt="Croissants" style="" draggable="false"><span>Croissants</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo.png" alt="" draggable="false"></span></a>
-              <a class="ring3d__card" style="--i:1" href="class.html?c=laminated" data-cap="Fig supreme" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/m/fig-pastry.jpg" decoding="async" alt="Fig supreme" style="" draggable="false"><span>Fig supreme</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo.png" alt="" draggable="false"></span></a>
-              <a class="ring3d__card" style="--i:2" href="class.html?c=sourdough" data-cap="Sourdough" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/m/sourdough.jpg" decoding="async" alt="Sourdough" style="" draggable="false"><span>Sourdough</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo.png" alt="" draggable="false"></span></a>
-              <a class="ring3d__card" style="--i:3" href="class.html?c=danish" data-cap="Berry Danish" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/m/fruit-danish.jpg" decoding="async" alt="Berry Danish" style="" draggable="false"><span>Berry Danish</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo.png" alt="" draggable="false"></span></a>
-              <a class="ring3d__card" style="--i:4" href="class.html?c=choux" data-cap="Craquelin choux" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/m/sam.jpg" decoding="async" alt="Craquelin choux" style="object-position:50% 28%" draggable="false"><span>Craquelin choux</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo.png" alt="" draggable="false"></span></a>
-              <a class="ring3d__card" style="--i:5" href="class.html?c=festive" data-cap="Tarte au chocolat" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/m/chocolate-tart.jpg" decoding="async" alt="Tarte au chocolat" style="" draggable="false"><span>Tarte au chocolat</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo.png" alt="" draggable="false"></span></a>
-              <a class="ring3d__card" style="--i:6" href="class.html?c=focaccia" data-cap="Focaccia" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/m/focaccia.jpg" decoding="async" alt="Focaccia" style="" draggable="false"><span>Focaccia</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo.png" alt="" draggable="false"></span></a>
-              <a class="ring3d__card" style="--i:7" href="class.html?c=croissant" data-cap="Almond croissants" draggable="false"><span class="ring3d__face ring3d__face--front"><img src="assets/img/m/almond-croissant.jpg" decoding="async" alt="Almond croissants" style="" draggable="false"><span>Almond croissants</span></span><span class="ring3d__face ring3d__face--back"><img src="assets/img/logo.png" alt="" draggable="false"></span></a>
-            </div>
-          </div>
-          <div class="ring3d__meta">
-            <span class="cap"><em data-ring-cap>Croissants</em></span>
-            <span class="label hint"><svg viewBox="0 0 34 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M5 7h24M9 3 5 7l4 4M25 3l4 4-4 4"/></svg>Drag to spin · <span class="idx" data-ring-idx>01 / 08</span></span>
-          </div>
+        <div class="ring3d__meta">
+          <span class="cap"><em data-ring-cap>Croissants</em></span>
+          <span class="label hint"><svg viewBox="0 0 34 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M5 7h24M9 3 5 7l4 4M25 3l4 4-4 4"/></svg>Drag to spin · <span class="idx" data-ring-idx>01 / 08</span></span>
         </div>
       </div>
     </div>
@@ -75,7 +59,7 @@
   <div class="container">
     <span class="eyebrow label" data-reveal><span class="num">(01)</span><span class="dash"></span>Hello, I'm Sam</span>
     <p class="hello__text" style="margin-top:clamp(28px,3vw,44px)" data-scrub-words>
-      Chef, pâtissier <span class="pill-img"><img loading="lazy" decoding="async" src="assets/img/sam-square.jpg" alt=""></span> and artisan baker. I trained at <em>Le Cordon Bleu</em> and The School of Artisan Food <span class="pill-img"><img loading="lazy" decoding="async" src="assets/img/crumb.jpg" alt=""></span>, taught as a Pâtisserie Chef Lecturer, and cooked my way across the UK, Europe and New Zealand. Now I've brought it all <em>home to Crieff</em>, to share with you.
+      Chef, pâtissier and artisan baker. I trained at <em>Le Cordon Bleu</em> and The School of Artisan Food, taught as a Pâtisserie Chef Lecturer, and cooked my way across the UK, Europe and New Zealand. Now I've brought it all <em>home to Crieff</em>, to share with you.
     </p>
     <div class="hello__foot">
       <div class="stats">
@@ -333,12 +317,6 @@
 
 <!-- ============ CTA ============ -->
 <section class="section cta-final theme-paper">
-  <div class="cta-final__floats" aria-hidden="true">
-    <img src="assets/img/croissants.jpg" alt="" loading="lazy" data-float>
-    <img src="assets/img/fruit-danish.jpg" alt="" loading="lazy" data-float>
-    <img src="assets/img/chocolate-tart.jpg" alt="" loading="lazy" data-float>
-    <img src="assets/img/sourdough.jpg" alt="" loading="lazy" data-float>
-  </div>
   <div class="container">
     <span class="eyebrow label" data-reveal><span class="num">(✺)</span><span class="dash"></span>Your seat is waiting</span>
     <h2 class="display" style="margin-top:28px" data-split>Let's get <em>baking.</em></h2>

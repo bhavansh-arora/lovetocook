@@ -449,40 +449,22 @@
     if (!sec) return;
     const track = $(".hgal__track", sec);
     const bar = $(".hgal__progress span", sec);
-    const items = $$(".hgal__item", sec);
-    let geo = [], baseLeft = 0;
-    const measure = () => {
-      const tx = gsap.getProperty(track, "x") || 0;
-      baseLeft = track.getBoundingClientRect().left - tx;
-      geo = items.map((it) => it.offsetLeft + it.offsetWidth / 2);
-    };
-    measure();
-    window.addEventListener("resize", measure);
-    window.addEventListener("load", measure);
-    const curve = (scrollLeft = 0) => {
-      const vw = window.innerWidth, left = baseLeft + (gsap.getProperty(track, "x") || 0);
-      items.forEach((it, k) => {
-        const cx = left + geo[k] - scrollLeft;
-        const d = clamp((cx - vw / 2) / (vw / 2), -1.4, 1.4);
-        it.style.transform = `translateZ(${(-Math.abs(d) * 150).toFixed(1)}px) rotateY(${(-d * 24).toFixed(2)}deg)`;
-      });
-    };
     const mm = gsap.matchMedia();
+    // desktop: the page scrolls the counter sideways, flat and clean
     mm.add("(min-width: 1001px) and (hover: hover)", () => {
       const dist = () => track.scrollWidth - window.innerWidth;
       gsap.to(track, {
         x: () => -dist(), ease: "none",
         scrollTrigger: {
           trigger: sec, start: "top top", end: () => "+=" + dist(), pin: true, scrub: 0.4, invalidateOnRefresh: true, anticipatePin: 1,
-          onUpdate: (s) => { if (bar) gsap.set(bar, { scaleX: s.progress }); curve(); },
-          onRefresh: () => { measure(); curve(); },
+          onUpdate: (s) => { if (bar) gsap.set(bar, { scaleX: s.progress }); },
         },
       });
-      curve();
-      return () => { gsap.set(track, { clearProps: "transform" }); items.forEach((it) => (it.style.transform = "")); };
+      return () => gsap.set(track, { clearProps: "transform" });
     });
+    // touch: native swipe, the bar follows
     mm.add("(max-width: 1000px), (hover: none)", () => {
-      const onS = () => { if (bar) gsap.set(bar, { scaleX: track.scrollLeft / Math.max(1, track.scrollWidth - track.clientWidth) }); curve(track.scrollLeft); };
+      const onS = () => { if (bar) gsap.set(bar, { scaleX: track.scrollLeft / Math.max(1, track.scrollWidth - track.clientWidth) }); };
       track.addEventListener("scroll", onS, { passive: true });
       onS();
       return () => track.removeEventListener("scroll", onS);
