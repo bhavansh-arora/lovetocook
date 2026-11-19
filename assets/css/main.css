@@ -442,8 +442,9 @@ body::after {
   border-radius: 0 0 50% 50% / 0 0 var(--cb) var(--cb); will-change: transform; }
 .loader::before { content: ""; position: absolute; left: 50%; top: 50%; width: 80vmax; height: 80vmax; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(241, 207, 143, .6), rgba(241, 207, 143, 0)); }
 .loader__cards { position: absolute; inset: 0; }
-.loader__card { position: absolute; left: 50%; top: 50%; width: clamp(104px, 11vw, 176px); aspect-ratio: 4 / 5; margin: 0; padding: 7px 7px 26px; background: var(--white); border-radius: 14px;
-  box-shadow: 0 30px 60px -28px rgba(29, 14, 4, .45); transform: translate(-50%, -50%) translate(calc(var(--x) * 1vw), calc(var(--y) * 1vh)) rotate(var(--r)); }
+.loader__card { --w: clamp(104px, 11vw, 176px); position: absolute; width: var(--w); aspect-ratio: 4 / 5; margin: 0; padding: 7px 7px 26px; background: var(--white); border-radius: 14px;
+  left: calc(50% + var(--x) * 1vw - var(--w) / 2); top: calc(50% + var(--y) * var(--ys, 1vh) - var(--w) * .625);
+  box-shadow: 0 30px 60px -28px rgba(29, 14, 4, .45); transform: rotate(var(--r)); }
 .loader__card img { width: 100%; height: 100%; object-fit: cover; border-radius: 9px; }
 .loader__center { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 18px; text-align: center; width: min(80vw, 420px); }
 .loader__logo { width: clamp(150px, 15vw, 230px); height: auto; }
@@ -458,7 +459,7 @@ body::after {
 .loader__bar span { position: absolute; inset: 0; background: var(--caramel); transform: scaleX(0); transform-origin: left; }
 .no-js .loader, .loader.is-done { display: none; }
 @media (max-width: 760px) {
-  .loader__card { width: 24vw; padding: 5px 5px 16px; }
+  .loader__card { --w: 24vw; --ys: 1.25vh; padding: 5px 5px 16px; }
   .loader__word { display: none; }
   .loader__center { width: 62vw; }
 }
@@ -1527,3 +1528,41 @@ form.is-sent .form-success { display: block; animation: cardIn .8s var(--ease); 
 .ribbon figure:nth-child(even) { transform: rotate(2deg); }
 .ribbon img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s var(--ease); }
 .ribbon figure:hover img { transform: scale(1.06); }
+
+/* ==========================================================================
+   Reviews: a photo card beside the quote, the quote in its own card
+   ========================================================================== */
+.reviews { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); align-items: stretch; }
+.reviews__photo { grid-column: 1 / span 4; position: relative; display: block; min-height: 420px; border-radius: var(--r-lg); overflow: hidden; }
+.reviews__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease); }
+.reviews__photo:hover img { transform: scale(1.05); }
+.reviews__photo::after { content: ""; position: absolute; inset: 40% 0 0; background: linear-gradient(transparent, rgba(29, 14, 4, .78)); }
+.reviews__tag { position: absolute; left: 22px; right: 22px; bottom: 22px; z-index: 1; display: grid; gap: 6px; color: var(--cream); }
+.reviews__tag .label { color: var(--butter); }
+.reviews__tag b { font-family: var(--f-display); font-weight: 400; font-size: clamp(1.4rem, 2vw, 1.9rem); line-height: 1.1; letter-spacing: -.02em; }
+.reviews__go { display: inline-flex; align-items: center; gap: 8px; margin-top: 8px; font-size: var(--fs-xs); font-weight: 600; }
+.reviews__go svg { width: 14px; height: 14px; transition: transform .4s var(--ease); }
+.reviews__photo:hover .reviews__go svg { transform: translateX(4px); }
+.reviews__slider { grid-column: 5 / span 8; display: flex; flex-direction: column; justify-content: space-between; padding: clamp(28px, 3.4vw, 52px); border-radius: var(--r-lg); background: var(--white); }
+.reviews__slider .tslide { grid-template-columns: 1fr; gap: 0; }
+.reviews__slider .tslide blockquote { grid-column: 1 / -1; font-size: clamp(1.6rem, 2.7vw, 2.9rem); line-height: 1.12; }
+.reviews__slider .tslide figcaption { margin-top: 28px; }
+.reviews__slider .tslider__nav { margin-top: 28px; padding-top: 22px; }
+@media (max-width: 1000px) {
+  .reviews__photo, .reviews__slider { grid-column: 1 / -1; }
+  .reviews__photo { min-height: 260px; }
+}
+
+/* ==========================================================================
+   Tighter rhythm: less dead space between and inside sections
+   ========================================================================== */
+:root { --section: clamp(64px, 7vw, 112px); }
+.sec-head { margin-bottom: clamp(28px, 3.2vw, 48px); padding-bottom: clamp(22px, 2.4vw, 34px); }
+.hello__foot { margin-top: clamp(40px, 5vw, 72px); }
+.tslider__nav { margin-top: clamp(28px, 3vw, 44px); }
+.ribbon-wrap { padding: clamp(40px, 5vw, 72px) 0 clamp(48px, 6vw, 88px); }
+.page-hero { padding-bottom: clamp(36px, 4.4vw, 64px); }
+.cta-final { padding-block: clamp(72px, 8vw, 128px); }
+.footer { padding-top: clamp(64px, 7vw, 112px); }
+.footer__news { padding-bottom: clamp(44px, 5vw, 76px); }
+.footer__cols { padding-block: clamp(44px, 5vw, 72px); }

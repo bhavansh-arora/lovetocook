@@ -280,7 +280,7 @@
         .fromTo(".loader__line", { y: -14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease }, 0.15)
         .fromTo(".loader__row", { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease }, 0.2)
         .fromTo(cardsEl, { opacity: 0, scale: 0.7, y: -120, rotation: (i) => (i % 2 ? 16 : -16) }, {
-          opacity: 1, scale: 1, y: 0, rotation: 0, duration: 0.95, stagger: 0.2, ease: "back.out(1.4)",
+          opacity: 1, scale: 1, y: 0, rotation: (i) => parseFloat(cardsEl[i].style.getPropertyValue("--r")), duration: 0.95, stagger: 0.2, ease: "back.out(1.4)",
         }, 0.35)
         .to(o, { v: 100, duration: 2.1, ease: "power2.inOut", onUpdate: () => (count.textContent = Math.round(o.v)) }, 0.25)
         .to(".loader__bar span", { scaleX: 1, duration: 2.1, ease: "power2.inOut" }, 0.25)
