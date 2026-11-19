@@ -249,16 +249,16 @@
       tl.from(chars, { yPercent: 115, rotation: 6, opacity: 0, filter: "blur(12px)", duration: 1.15, stagger: 0.022, ease: "expo.out", clearProps: "transform,opacity,filter" }, k * 0.12);
     });
     const has = (s) => document.querySelector(s);
-    if (has("[data-hero-fade]")) tl.from("[data-hero-fade]", { y: 30, opacity: 0, duration: 1.2, stagger: 0.08 }, 0.35);
+    if (has("[data-hero-fade]")) tl.fromTo("[data-hero-fade]", { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2, stagger: 0.08, clearProps: "transform" }, 0.35);
     if (has("[data-ring]")) {
       tl.add(() => window.dispatchEvent(new Event("ltc:hero")), 0.1);
-      tl.from("[data-ring]", { opacity: 0, y: 70, duration: 1.6, ease: "expo.out", clearProps: "opacity,transform" }, 0.15);
+      tl.fromTo("[data-ring]", { opacity: 0, y: -60 }, { opacity: 1, y: 0, duration: 1.6, ease: "expo.out", clearProps: "transform" }, 0.15);
     }
     if (has("[data-deck]")) {
-      tl.from("[data-deck] .deck__face", { y: 180, rotationX: 55, rotationZ: (i) => [-14, 12, 0][i % 3], opacity: 0, duration: 1.9, stagger: 0.12, ease: "expo.out" }, 0.2);
-      if (has("[data-deck] .deck__chip")) tl.from("[data-deck] .deck__chip", { y: 40, scale: 0.85, opacity: 0, duration: 1.2, ease: "back.out(1.4)" }, 0.9);
+      tl.fromTo("[data-deck] .deck__face", { y: -160, rotationX: -40, rotationZ: (i) => [-14, 12, 0][i % 3], opacity: 0 }, { y: 0, rotationX: 0, rotationZ: 0, opacity: 1, duration: 1.9, stagger: 0.12, ease: "expo.out" }, 0.2);
+      if (has("[data-deck] .deck__chip")) tl.fromTo("[data-deck] .deck__chip", { y: -30, scale: 0.85, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 1.2, ease: "back.out(1.4)" }, 0.9);
     }
-    $$("[data-hero-media]:not([data-ring])").forEach((m, k) => tl.from(m, { rotationX: 38, y: 90, opacity: 0, transformPerspective: 1200, transformOrigin: "50% 100%", duration: 1.8, clearProps: "opacity,rotationX,y,transformPerspective" }, 0.15 + k * 0.1));
+    $$("[data-hero-media]:not([data-ring])").forEach((m, k) => tl.fromTo(m, { clipPath: "inset(0% 0% 100% 0% round 32px)", y: -40, opacity: 0 }, { clipPath: "inset(0% 0% 0% 0% round 32px)", y: 0, opacity: 1, duration: 1.6, ease: "expo.inOut", clearProps: "clipPath,transform" }, 0.15 + k * 0.1));
     if (has("[data-hero-pop]")) tl.from("[data-hero-pop]", { scale: 0, rotate: -40, duration: 1.2, stagger: 0.1, ease: "back.out(1.6)" }, 0.9);
     return tl;
   }
@@ -276,13 +276,11 @@
       const o = { v: 0 };
       const tl = gsap.timeline();
       // the logo and line arrive, then Sam's bakes are dealt out around them as the count climbs
-      tl.from(".loader__logo", { y: 26, opacity: 0, duration: 1, ease })
-        .from(".loader__line", { y: 18, opacity: 0, duration: 0.9, ease }, 0.15)
-        .from(".loader__row", { y: 20, opacity: 0, duration: 0.8, ease }, 0.2)
-        .from(cardsEl, {
-          opacity: 0, scale: 0.55, x: (i) => -parseFloat(cardsEl[i].style.getPropertyValue("--x")) * window.innerWidth * 0.004,
-          y: (i) => 60 - parseFloat(cardsEl[i].style.getPropertyValue("--y")) * window.innerHeight * 0.004, rotation: (i) => (i % 2 ? 18 : -18),
-          duration: 0.9, stagger: 0.2, ease: "back.out(1.5)",
+      tl.fromTo(".loader__logo", { y: -22, opacity: 0 }, { y: 0, opacity: 1, duration: 1, ease })
+        .fromTo(".loader__line", { y: -14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease }, 0.15)
+        .fromTo(".loader__row", { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease }, 0.2)
+        .fromTo(cardsEl, { opacity: 0, scale: 0.7, y: -120, rotation: (i) => (i % 2 ? 16 : -16) }, {
+          opacity: 1, scale: 1, y: 0, rotation: 0, duration: 0.95, stagger: 0.2, ease: "back.out(1.4)",
         }, 0.35)
         .to(o, { v: 100, duration: 2.1, ease: "power2.inOut", onUpdate: () => (count.textContent = Math.round(o.v)) }, 0.25)
         .to(".loader__bar span", { scaleX: 1, duration: 2.1, ease: "power2.inOut" }, 0.25)
@@ -357,12 +355,12 @@
     ScrollTrigger.batch("[data-reveal]", {
       start: "top 92%",
       once: true,
-      onEnter: (els) => gsap.to(els, { opacity: 1, y: 0, rotationX: 0, duration: 1.3, ease, stagger: 0.08, overwrite: "auto", clearProps: "transform" }),
+      onEnter: (els) => { gsap.to(els, { opacity: 1, y: 0, rotationX: 0, duration: 1.3, ease, stagger: 0.08, overwrite: "auto", clearProps: "transform" }); els.forEach((e) => e.classList.add("is-lit")); },
     });
     $$("[data-reveal-img]").forEach((el) => {
       const img = $("img", el);
-      gsap.fromTo(el, { clipPath: "inset(14% 8% 14% 8% round 32px)" }, { clipPath: "inset(0% 0% 0% 0% round 32px)", duration: 1.6, ease: "expo.out", scrollTrigger: { trigger: el, start: "top 88%", once: true }, clearProps: "clipPath" });
-      if (img) gsap.fromTo(img, { scale: 1.18 }, { scale: 1, duration: 1.8, ease: "expo.out", clearProps: "transform", scrollTrigger: { trigger: el, start: "top 88%", once: true } });
+      gsap.fromTo(el, { clipPath: "inset(0% 0% 100% 0% round 32px)" }, { clipPath: "inset(0% 0% 0% 0% round 32px)", duration: 1.4, ease: "expo.inOut", scrollTrigger: { trigger: el, start: "top 88%", once: true }, clearProps: "clipPath" });
+      if (img) gsap.fromTo(img, { scale: 1.25, yPercent: -10 }, { scale: 1, yPercent: 0, duration: 1.8, ease: "expo.out", clearProps: "transform", scrollTrigger: { trigger: el, start: "top 88%", once: true } });
     });
     $$("[data-parallax]").forEach((el) => {
       const amt = parseFloat(el.dataset.parallax) || 12;
@@ -713,8 +711,8 @@
       const img = $("img", wrap);
       if (!img) return;
       const r = getComputedStyle(wrap).borderTopLeftRadius || "0px";
-      gsap.fromTo(wrap, { clipPath: `inset(100% 0% 0% 0% round ${r})` }, { clipPath: `inset(0% 0% 0% 0% round ${r})`, duration: 1.3, ease: "expo.inOut", scrollTrigger: { trigger: wrap, start: "top 88%", once: true } });
-      gsap.fromTo(img, { scale: 1.35 }, { scale: 1.12, duration: 1.8, ease: "expo.out", scrollTrigger: { trigger: wrap, start: "top 88%", once: true } });
+      gsap.fromTo(wrap, { clipPath: `inset(0% 0% 100% 0% round ${r})` }, { clipPath: `inset(0% 0% 0% 0% round ${r})`, duration: 1.3, ease: "expo.inOut", scrollTrigger: { trigger: wrap, start: "top 88%", once: true } });
+      gsap.fromTo(img, { scale: 1.35, y: -40 }, { scale: 1.12, y: 0, duration: 1.8, ease: "expo.out", scrollTrigger: { trigger: wrap, start: "top 88%", once: true } });
       if (!wrap.closest(".ig-grid")) gsap.fromTo(img, { yPercent: -5 }, { yPercent: 5, ease: "none", scrollTrigger: { trigger: wrap, start: "top bottom", end: "bottom top", scrub: true } });
     });
   }

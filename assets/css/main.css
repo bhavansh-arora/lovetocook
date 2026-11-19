@@ -1479,3 +1479,51 @@ form.is-sent .form-success { display: block; animation: cardIn .8s var(--ease); 
 .book-card__trust { gap: 6px; margin-top: 12px; }
 .book-card__gift { margin-top: 10px; }
 @media (max-height: 840px) { .detail__aside { position: static; } }
+
+/* ==========================================================================
+   Start states: hero and loader pieces begin hidden so they only appear once
+   ========================================================================== */
+.js .loader__card, .js .loader__logo, .js .loader__line, .js .loader__row { opacity: 0; }
+.js [data-hero-fade], .js [data-ring], .js [data-deck] .deck__face, .js [data-deck] .deck__chip, .js [data-hero-media] { opacity: 0; }
+.no-motion [data-hero-fade], .no-motion [data-ring], .no-motion [data-deck] .deck__face, .no-motion [data-deck] .deck__chip, .no-motion [data-hero-media] { opacity: 1 !important; }
+
+/* Class and bakery cards: the photo unveils downwards when the card is drawn */
+.ccard, .bake { animation: cardRise .8s var(--ease) both; }
+@keyframes cardRise { from { opacity: 0; transform: translateY(-18px); } }
+.ccard__media, .bake__media { animation: mediaDown 1.2s var(--ease) both; }
+.ccard__media img, .bake__media img { animation: mediaSettle 1.6s var(--ease) both; }
+@keyframes mediaDown { from { clip-path: inset(0 0 100% 0 round var(--r-lg)); } to { clip-path: inset(0 0 0 0 round var(--r-lg)); } }
+@keyframes mediaSettle { from { transform: translateY(-8%) scale(1.2); } }
+.reduce-motion .ccard, .reduce-motion .bake, .reduce-motion .ccard__media, .reduce-motion .bake__media, .reduce-motion .ccard__media img, .reduce-motion .bake__media img { animation: none; }
+
+/* ==========================================================================
+   Inner pages: richer cards
+   ========================================================================== */
+.features { counter-reset: feat; }
+.feature, .value, .format, .ccard-contact { position: relative; isolation: isolate; overflow: hidden; }
+.feature { counter-increment: feat; transition: color .5s var(--ease); }
+.feature::after { content: "0" counter(feat); position: absolute; right: clamp(20px, 2.4vw, 32px); top: clamp(22px, 2.6vw, 36px); font-family: var(--f-display); font-style: italic; color: var(--caramel); font-size: 1.05rem; }
+.feature::before, .value::before, .format::before, .ccard-contact::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--ink); transform: translateY(101%); transition: transform .7s var(--ease); }
+.feature:hover::before, .value:hover::before, .format:hover::before, .ccard-contact:hover::before { transform: none; }
+.feature:hover, .value:hover, .format:hover, .ccard-contact:hover { color: var(--cream); --text: var(--cream); --muted: rgba(247, 240, 230, .7); }
+.feature:hover p, .value:hover p, .format:hover p, .ccard-contact:hover p { color: rgba(247, 240, 230, .72); }
+.feature__ic { transition: transform .7s var(--ease), background-color .5s; }
+.feature:hover .feature__ic, .ccard-contact:hover .feature__ic { transform: rotate(-12deg) scale(1.08); background: var(--butter); }
+.feature:hover::after { color: var(--butter); }
+.value::after, .format::after, .ccard-contact::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--caramel); transform: scaleX(0); transform-origin: left; transition: transform 1s var(--ease) .2s; }
+.is-in.value::after, .is-in.format::after, .is-in.ccard-contact::after, .value.is-lit::after, .format.is-lit::after, .ccard-contact.is-lit::after { transform: none; }
+.value:hover .value__n { color: var(--butter); }
+.format:hover .label, .format:hover small { color: var(--butter) !important; }
+.format .btn, .ccard-contact a { position: relative; z-index: 1; }
+.format:hover .btn { --bg: var(--butter); --fg: var(--ink); }
+
+/* Photo ribbon: a slow strip of real bakes near the end of each inner page */
+.ribbon-wrap { padding: clamp(56px, 7vw, 104px) 0 clamp(64px, 8vw, 120px); overflow: hidden; }
+.ribbon-wrap__label { text-align: center; color: var(--muted); margin-bottom: clamp(24px, 3vw, 40px); }
+.ribbon { overflow: hidden; }
+.ribbon .marquee__group { display: inline-flex; align-items: center; flex: none; }
+.ribbon figure { flex: none; width: clamp(170px, 17vw, 260px); aspect-ratio: 4 / 5; margin: 0 clamp(10px, 1.2vw, 18px) 0 0; border-radius: 22px; overflow: hidden; box-shadow: 0 30px 60px -34px rgba(29, 14, 4, .5); }
+.ribbon figure:nth-child(odd) { transform: rotate(-2deg) translateY(10px); }
+.ribbon figure:nth-child(even) { transform: rotate(2deg); }
+.ribbon img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s var(--ease); }
+.ribbon figure:hover img { transform: scale(1.06); }
