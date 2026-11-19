@@ -32,6 +32,11 @@
     let rot = 0, vel = auto, front = -1, visible = true;
     let dragging = false, lastX = 0, moved = 0, lastScroll = window.scrollY;
     const target = { x: 0, y: 0 }, cur = { x: 0, y: 0 };
+    // intro: the ring starts tipped towards you and spinning, then settles (driven here, not by GSAP,
+    // so nothing else writes the same transform)
+    const waitHero = hasGSAP && !reduce;
+    let introAt = waitHero ? null : -1e9;
+    window.addEventListener("ltc:hero", () => { introAt = performance.now(); rot = -150; vel = -3.4; });
 
     const layout = () => {
       const cw = cards[0].offsetWidth;
@@ -66,10 +71,12 @@
       raf = 0;
       if (!visible || document.hidden) return;
       {
-        if (!dragging) { vel += (auto - vel) * 0.035; rot += vel; }
+        if (!dragging && introAt !== null) { vel += (auto - vel) * 0.035; rot += vel; }
         cur.x += (target.x - cur.x) * 0.06;
         cur.y += (target.y - cur.y) * 0.06;
-        tilt.style.transform = `rotateX(${-15 - cur.y * 10}deg) rotateY(${cur.x * 16}deg)`;
+        const k = introAt === null ? 1 : Math.max(0, 1 - (performance.now() - introAt) / 1900);
+        const ik = k * k * k;
+        tilt.style.transform = `translateY(${(ik * 36).toFixed(1)}px) rotateX(${(-15 - cur.y * 10).toFixed(2)}deg) rotateY(${cur.x * 16}deg)`;
         spin.style.transform = `rotateY(${rot}deg)`;
         let best = 0, bestCos = -2;
         for (let i = 0; i < N; i++) {
@@ -239,7 +246,10 @@
     $$("[data-hero-split]").forEach((el, k) => tl.from(splitLines(el), lineIn, k * 0.08));
     const has = (s) => document.querySelector(s);
     if (has("[data-hero-fade]")) tl.from("[data-hero-fade]", { y: 30, opacity: 0, duration: 1.2, stagger: 0.08 }, 0.35);
-    if (has("[data-ring]")) tl.from("[data-ring] .ring3d__tilt", { rotationX: -70, y: 120, scale: 0.6, opacity: 0, duration: 2.2, ease: "expo.out" }, 0.15);
+    if (has("[data-ring]")) {
+      tl.add(() => window.dispatchEvent(new Event("ltc:hero")), 0.1);
+      tl.from("[data-ring]", { opacity: 0, y: 70, duration: 1.6, ease: "expo.out", clearProps: "opacity,transform" }, 0.15);
+    }
     if (has("[data-deck]")) {
       tl.from("[data-deck] .deck__face", { y: 180, rotationX: 55, rotationZ: (i) => [-14, 12, 0][i % 3], opacity: 0, duration: 1.9, stagger: 0.12, ease: "expo.out" }, 0.2);
       if (has("[data-deck] .deck__chip")) tl.from("[data-deck] .deck__chip", { y: 40, scale: 0.85, opacity: 0, duration: 1.2, ease: "back.out(1.4)" }, 0.9);
@@ -367,160 +377,70 @@
     });
   }
 
-  /* ---------- Lamination: butter lock-in, roll, letter fold ×2 → 27 layers, scrubbed in 3D ---------- */
+  /* ---------- Lamination: Sam's real photos fold in thirds like dough, 3 → 9 → 27 ---------- */
   function lamination() {
     const sec = $("[data-lam]");
     if (!sec) return;
-    const stage = $(".lam__stage", sec);
-    const scene = $("[data-l3]", sec);
-    const B = {};
-    $$("[data-b]", scene).forEach((el) => (B[el.dataset.b] = { el, c: {} }));
-    const pin = $("[data-l3-pin]", scene), roll = $("[data-l3-roll]", scene), shadow = $("[data-l3-shadow]", scene);
+    const cards = $$("[data-lp-card]", sec);
     const count = $("[data-lam-count]", sec);
     const steps = $$(".lam__step", sec);
     const dots = $$(".lam__dots i", sec);
     const bar = $(".lam__progress span", sec);
-    const photo = $(".lam__photo", sec);
-    onScreen(sec, (v) => sec.classList.toggle("is-offscreen", !v));
-
-    let W = 400, T = 28, D = 220, PR = 18;
-    const G = 0.8; // hairline gap so folded layers never z-fight
-    const size = () => {
-      const sw = stage.clientWidth;
-      if (!sw) return;
-      W = clamp(sw * 0.58, 190, 470); T = W * 0.072; D = W * 0.56; PR = W * 0.045;
-      scene.style.setProperty("--W", W + "px");
-      scene.style.setProperty("--D", D + "px");
-    };
-    size();
-
-    // write a style only when it changes
-    const put = (o, k, v, fn) => { if (o.c[k] !== v) { o.c[k] = v; fn(v); } };
-    const setBox = (key, vis, w, h, n, x, y, a = 0, d = D, o = 1) => {
-      const b = B[key], el = b.el;
-      put(b, "vis", vis ? "visible" : "hidden", (v) => (el.style.visibility = v));
-      if (!vis) return;
-      put(b, "w", w.toFixed(1), (v) => el.style.setProperty("--w", v + "px"));
-      put(b, "h", h.toFixed(2), (v) => el.style.setProperty("--h", v + "px"));
-      put(b, "d", d.toFixed(1), (v) => el.style.setProperty("--d", v + "px"));
-      put(b, "sh", (h / n).toFixed(3), (v) => el.style.setProperty("--sh", v + "px"));
-      put(b, "o", o.toFixed(2), (v) => el.style.setProperty("--o", v));
-      put(b, "t", `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0) rotateZ(${a.toFixed(2)}deg)`, (v) => (el.style.transform = v));
-    };
-    const rot = (P, c, deg) => {
-      const r = (deg * Math.PI) / 180, dx = c[0] - P[0], dy = c[1] - P[1];
-      return [P[0] + dx * Math.cos(r) - dy * Math.sin(r), P[1] + dx * Math.sin(r) + dy * Math.cos(r)];
-    };
-
-    const st = {};
-    const reset = () => Object.assign(st, {
-      mode: 0, drop: 0, lid: 0, tags: 0,
-      pw: (W * 0.82) / 3, h: T * 1.25, n: 3, fl: 0, fr: 0,
-      sw: W / 3, sh: 3 * T + 2 * G, N: 9,
-      px: -W * 0.82, py: -PR,
-      rx: -22, ry: -34, cs: 1, cy: 0, count: 3,
-    });
-    reset();
-    const misc = { c: {} };
+    const strips = cards.map((c) => $$(".lp__s", c));
+    const notes = cards.map((c) => $(".lp__note", c));
+    const caps = cards.map((c) => $(".lp__cap", c));
+    // the deck: cards further down sit back and lower, the top card is tilted towards the copy
+    const rest = (k) => ({ x: 0, yPercent: -50 + k * 3.2, z: -k * 70, rotationY: -14 + k * 2, rotationX: 4, rotationZ: k * 1.6, scale: 1 - k * 0.045 });
+    cards.forEach((c, k) => gsap.set(c, { ...rest(k), zIndex: cards.length - k, transformPerspective: 0 }));
+    gsap.set(notes[0], { opacity: 1 });
+    const cnt = { v: 3 };
     let lastStep = -1;
-
-    const render = () => {
-      const hI = T * 1.25, lift = W * 0.75;
-      setBox("board", true, W * 2.1, 14, 1, W * 0.02, 7, 0, D * 1.75);
-      // 1. lock-in: butter drops onto the dough, the dough lid closes over it
-      const intro = st.mode === 0;
-      setBox("base", intro, W * 0.82, hI / 3, 1, 0, -hI / 6);
-      setBox("butter", intro && st.drop > 0.02, W * 0.62, hI / 3, 1, 0, -hI / 2 - (1 - st.drop) * lift, 0, D * 0.78, clamp(st.drop * 4, 0, 1));
-      setBox("lid", intro && st.lid > 0.02, W * 0.82, hI / 3, 1, 0, -hI * 5 / 6 - (1 - st.lid) * lift, 0, D, clamp(st.lid * 4, 0, 1));
-      // 2. three panels, letter-folded: left over the middle, then right over the top
-      const panels = st.mode === 1, pw = st.pw, h = st.h;
-      setBox("M", panels, pw, h, st.n, 0, -h / 2);
-      const aL = 180 * st.fl, cL = rot([-pw / 2, -h - G / 2], [-pw, -h / 2], aL);
-      setBox("L", panels, pw, h, st.n, cL[0], cL[1], aL);
-      const aR = -180 * st.fr, cR = rot([pw / 2, -1.5 * h - G], [pw, -h / 2], aR);
-      setBox("R", panels, pw, h, st.n, cR[0], cR[1], aR);
-      put(B.R, "tags", st.tags.toFixed(2), (v) => B.R.el.style.setProperty("--tags", v));
-      // 3. the folded block rolled back out into one long, thinner sheet
-      setBox("S", st.mode === 2, st.sw, st.sh, st.N, 0, -st.sh / 2);
-      // rolling pin turns as it travels
-      put(misc, "pin", `translate3d(${st.px.toFixed(1)}px,${st.py.toFixed(1)}px,0)`, (v) => (pin.style.transform = v));
-      put(misc, "roll", `rotateZ(${((st.px / PR) * 57.2958).toFixed(1)}deg)`, (v) => (roll.style.transform = v));
-      // soft shadow under whatever is on the board
-      let l, r;
-      if (st.mode === 0) { l = -W * 0.41; r = W * 0.41; }
-      else if (st.mode === 1) { l = -pw / 2 - pw * (1 - st.fl); r = pw / 2 + pw * (1 - st.fr); }
-      else { l = -st.sw / 2; r = st.sw / 2; }
-      const fw = (r - l) * 1.3;
-      put(misc, "sh", `translate3d(${((l + r) / 2).toFixed(1)}px,-1px,0) rotateX(90deg) scaleX(${(fw / 100).toFixed(3)})`, (v) => (shadow.style.transform = v));
-      put(misc, "cam", `translateY(${st.cy.toFixed(1)}px) rotateX(${st.rx.toFixed(2)}deg) rotateY(${st.ry.toFixed(2)}deg) scale3d(${st.cs.toFixed(3)},${st.cs.toFixed(3)},${st.cs.toFixed(3)})`, (v) => (scene.style.transform = v));
-      put(misc, "count", String(Math.round(st.count)), (v) => (count.textContent = v));
-    };
-    render();
-
     const Dur = 10;
-    let tl;
-    const build = () => {
-      if (tl) { tl.scrollTrigger && tl.scrollTrigger.kill(); tl.kill(); }
-      size(); reset(); misc.c = {}; Object.values(B).forEach((b) => (b.c = {}));
-      const pe = { ease: "power2.inOut" };
-      tl = gsap.timeline({
-        defaults: { ease: "none" },
-        onUpdate: render,
-        scrollTrigger: {
-          trigger: sec, start: "top top", end: () => "+=" + window.innerHeight * 2.8, pin: true, scrub: 0.4, anticipatePin: 1,
-          onUpdate: (self) => {
-            if (bar) gsap.set(bar, { scaleX: self.progress });
-            const t = self.progress * Dur;
-            const k = t < 1.15 ? 0 : t < 3.65 ? 1 : t < 5.4 ? 2 : 3;
-            if (k !== lastStep) {
-              lastStep = k;
-              steps.forEach((s, i) => s.classList.toggle("is-active", i === k));
-              dots.forEach((d, i) => d.classList.toggle("is-on", i <= k));
-            }
-          },
+    const tl = gsap.timeline({
+      defaults: { ease: "power2.inOut" },
+      scrollTrigger: {
+        trigger: sec, start: "top top", end: () => "+=" + window.innerHeight * 2.8, pin: true, scrub: 0.5, anticipatePin: 1, invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          if (bar) gsap.set(bar, { scaleX: self.progress });
+          const t = self.progress * Dur;
+          const k = t < 1.4 ? 0 : t < 4.6 ? 1 : t < 6.6 ? 2 : 3;
+          if (k !== lastStep) {
+            lastStep = k;
+            steps.forEach((s, i) => s.classList.toggle("is-active", i === k));
+            dots.forEach((d, i) => d.classList.toggle("is-on", i <= k));
+          }
         },
-      });
-      const rollY = (top) => top - PR;
-      tl
-        // lock-in
-        .to(st, { drop: 1, duration: 0.6, ease: "power2.in" }, 0.05)
-        .to(st, { lid: 1, duration: 0.55, ease: "power2.in" }, 0.55)
-        .set(st, { mode: 1 }, 1.12)
-        .to(st, { tags: 1, duration: 0.2 }, 1.12)
-        // first roll: the pin hops on and rolls left to right
-        .to(st, { px: -W * 0.41 - PR, py: rollY(-T * 1.25), duration: 0.18, ...pe }, 1.14)
-        .to(st, { px: W / 2 + PR, py: rollY(-T), pw: W / 3, h: T, duration: 0.7, ease: "power1.inOut" }, 1.32)
-        .to(st, { tags: 0, duration: 0.15 }, 1.95)
-        .to(st, { px: W * 0.82, py: -PR, duration: 0.18, ...pe }, 2.02)
-        // first letter fold: ×3
-        .to(st, { fl: 1, duration: 0.7, ease: "power2.inOut" }, 2.2)
-        .to(st, { fr: 1, duration: 0.7, ease: "power2.inOut" }, 2.9)
-        .to(st, { count: 9, duration: 1.1, ease: "power1.inOut" }, 2.5)
-        // rest & roll out the folded block, right to left
-        .set(st, { mode: 2, sw: W / 3, sh: 3 * T + 2 * G, N: 9 }, 3.65)
-        .to(st, { px: W / 6 + PR, py: rollY(-(3 * T + 2 * G)), duration: 0.16, ...pe }, 3.66)
-        .to(st, { px: -W / 2 - PR, py: rollY(-T), sw: W, sh: T, duration: 1.35, ease: "power1.inOut" }, 3.84)
-        .to(st, { px: -W * 0.82, py: -PR, duration: 0.18, ...pe }, 5.2)
-        // second letter fold: ×3 again
-        .set(st, { mode: 1, pw: W / 3, h: T, n: 9, fl: 0, fr: 0 }, 5.4)
-        .to(st, { fl: 1, duration: 0.7, ease: "power2.inOut" }, 5.45)
-        .to(st, { fr: 1, duration: 0.7, ease: "power2.inOut" }, 6.15)
-        .to(st, { count: 27, duration: 1.2, ease: "power1.inOut" }, 5.65)
-        // move in on the 27-layer cut edge
-        .to(st, { rx: -10, ry: -16, cs: 1.4, cy: T * 1.6, duration: 1.8, ease: "power2.inOut" }, 7.0)
-        .to(photo, { opacity: 1, rotationY: 0, x: 0, duration: 1.2, ease: "power3.out" }, 8.2)
-        .set({}, {}, Dur);
-    };
-    build();
-    let rw = window.innerWidth;
-    window.addEventListener("resize", () => {
-      if (Math.abs(window.innerWidth - rw) < 2) return;
-      rw = window.innerWidth;
-      const p = tl.scrollTrigger ? tl.scrollTrigger.progress : 0;
-      build();
-      ScrollTrigger.refresh();
-      render();
+      },
     });
+    const advance = (from, at) => {
+      for (let k = from; k < cards.length; k++) tl.to(cards[k], { ...rest(k - from), duration: 0.7 }, at);
+    };
+    // letter fold: left third over the middle, right third over the top, then the folded strip lifts away
+    const fold = (i, at) => {
+      const [L, , R] = strips[i];
+      tl.to([notes[i], caps[i]], { opacity: 0, duration: 0.2 }, at)
+        .fromTo(L, { z: 1, rotationY: 0 }, { z: 1, rotationY: 180, duration: 0.6 }, at + 0.1)
+        .fromTo(R, { z: 2, rotationY: 0 }, { z: 2, rotationY: -180, duration: 0.6 }, at + 0.7)
+        .to(cards[i], { yPercent: -150, z: 160, rotationX: 28, rotationZ: -10, duration: 0.6, ease: "power2.in" }, at + 1.35)
+        .set(cards[i], { visibility: "hidden" }, at + 1.95);
+      advance(i + 1, at + 1.45);
+    };
+    // rest & roll: the card rolls back and away
+    const rollAway = (i, at) => {
+      tl.to([notes[i], caps[i]], { opacity: 0, duration: 0.2 }, at)
+        .to(cards[i], { transformOrigin: "50% 100%", rotationX: -95, yPercent: -20, z: -120, duration: 0.8, ease: "power2.in" }, at + 0.1)
+        .set(cards[i], { visibility: "hidden" }, at + 0.9);
+      advance(i + 1, at + 0.4);
+    };
+    fold(0, 1.45);
+    tl.to(cnt, { v: 9, duration: 0.9, onUpdate: () => (count.textContent = Math.round(cnt.v)) }, 2.0)
+      .to(notes[1], { opacity: 1, duration: 0.3 }, 3.3);
+    rollAway(1, 4.65);
+    tl.to(notes[2], { opacity: 1, duration: 0.3 }, 5.6);
+    fold(2, 6.65);
+    tl.to(cnt, { v: 27, duration: 0.9, onUpdate: () => (count.textContent = Math.round(cnt.v)) }, 7.2)
+      .to(notes[3], { opacity: 1, duration: 0.3 }, 8.4)
+      .set({}, {}, Dur);
   }
 
   /* ---------- Gallery: pinned on desktop, bends around you in 3D ---------- */
