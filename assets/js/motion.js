@@ -306,6 +306,13 @@
   // only the rising edge gets a dome; a lifting sheet leaves with a straight edge, so no semicircle is left on screen
   const cTop = cMain && cap(cMain, "cap--top");
 
+  // The sheets wait off screen with CSS translateY(100%). GSAP reads that back as a fixed pixel offset and
+  // adds it to every yPercent move, so the sheets started a full screen too low and never covered the page.
+  // Tell GSAP where they really are.
+  if (curtain) gsap.set([cLead, cMain], { y: 0, yPercent: html.classList.contains("ltc-seen") ? 0 : 100 });
+  // the sheets answer a click at once: full speed from the first frame, slowing as they cover the page
+  const COVER = "power3.out";
+
   function runIntro() {
     if (loader && firstVisit) {
       try { sessionStorage.setItem("ltc:seen", "1"); } catch (e) { /* ignore */ }
@@ -399,13 +406,13 @@
     gsap.timeline({ onComplete: () => (location.href = url.href) })
       .set(curtain, { visibility: "visible" })
       .set([cLabel, cTitle], { yPercent: 110, opacity: 1 })
-      .fromTo(cLead, { yPercent: 100 }, { yPercent: 0, duration: 1, ease: SHEET }, 0)
-      .fromTo(cMain, { yPercent: 100 }, { yPercent: 0, duration: 1.1, ease: SHEET }, 0.12)
-      .fromTo(cTop, { scaleY: 1 }, { scaleY: 0, duration: 1.1, ease: SHEET }, 0.12)
+      .fromTo(cLead, { yPercent: 100 }, { yPercent: 0, duration: 0.75, ease: COVER }, 0)
+      .fromTo(cMain, { yPercent: 100 }, { yPercent: 0, duration: 0.85, ease: COVER }, 0.06)
+      .fromTo(cTop, { scaleY: 1 }, { scaleY: 0, duration: 0.85, ease: COVER }, 0.06)
       // once the page is covered, its own animations rest so the curtain has the frame to itself
-      .add(() => window.dispatchEvent(new Event("ltc:covered")), 1.1)
-      .fromTo(cCards, { y: () => -window.innerHeight * 0.4, rotation: (i) => [-20, 18, 8][i % 3], opacity: 0 }, { y: 0, rotation: (i) => [-10, 9, -2][i % 3], opacity: 1, duration: 0.85, ease: "power3.out", stagger: 0.08 }, 0.55)
-      .to([cLabel, cTitle], { yPercent: 0, duration: 0.75, ease: "power3.out", stagger: 0.07 }, 0.72);
+      .add(() => window.dispatchEvent(new Event("ltc:covered")), 0.8)
+      .fromTo(cCards, { y: () => -window.innerHeight * 0.4, rotation: (i) => [-20, 18, 8][i % 3], opacity: 0 }, { y: 0, rotation: (i) => [-10, 9, -2][i % 3], opacity: 1, duration: 0.8, ease: "power3.out", stagger: 0.08 }, 0.3)
+      .to([cLabel, cTitle], { yPercent: 0, duration: 0.7, ease: "power3.out", stagger: 0.07 }, 0.42);
   });
   // fetch the next page while the pointer is on its link, so it is ready when the curtain closes
   const fetched = new Set();
