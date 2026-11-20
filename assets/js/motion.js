@@ -531,6 +531,42 @@
   }
 
   /* ---------- Class day: a caramel line runs down the day as you read it ---------- */
+  // About: the journey rail runs from the first chapter's dot to the last, fills as you read,
+  // and each dot lights once the line reaches it
+  function journeyRail() {
+    const wrap = $(".chapters");
+    if (!wrap) return;
+    const items = $$(".chapter", wrap);
+    if (items.length < 2) return;
+    const fill = document.createElement("span");
+    fill.className = "chapters__fill";
+    fill.setAttribute("aria-hidden", "true");
+    wrap.prepend(fill);
+    let ys = [0, 1];
+    // layout offsets (not screen rects), so a card still fading in measures true
+    const measure = () => {
+      ys = items.map((it) => { const d = $(".chapter__dot", it); return it.offsetTop + d.offsetTop + d.offsetHeight / 2; });
+      wrap.style.setProperty("--r0", ys[0] + "px");
+      wrap.style.setProperty("--r1", ys[ys.length - 1] + "px");
+    };
+    measure();
+    window.addEventListener("load", measure);
+    let lit = -1;
+    gsap.fromTo(fill, { scaleY: 0 }, {
+      scaleY: 1, ease: "none",
+      scrollTrigger: {
+        trigger: wrap, start: () => "top+=" + ys[0] + " 62%", end: () => "top+=" + ys[ys.length - 1] + " 62%", scrub: 0.4, invalidateOnRefresh: true, onRefresh: measure,
+        onUpdate: (self) => {
+          const span = Math.max(1, ys[ys.length - 1] - ys[0]);
+          const n = ys.filter((y) => self.progress >= (y - ys[0]) / span - 0.002).length;
+          if (n === lit) return;
+          lit = n;
+          items.forEach((it, k) => it.classList.toggle("is-past", k < n));
+        },
+      },
+    });
+  }
+
   function dayRail() {
     const wrap = $(".j-day");
     if (!wrap) return;
@@ -831,6 +867,7 @@
     marquees();
     foldSteps();
     dayRail();
+    journeyRail();
     hgallery();
     steps();
     tilt3d();

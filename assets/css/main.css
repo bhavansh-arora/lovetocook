@@ -1201,20 +1201,50 @@ form.is-sent .form-success { display: block; animation: cardIn .8s var(--ease); 
 .about-hero__img { grid-column: 8 / span 5; }
 .about-hero__img .media { aspect-ratio: 3 / 4; border-radius: 999px 999px var(--r-lg) var(--r-lg); }
 @media (max-width: 1000px) { .about-hero__title, .about-hero__img { grid-column: 1 / -1; } .about-hero__img { max-width: 520px; } }
-.chapters { position: relative; }
-.chapter { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); padding-block: clamp(36px, 4vw, 56px); border-top: 1px solid var(--line); align-items: start; }
-.chapter:last-child { border-bottom: 1px solid var(--line); }
-.chapter__n { grid-column: 1 / span 2; font-family: var(--f-display); font-style: italic; color: var(--caramel); font-size: 1.15rem; font-variation-settings: "SOFT" 100, "WONK" 0; }
-.theme-dark .chapter__n { color: var(--butter); }
-.chapter__place { grid-column: 3 / span 3; color: var(--muted); }
-.chapter__title { grid-column: 6 / span 4; font-family: var(--f-display); font-size: clamp(1.6rem, 2.6vw, 2.5rem); font-weight: 360; letter-spacing: -.03em; line-height: 1.04; font-variation-settings: "SOFT" 60, "opsz" 144; }
-.chapter__text { grid-column: 10 / span 3; color: var(--muted); font-size: var(--fs-sm); }
-.chapter__award { display: inline-flex; margin-top: 14px; }
-@media (max-width: 1000px) {
-  .chapter__n { grid-column: 1 / span 3; }
-  .chapter__place { grid-column: 4 / -1; text-align: right; }
-  .chapter__title { grid-column: 1 / -1; margin-top: 8px; }
-  .chapter__text { grid-column: 1 / -1; }
+/* The journey: a centred rail that fills in caramel as you read, chapters alternating either side of it */
+.chapters { --rail: 2px; --dot: 16px; --side: clamp(28px, 3.4vw, 56px); --stagger: clamp(48px, 7vw, 120px);
+  position: relative; list-style: none; margin: 0; padding: 12px 0 0; display: grid; row-gap: 28px; }
+.chapters::before, .chapters__fill { content: ""; position: absolute; left: calc(50% - var(--rail) / 2); top: var(--r0, 0px); height: calc(var(--r1, 100%) - var(--r0, 0px)); width: var(--rail); border-radius: 2px; }
+.chapters::before { background: var(--line); }
+.chapters__fill { z-index: 1; background: var(--caramel); transform-origin: top; transform: scaleY(0); pointer-events: none; }
+.chapter { position: relative; width: calc(50% - var(--side)); }
+.chapter:nth-child(odd of .chapter) { justify-self: start; }
+.chapter:nth-child(even of .chapter) { justify-self: end; }
+.chapter + .chapter { margin-top: calc(-1 * var(--stagger)); }
+.chapter__dot { position: absolute; z-index: 2; top: 44px; width: var(--dot); height: var(--dot); border-radius: 50%; background: var(--paper); border: 2px solid var(--line-strong);
+  transition: background-color .5s var(--ease), border-color .5s var(--ease), box-shadow .5s var(--ease); }
+.chapter:nth-child(odd of .chapter) .chapter__dot { right: calc(-1 * var(--side) - var(--dot) / 2 - 1px); }
+.chapter:nth-child(even of .chapter) .chapter__dot { left: calc(-1 * var(--side) - var(--dot) / 2 + 1px); }
+.chapter.is-past .chapter__dot { background: var(--caramel); border-color: var(--caramel); box-shadow: 0 0 0 6px rgba(196, 122, 44, .16); }
+/* a short tick from the card towards the rail */
+.chapter__card::before { content: ""; position: absolute; top: 51px; width: calc(var(--side) - var(--dot) / 2 - 8px); height: 2px; background: var(--line); }
+.chapter:nth-child(odd of .chapter) .chapter__card::before { left: 100%; }
+.chapter:nth-child(even of .chapter) .chapter__card::before { right: 100%; }
+.chapter__card { position: relative; display: grid; gap: 14px; align-content: start; padding: clamp(24px, 2.6vw, 38px); border-radius: 22px; background: var(--polaroid, var(--white)); box-shadow: var(--shadow-sm); }
+.chapter__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+.chapter__n { display: grid; font-family: var(--f-display); font-style: italic; font-weight: 320; color: var(--caramel); font-size: clamp(2.8rem, 4.2vw, 4.2rem); line-height: .86; letter-spacing: -.04em; font-variant-numeric: lining-nums; font-variation-settings: "SOFT" 100, "WONK" 0; }
+.chapter__n small { font-family: var(--f-body); font-style: normal; font-size: var(--fs-label); letter-spacing: .2em; text-transform: uppercase; font-weight: 600; line-height: 1.2; color: var(--muted); margin-bottom: 10px; }
+.chapter__place { color: var(--muted); text-align: right; max-width: 60%; }
+.chapter__title { margin: 4px 0 0; font-family: var(--f-display); font-size: clamp(1.55rem, 2.2vw, 2.15rem); font-weight: 360; letter-spacing: -.03em; line-height: 1.08; font-variation-settings: "SOFT" 60, "opsz" 144; }
+.chapter__text { margin: 0; color: var(--muted); font-size: var(--fs-sm); max-width: 46ch; }
+.chapter__award { justify-self: start; }
+/* the last chapter is home: the card turns chocolate and its dot is larger */
+.chapter--home .chapter__card { background: var(--ink); color: var(--cream); --muted: rgba(247, 240, 230, .66); --line: rgba(247, 240, 230, .16); }
+.chapter--home .chapter__card::before { background: rgba(29, 14, 4, .14); }
+.chapter--home .chapter__n { color: var(--butter); }
+.chapter--home { --dot: 22px; }
+.chapter--home .chapter__dot { top: 41px; }
+@media (max-width: 860px) {
+  .chapters { --side: 0px; --dot: 16px; padding-left: 36px; row-gap: 18px; }
+  .chapters::before, .chapters__fill { left: 11px; }
+  .chapter:nth-child(n of .chapter) { width: 100%; justify-self: stretch; }
+  .chapter + .chapter { margin-top: 0; }
+  .chapter:nth-child(n of .chapter) .chapter__dot { left: -33px; right: auto; top: 30px; }
+  .chapter--home { --dot: 20px; }
+  .chapter--home:nth-child(n of .chapter) .chapter__dot { left: -35px; top: 28px; }
+  .chapter__card::before { display: none; }
+  .chapter__head { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .chapter__place { text-align: left; max-width: none; }
 }
 .values { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
 .value { padding: clamp(28px, 3vw, 44px); border-radius: var(--r-lg); background: var(--white); display: grid; gap: 16px; align-content: start; }
