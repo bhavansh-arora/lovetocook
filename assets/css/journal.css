@@ -445,3 +445,20 @@ main > section, main > .marquee, main > div, .footer { overflow-x: clip; }
 /* the film grain is invisible on a phone screen but costs a full-screen layer on every frame */
 @media (hover: none) { body::after { display: none; } }
 
+
+/* ---------- Phones: everything sits inside the side margins ---------- */
+@media (max-width: 900px) {
+  /* gift teaser: the tilted photo stays on screen and the voucher overlaps only its corner, not the caption */
+  .j-gift__stage { min-height: 0; aspect-ratio: 1 / 1.16; max-width: 480px; width: 100%; margin-inline: auto; }
+  .j-gift__pola { right: 5%; width: 44%; }
+  .j-gift__voucher { width: 82%; }
+  /* Sam's note: the photo is centred over the quote rather than hanging past the left margin */
+  .j-note__photo { justify-self: center; width: min(74%, 300px); margin-bottom: 8px; }
+}
+@media (max-width: 1000px), (hover: none) {
+  /* the "things you'll learn" photos fit the screen, with the next one peeking in */
+  .j-gal .hgal__item .pola img { height: auto; width: min(74vw, calc(270px * var(--ar, 4 / 3))); }
+  .j-gal .hgal__item { max-width: calc(100vw - 2 * var(--gutter)); }
+  .j-gal .hgal__track { scroll-padding-inline: var(--gutter); }
+  .j-gal .hgal__item { scroll-snap-align: start; }
+}
