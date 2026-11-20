@@ -427,11 +427,11 @@
       gsap.from(lines, { ...lineIn, scrollTrigger: { trigger: el, start: "top 88%", once: true } });
     });
     // content rises into place (flat at rest, so waiting blocks are not held on their own layers)
-    gsap.set("[data-reveal]", { y: 48 });
+    gsap.set("[data-reveal]", { y: 30 });
     ScrollTrigger.batch("[data-reveal]", {
       start: "top 92%",
       once: true,
-      onEnter: (els) => { gsap.fromTo(els, { opacity: 0, y: 48 }, { opacity: 1, y: 0, duration: 1.1, ease, stagger: 0.08, overwrite: "auto", onComplete: unset("transform") }); els.forEach((e) => e.classList.add("is-lit")); },
+      onEnter: (els) => { gsap.fromTo(els, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.1, ease: "power3.out", stagger: 0.08, overwrite: "auto", onComplete: unset("transform") }); els.forEach((e) => e.classList.add("is-lit")); },
     });
     $$("[data-reveal-img]").forEach((el) => {
       const img = $("img", el);
@@ -486,17 +486,18 @@
       const group = $(".marquee__group", track);
       track.appendChild(group.cloneNode(true)).setAttribute("aria-hidden", "true");
       const dir = m.dataset.marquee === "right" ? 1 : -1;
-      let x = 0, speed = 1, w = group.offsetWidth, on = true;
+      let x = 0, speed = 1, target = 1, w = group.offsetWidth, on = true;
       onScreen(m, (v) => (on = v));
       window.addEventListener("resize", () => (w = group.offsetWidth));
       ScrollTrigger.create({
         trigger: m, start: "top bottom", end: "bottom top",
-        onUpdate: (self) => { const v = self.getVelocity(); speed = 1 + Math.min(6, Math.abs(v / 300)); },
+        onUpdate: (self) => { target = 1 + Math.min(4, Math.abs(self.getVelocity() / 400)); },
       });
       gsap.ticker.add((t, dt) => {
         if (!on) return;
         x += dir * 0.06 * speed * dt;
-        speed += (1 - speed) * 0.05;
+        speed += (target - speed) * 0.08;
+        target += (1 - target) * 0.06;
         if (x <= -w) x += w;
         if (x > 0) x -= w;
         track.style.transform = `translate3d(${x.toFixed(1)}px,0,0)`;
@@ -514,7 +515,7 @@
       const media = $(".j-fold__media", st), txt = $(".j-fold__txt", st), stamp = $(".j-fold__stamp", st), num = $(".j-fold__stamp b", st), op = $(".j-fold__op", st);
       const n = parseInt(num.dataset.n, 10) || 0, o = { v: 0 }, at = i * 0.3;
       num.textContent = "0";
-      tl.fromTo(media, { y: -130, rotation: i % 2 ? 14 : -14, opacity: 0 }, { y: 0, rotation: 0, opacity: 1, duration: 1, ease: "back.out(1.25)", onComplete: unset("transform,opacity") }, at)
+      tl.fromTo(media, { y: -70, rotation: i % 2 ? 8 : -8, opacity: 0 }, { y: 0, rotation: 0, opacity: 1, duration: 1, ease: "power3.out", onComplete: unset("transform,opacity") }, at)
         .fromTo(txt, { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", onComplete: unset("transform,opacity") }, at + 0.32)
         .fromTo(stamp, { scale: 0, rotation: -60 }, { scale: 1, rotation: 0, duration: 0.7, ease: "back.out(2.2)", onComplete: unset("transform") }, at + 0.62)
         .to(o, { v: n, duration: 0.8, ease: "power2.out", onUpdate: () => { num.textContent = Math.round(o.v); } }, at + 0.62);
@@ -772,8 +773,8 @@
     $$("[data-deal]").forEach((group) => {
       const cards = Array.from(group.children);
       const tilt = (el) => parseFloat(getComputedStyle(el).getPropertyValue("--r")) || 0;
-      gsap.fromTo(cards, { opacity: 0, y: -120, rotation: (i, el) => tilt(el) + (i % 2 ? 14 : -14) }, {
-        opacity: 1, y: 0, rotation: (i, el) => tilt(el), duration: 1.05, stagger: 0.13, ease: "back.out(1.3)", onComplete: unset("transform"),
+      gsap.fromTo(cards, { opacity: 0, y: -64, rotation: (i, el) => tilt(el) + (i % 2 ? 8 : -8) }, {
+        opacity: 1, y: 0, rotation: (i, el) => tilt(el), duration: 1.1, stagger: 0.12, ease: "power3.out", onComplete: unset("transform"),
         scrollTrigger: { trigger: group, start: "top 82%", once: true },
       });
     });

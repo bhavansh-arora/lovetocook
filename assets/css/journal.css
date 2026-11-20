@@ -446,3 +446,6 @@ main > section, main > .marquee, main > div, .footer { overflow-x: clip; }
 .quote-band__bg { will-change: transform; }
 /* the film grain is invisible on a phone screen but costs a full-screen layer on every frame */
 @media (hover: none) { body::after { display: none; } }
+
+/* polaroids that are dealt in are drawn ahead of time on computers, so their entrance only moves them */
+@media (hover: hover) and (pointer: fine) { .motion-ok [data-deal] > * { will-change: transform; } }
