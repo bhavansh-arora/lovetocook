@@ -746,6 +746,14 @@
   const cap = (host, cls) => { const c = document.createElement("span"); c.className = "cap " + cls; c.setAttribute("aria-hidden", "true"); host.appendChild(c); return c; };
   const cTop = cMain && cap(cMain, "cap--top"), cBot = cMain && cap(cMain, "cap--bot");
   const lBot = loader && cap(loader, "cap--bot");
+  // How far a lifting sheet travels: off the top, plus the height of the dome trailing under it. At -100%
+  // the dome was left sitting across the top of the screen until the sheet was removed, and if the phone
+  // was busy starting the hero just then, that frame stayed up as a white semicircle.
+  const clearOf = (sheet, dome) => () => -100 - (dome.offsetHeight / Math.max(1, sheet.offsetHeight)) * 100 - 2;
+  // The sheets wait off screen with CSS translateY(100%). GSAP reads that back from the computed style
+  // as a fixed pixel offset (the percentage is lost) and adds it to every yPercent move, so the first
+  // page change after the loader never covered the screen and its lift stopped short. Say where they are.
+  if (curtain) gsap.set([cLead, cMain], { y: 0, yPercent: html.classList.contains("ltc-seen") ? 0 : 100 });
 
   function loaderTimeline(onHero) {
     try { sessionStorage.setItem("ltc:seen", "1"); } catch (e) { /* ignore */ }
@@ -769,7 +777,7 @@
         rotation: (i) => (i % 2 ? 24 : -24), opacity: 0, duration: 0.8, stagger: 0.03, ease: "power3.in",
       }, "+=0.15")
       .to([".loader__center", ".loader__row", ".loader__bar"], { y: -24, opacity: 0, duration: 0.5, ease: "power2.in" }, "<0.2")
-      .to(loader, { yPercent: -100, duration: 1.1, ease: "expo.inOut" }, "-=0.25")
+      .to(loader, { yPercent: clearOf(loader, lBot), duration: 1.1, ease: "expo.inOut" }, "-=0.25")
       .fromTo(lBot, { scaleY: 0 }, { scaleY: 1, duration: 1.1, ease: "expo.inOut" }, "<")
       .add(() => { loader.classList.add("is-done"); }, ">")
       .add(onHero, "-=0.7");
@@ -790,7 +798,7 @@
       .add(() => { curtain.classList.remove("is-shut"); curtain.classList.add("is-open"); }, 0)
       .to(cCards, { y: () => -window.innerHeight * 0.5, rotation: (i) => [-22, 20, -6][i % 3], opacity: 0, duration: 0.8, ease: "power2.in", stagger: 0.06 }, 0)
       .to([cLabel, cTitle], { yPercent: -110, opacity: 0, duration: 0.6, ease: "power2.in", stagger: 0.05 }, 0.1)
-      .to(cMain, { yPercent: -100, duration: 1.2, ease: SHEET }, 0.42)
+      .to(cMain, { yPercent: clearOf(cMain, cBot), duration: 1.2, ease: SHEET }, 0.42)
       .fromTo(cBot, { scaleY: 0 }, { scaleY: 1, duration: 1.2, ease: SHEET }, 0.42)
       .to(cLead, { yPercent: -100, duration: 1.2, ease: SHEET }, 0.56);
   }
