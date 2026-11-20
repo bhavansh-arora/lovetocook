@@ -455,7 +455,7 @@ body::after {
 .cap--bot { top: calc(100% - 1px); border-radius: 0 0 50% 50% / 0 0 100% 100%; transform-origin: 50% 0; }
 .cap--top { bottom: calc(100% - 1px); border-radius: 50% 50% 0 0 / 100% 100% 0 0; transform-origin: 50% 100%; }
 .loader__card { --w: clamp(104px, 11vw, 176px); position: absolute; width: var(--w); aspect-ratio: 4 / 5; margin: 0; padding: 7px 7px 26px; background: var(--white); border-radius: 14px;
-  left: calc(50% + var(--x) * 1vw - var(--w) / 2); top: calc(50% + var(--y) * var(--ys, 1vh) - var(--w) * .625);
+  left: calc(50% + var(--x) * var(--xs, 1vw) - var(--w) / 2); top: calc(50% + var(--y) * var(--ys, 1vh) + var(--yo, 0px) - var(--w) * .625);
   box-shadow: 0 30px 60px -28px rgba(29, 14, 4, .45); transform: rotate(var(--r)); }
 .loader__card img { width: 100%; height: 100%; object-fit: cover; border-radius: 9px; }
 .loader__center { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 18px; text-align: center; width: min(80vw, 420px); }
@@ -471,9 +471,14 @@ body::after {
 .loader__bar span { position: absolute; inset: 0; background: var(--caramel); transform: scaleX(0); transform-origin: left; }
 .no-js .loader, .loader.is-done { display: none; }
 @media (max-width: 760px) {
-  .loader__card { --w: 24vw; --ys: 1.25vh; padding: 5px 5px 16px; }
+  /* phones: the photos ring the logo inside the visible screen (dvh leaves out Safari's toolbars) */
+  .loader__card { --w: 22vw; --xs: .86vw; --ys: 1.02vh; --ys: 1.02dvh; --yo: 3vh; --yo: 3dvh; padding: 5px 5px 16px; }
   .loader__word { display: none; }
-  .loader__center { width: 62vw; }
+  .loader__center { width: 88vw; }
+}
+/* short phones (an SE, or a phone with its toolbars showing): smaller photos, spread a little further from the logo */
+@media (max-width: 760px) and (max-height: 680px) {
+  .loader__card { --w: 18vw; --ys: 1.12vh; --ys: 1.12dvh; --yo: 2vh; --yo: 2dvh; }
 }
 
 /* ---------- Page change: a caramel sheet, then a cream curtain carrying the next page's name ---------- */
