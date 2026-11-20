@@ -38,7 +38,7 @@
   --fs-xs: 0.8125rem;
   --fs-label: 0.75rem;
 
-  --gutter: clamp(20px, 4.2vw, 64px);
+  --gutter: clamp(24px, 4.2vw, 64px);
   --section: clamp(80px, 9vw, 144px);
   --gap: clamp(20px, 2.4vw, 36px);
   --gap-lg: clamp(40px, 6vw, 96px);
