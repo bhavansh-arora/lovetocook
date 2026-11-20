@@ -438,9 +438,11 @@ body::after {
   .footer { padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
 }
 @media (max-width: 480px) {
-  .news-form { flex-direction: column; align-items: stretch; border-radius: var(--r-md); padding: 8px; }
-  .news-form input { padding: 0 14px; }
-  .news-form .btn { width: 100%; }
+  /* phones: the email field is its own pill, with the button below it rather than inside it */
+  .news-form, .news-form:focus-within { flex-direction: column; align-items: stretch; gap: 12px; padding: 0; border-radius: 0; box-shadow: none; }
+  .news-form input { flex: none; height: 56px; padding: 0 24px; border-radius: var(--r-pill); box-shadow: inset 0 0 0 1px var(--line-strong); transition: box-shadow .3s; }
+  .news-form input:focus { box-shadow: inset 0 0 0 1px var(--butter); }
+  .news-form .btn { width: 100%; height: 56px; }
 }
 
 /* ---------- Preloader & transitions ---------- */
