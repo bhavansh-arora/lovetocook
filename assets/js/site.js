@@ -380,7 +380,7 @@
         cells += ev ? `<button type="button" class="${cls}" data-day="${d}" aria-label="${longDate(date)}, ${ev.length} class${ev.length > 1 ? "es" : ""}">${d}${dots}</button>` : `<div class="${cls}">${d}</div>`;
       }
       const side = selected && byDay[selected.getDate()]
-        ? `<h4>${longDate(selected)}</h4>` + byDay[selected.getDate()].map((s) => `<div class="cal__item"><img src="${sm(s.course.image)}" loading="lazy" alt="" style="object-position:${s.course.imagePos || "center"}"><div><b>${esc(s.course.title)}</b><small>${s.start}–${s.end} · ${money(s.course.price)} pp</small>${seatsHTML(s, s.course.capacity)}<div class="btn-row" style="margin-top:12px">${seatsLeft(s) ? `<button class="btn btn--sm" type="button" data-quick-book="${s.id}">Book ${arrowIcon()}</button>` : `<button class="btn btn--sm btn--ghost" type="button" data-waitlist="${s.id}">Waitlist ${arrowIcon()}</button>`}<a class="link" href="class.html?c=${s.course.id}&s=${s.id}">Details</a></div></div></div>`).join("")
+        ? `<h4>${longDate(selected)}</h4>` + byDay[selected.getDate()].map((s) => `<div class="cal__item"><img src="${sm(s.course.image)}" loading="lazy" decoding="async" alt="" style="object-position:${s.course.imagePos || "center"}"><div><b>${esc(s.course.title)}</b><small>${s.start}–${s.end} · ${money(s.course.price)} pp</small>${seatsHTML(s, s.course.capacity)}<div class="btn-row" style="margin-top:12px">${seatsLeft(s) ? `<button class="btn btn--sm" type="button" data-quick-book="${s.id}">Book ${arrowIcon()}</button>` : `<button class="btn btn--sm btn--ghost" type="button" data-waitlist="${s.id}">Waitlist ${arrowIcon()}</button>`}<a class="link" href="class.html?c=${s.course.id}&s=${s.id}">Details</a></div></div></div>`).join("")
         : `<h4>${fmt(month, { month: "long" })}</h4><p class="muted">No classes this month in this category. Try the next month, or <a class="link" href="private.html">book a private lesson</a>.</p>`;
       calWrap.innerHTML = `<div class="cal"><div><div class="cal__head"><h3>${fmt(month, { month: "long", year: "numeric" })}</h3><div class="cal__nav"><button class="icon-btn" type="button" data-cal-nav="-1" aria-label="Previous month">${icon("arrow")}</button><button class="icon-btn" type="button" data-cal-nav="1" aria-label="Next month">${icon("arrow")}</button></div></div>
         <div class="cal__grid">${cells}</div>
@@ -430,7 +430,7 @@
           return `<li class="j-day__item${brk ? " is-break" : ""}"><time>${t}</time><span class="j-day__dot">${brk ? icon("cup") : ""}</span><div class="j-day__what"><b>${esc(x)}</b>${d > 0 ? `<small>${dur(d)}</small>` : ""}</div></li>`;
         }).join("");
       }
-      if (k === "gallery") el.innerHTML = c.gallery.map((g, i) => `<div class="media img-reveal" data-reveal-img><img src="${g}" alt="${i ? "" : esc(c.title)}" ${i ? 'loading="lazy"' : ""} style="object-position:${i === 0 && c.imagePos ? c.imagePos : "center"}"></div>`).join("");
+      if (k === "gallery") el.innerHTML = c.gallery.map((g, i) => `<div class="media img-reveal" data-reveal-img><img src="${sm(g)}" srcset="${sm(g)} 760w, ${g} 1400w" sizes="(max-width: 760px) 92vw, 36vw" alt="${i ? "" : esc(c.title)}" ${i ? 'loading="lazy"' : ""} decoding="async" style="object-position:${i === 0 && c.imagePos ? c.imagePos : "center"}"></div>`).join("");
     });
     // related
     const rel = $("[data-related]");
@@ -753,6 +753,26 @@
   renderFAQ();
   renderBag();
   onScroll();
+
+  /* ---------- Photos load and decode about a screen before they arrive, so the frame they appear in
+     is never held up waiting for a big JPEG to be unpacked ---------- */
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver((es) => es.forEach((e) => {
+      if (!e.isIntersecting) return;
+      io.unobserve(e.target);
+      const im = e.target;
+      im.loading = "eager";
+      if (im.decode) im.decode().catch(() => {});
+    }), { rootMargin: "120% 100% 120% 100%" });
+    const scan = () => $$("img[loading=lazy]:not([data-pd])").forEach((im) => { im.setAttribute("data-pd", ""); io.observe(im); });
+    scan();
+    let pend = false;
+    new MutationObserver((rs) => {
+      if (pend || !rs.some((r) => Array.prototype.some.call(r.addedNodes, (n) => n.nodeType === 1))) return;
+      pend = true;
+      requestAnimationFrame(() => { pend = false; scan(); });
+    }).observe(document.body, { childList: true, subtree: true });
+  }
 
   window.LTC = { openDrawer, toast, money };
 })();

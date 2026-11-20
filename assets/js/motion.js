@@ -105,7 +105,8 @@
   /* ---------- Flour dust: drifting particles that part around the pointer ---------- */
   function flour() {
     const cv = $("[data-flour]");
-    if (!cv || reduce) return;
+    if (!cv) return;
+    if (reduce || !finePointer) { cv.style.display = "none"; return; }
     const ctx = cv.getContext("2d");
     const host = cv.parentElement;
     const P = [];
@@ -184,11 +185,13 @@
     if (t) { e.preventDefault(); window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 90, behavior: "smooth" }); }
   }));
 
+  // A photo that scales as it arrives is held on its own layer for the move, so it is drawn once, not every frame
+  const willOn = function () { this.targets().forEach((t) => (t.style.willChange = "transform")); };
   // Tidy up after an entrance without GSAP's clearProps, which re-reads the computed transform
   // straight away and forces the whole page to lay out again mid-scroll. Removing the inline
   // styles is enough; GSAP re-reads lazily if the element is ever tweened again.
   const unset = (props) => {
-    const list = props.split(",").flatMap((p) => (p === "transform" ? ["transform", "translate", "rotate", "scale"] : [p === "clipPath" ? "clip-path" : p]));
+    const list = props.split(",").flatMap((p) => (p === "transform" ? ["transform", "translate", "rotate", "scale"] : [p.replace(/[A-Z]/g, (c) => "-" + c.toLowerCase())]));
     return function () { this.targets().forEach((t) => { list.forEach((p) => t.style.removeProperty(p)); if (t._gsap) t._gsap.uncache = 1; }); };
   };
 
@@ -433,11 +436,11 @@
     $$("[data-reveal-img]").forEach((el) => {
       const img = $("img", el);
       gsap.fromTo(el, { clipPath: "inset(0% 0% 100% 0% round 32px)" }, { clipPath: "inset(0% 0% 0% 0% round 32px)", duration: 1.4, ease: "expo.inOut", scrollTrigger: { trigger: el, start: "top 88%", once: true }, onComplete: unset("clipPath") });
-      if (img) gsap.fromTo(img, { scale: 1.25, yPercent: -10 }, { scale: 1, yPercent: 0, duration: 1.8, ease: "expo.out", onComplete: unset("transform"), scrollTrigger: { trigger: el, start: "top 88%", once: true } });
+      if (img) gsap.fromTo(img, { scale: 1.25, yPercent: -10 }, { scale: 1, yPercent: 0, duration: 1.8, ease: "expo.out", onStart: willOn, onComplete: unset("transform,willChange"), scrollTrigger: { trigger: el, start: "top 88%", once: true } });
     });
     $$("[data-parallax]").forEach((el) => {
       const amt = parseFloat(el.dataset.parallax) || 12;
-      gsap.fromTo(el, { yPercent: -amt }, { yPercent: amt, ease: "none", scrollTrigger: { trigger: el.parentElement, start: "top bottom", end: "bottom top", scrub: true } });
+      gsap.fromTo(el, { yPercent: -amt }, { yPercent: amt, ease: "none", scrollTrigger: { trigger: el.parentElement, start: "top bottom", end: "bottom top", scrub: 0.5 } });
     });
     $$("[data-count]").forEach((el) => {
       const end = parseFloat(el.dataset.count);
@@ -445,12 +448,12 @@
       gsap.to(o, { v: end, duration: 2, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 90%", once: true }, onUpdate: () => (el.textContent = Math.round(o.v) + (el.dataset.suffix || "")) });
     });
     $$("[data-float]").forEach((el, k) => {
-      gsap.to(el, { y: k % 2 ? -60 : 60, rotate: k % 2 ? 6 : -6, rotationY: k % 2 ? 18 : -18, ease: "none", scrollTrigger: { trigger: el.closest("section"), start: "top bottom", end: "bottom top", scrub: true } });
+      gsap.to(el, { y: k % 2 ? -60 : 60, rotate: k % 2 ? 6 : -6, rotationY: k % 2 ? 18 : -18, ease: "none", scrollTrigger: { trigger: el.closest("section"), start: "top bottom", end: "bottom top", scrub: 0.5 } });
     });
     // the quote band image sinks back in depth as you pass
     $$(".quote-band").forEach((q) => {
       const bg = $(".quote-band__bg", q);
-      gsap.fromTo(bg, { scale: 1.18, rotationX: 8, transformPerspective: 1400 }, { scale: 1, rotationX: -4, ease: "none", scrollTrigger: { trigger: q, start: "top bottom", end: "bottom top", scrub: true } });
+      gsap.fromTo(bg, { scale: 1.18, rotationX: 8, transformPerspective: 1400 }, { scale: 1, rotationX: -4, ease: "none", scrollTrigger: { trigger: q, start: "top bottom", end: "bottom top", scrub: 0.5 } });
     });
   }
 
@@ -472,7 +475,7 @@
         });
       };
       walk(el);
-      gsap.to($$(".w", el), { opacity: 1, stagger: 0.05, ease: "none", scrollTrigger: { trigger: el, start: "top 80%", end: "bottom 45%", scrub: true } });
+      gsap.to($$(".w", el), { opacity: 1, stagger: 0.05, ease: "none", scrollTrigger: { trigger: el, start: "top 80%", end: "bottom 45%", scrub: 0.5 } });
     });
   }
 
@@ -608,7 +611,7 @@
     const list = $("[data-steps]");
     if (!list) return;
     const line = $(".steps-line span", list);
-    gsap.to(line, { scaleY: 1, ease: "none", scrollTrigger: { trigger: list, start: "top 60%", end: "bottom 60%", scrub: true } });
+    gsap.to(line, { scaleY: 1, ease: "none", scrollTrigger: { trigger: list, start: "top 60%", end: "bottom 60%", scrub: 0.5 } });
     $$(".step", list).forEach((s) => ScrollTrigger.create({ trigger: s, start: "top 62%", end: "bottom 62%", toggleClass: { targets: s, className: "is-active" }, onLeave: () => s.classList.add("is-active") }));
   }
 
@@ -684,6 +687,24 @@
     });
   }
 
+  /* ---------- While the page scrolls, hover effects wait: cards sliding under a still pointer
+     would otherwise start shadow and tilt animations on every one they pass ---------- */
+  // (a clear sheet over the page takes the pointer for that moment; switching one empty element is
+  // nearly free, where switching pointer-events on the whole page would restyle every element)
+  function hoverPause() {
+    if (!finePointer) return;
+    const shield = document.createElement("div");
+    shield.className = "scroll-shield";
+    shield.setAttribute("aria-hidden", "true");
+    document.body.appendChild(shield);
+    let t = 0, on = false;
+    window.addEventListener("scroll", () => {
+      if (!on) { on = true; shield.classList.add("is-on"); }
+      clearTimeout(t);
+      t = setTimeout(() => { on = false; shield.classList.remove("is-on"); }, 180);
+    }, { passive: true });
+  }
+
   /* ---------- Cursor ---------- */
   function cursor() {
     const c = $(".cursor");
@@ -751,8 +772,8 @@
     $$("[data-deal]").forEach((group) => {
       const cards = Array.from(group.children);
       const tilt = (el) => parseFloat(getComputedStyle(el).getPropertyValue("--r")) || 0;
-      gsap.fromTo(cards, { opacity: 0, y: -110, scale: 0.86, rotation: (i, el) => tilt(el) + (i % 2 ? 14 : -14) }, {
-        opacity: 1, y: 0, scale: 1, rotation: (i, el) => tilt(el), duration: 1.05, stagger: 0.13, ease: "back.out(1.3)", onComplete: unset("transform"),
+      gsap.fromTo(cards, { opacity: 0, y: -120, rotation: (i, el) => tilt(el) + (i % 2 ? 14 : -14) }, {
+        opacity: 1, y: 0, rotation: (i, el) => tilt(el), duration: 1.05, stagger: 0.13, ease: "back.out(1.3)", onComplete: unset("transform"),
         scrollTrigger: { trigger: group, start: "top 82%", once: true },
       });
     });
@@ -789,8 +810,9 @@
       if (!img) return;
       const r = getComputedStyle(wrap).borderTopLeftRadius || "0px";
       gsap.fromTo(wrap, { clipPath: `inset(0% 0% 100% 0% round ${r})` }, { clipPath: `inset(0% 0% 0% 0% round ${r})`, duration: 1.3, ease: "expo.inOut", scrollTrigger: { trigger: wrap, start: "top 88%", once: true } });
-      gsap.fromTo(img, { scale: 1.35, y: -40 }, { scale: 1.12, y: 0, duration: 1.8, ease: "expo.out", scrollTrigger: { trigger: wrap, start: "top 88%", once: true } });
-      if (!wrap.closest(".ig-grid")) gsap.fromTo(img, { yPercent: -5 }, { yPercent: 5, ease: "none", scrollTrigger: { trigger: wrap, start: "top bottom", end: "bottom top", scrub: true } });
+      const settle = wrap.closest(".ig-grid") ? { onStart: willOn, onComplete: unset("willChange") } : {};
+      gsap.fromTo(img, { scale: 1.35, y: -40 }, { scale: 1.12, y: 0, duration: 1.8, ease: "expo.out", ...settle, scrollTrigger: { trigger: wrap, start: "top 88%", once: true } });
+      if (!wrap.closest(".ig-grid")) gsap.fromTo(img, { yPercent: -5 }, { yPercent: 5, ease: "none", scrollTrigger: { trigger: wrap, start: "top bottom", end: "bottom top", scrub: 0.5 } });
     });
   }
 
@@ -825,6 +847,7 @@
     decks();
     magnetic();
     cursor();
+    hoverPause();
     voucher();
     footerMega();
     photos();
