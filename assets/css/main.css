@@ -1558,7 +1558,8 @@ form.is-sent .form-success { display: block; animation: cardIn .8s var(--ease); 
 /* Photo ribbon: a slow strip of real bakes near the end of each inner page */
 .ribbon-wrap { padding: clamp(56px, 7vw, 104px) 0 clamp(64px, 8vw, 120px); overflow: hidden; }
 .ribbon-wrap__label { text-align: center; color: var(--muted); margin-bottom: clamp(24px, 3vw, 40px); }
-.ribbon { overflow: hidden; }
+/* the strip clips sideways for the scroll, so it carries room above and below for the tilted corners and soft shadows */
+.ribbon { overflow: hidden; padding-block: 28px 80px; margin-block: -28px -80px; }
 .ribbon .marquee__group { display: inline-flex; align-items: center; flex: none; }
 .ribbon figure { flex: none; width: clamp(170px, 17vw, 260px); aspect-ratio: 4 / 5; margin: 0 clamp(10px, 1.2vw, 18px) 0 0; border-radius: 22px; overflow: hidden; box-shadow: 0 30px 60px -34px rgba(29, 14, 4, .5); }
 .ribbon figure:nth-child(odd) { transform: rotate(-2deg) translateY(10px); }
