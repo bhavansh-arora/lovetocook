@@ -63,6 +63,12 @@
 /* ---------- Reset ---------- */
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+/* the page never pans sideways on a phone (clip, unlike hidden, keeps sticky elements working) */
+html, body { overflow-x: clip; }
+/* iPhone Safari zooms the whole page into any field set below 16px, and stays zoomed after; on touch screens fields are 16px */
+@media (hover: none) and (pointer: coarse) {
+  input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea { font-size: max(16px, 1em) !important; }
+}
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 .lenis.lenis-stopped { overflow: hidden; }
