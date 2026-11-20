@@ -405,7 +405,9 @@
     prefetch(url);
     gsap.timeline({ onComplete: () => (location.href = url.href) })
       .set(curtain, { visibility: "visible" })
-      .set([cLabel, cTitle], { yPercent: 110, opacity: 1 })
+      .set(cLabel, { yPercent: 110, opacity: 1 })
+      // the title's mask leaves room below for descenders, so it waits further down to stay out of sight
+      .set(cTitle, { yPercent: 150, opacity: 1 })
       .fromTo(cLead, { yPercent: 100 }, { yPercent: 0, duration: 0.75, ease: COVER }, 0)
       .fromTo(cMain, { yPercent: 100 }, { yPercent: 0, duration: 0.85, ease: COVER }, 0.06)
       .fromTo(cTop, { scaleY: 1 }, { scaleY: 0, duration: 0.85, ease: COVER }, 0.06)

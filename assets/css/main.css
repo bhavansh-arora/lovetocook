@@ -473,8 +473,9 @@ body::after {
 .curtain__lead { background: var(--caramel); }
 .curtain__main { background: var(--cream); color: var(--ink); display: grid; place-content: center; justify-items: center; gap: 18px; text-align: center; padding: var(--gutter); }
 .curtain__label { font-size: var(--fs-label); letter-spacing: .2em; text-transform: uppercase; font-weight: 600; color: var(--caramel); }
-.curtain__mask { display: block; overflow: hidden; padding: .05em .1em .18em; }
-.curtain__title { display: block; font-family: var(--f-display); font-style: italic; font-weight: 340; font-size: clamp(2.8rem, 8vw, 7.5rem); line-height: 1; letter-spacing: -.04em; }
+/* room for italic descenders and swashes (the tail of "y"); the negative margin keeps the layout where it was */
+.curtain__mask { display: block; overflow: hidden; font-size: clamp(2.8rem, 8vw, 7.5rem); line-height: 1; padding: .08em .2em .32em; margin: -.04em -.14em -.2em; }
+.curtain__title { display: block; font-family: var(--f-display); font-style: italic; font-weight: 340; font-size: 1em; line-height: 1; letter-spacing: -.04em; }
 
 /* ---------- Custom cursor ---------- */
 .cursor { position: fixed; left: 0; top: 0; z-index: 400; pointer-events: none; display: none; opacity: 0; transition: opacity .4s; }
