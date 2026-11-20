@@ -39,7 +39,9 @@
       <h2 class="h2" data-split>How can Sam <em>help</em>?</h2>
       <p class="muted" data-reveal style="max-width:40ch">Pick a topic so your message lands in the right place. For bookings, the quickest route is always <a class="link" href="classes.html">online</a>.</p>
       <div class="map" style="min-height:320px" data-reveal>
-        <iframe title="Map showing 16 King Street, Crieff" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=16+King+Street,+Crieff,+Scotland&amp;z=16&amp;output=embed"></iframe>
+        <!-- the map loads once the page has finished arriving (its scripts would otherwise compete with the curtain) -->
+        <iframe title="Map showing 16 King Street, Crieff" loading="lazy" referrerpolicy="no-referrer-when-downgrade" data-defer-src="https://www.google.com/maps?q=16+King+Street,+Crieff,+Scotland&amp;z=16&amp;output=embed"></iframe>
+        <noscript><iframe title="Map showing 16 King Street, Crieff" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=16+King+Street,+Crieff,+Scotland&amp;z=16&amp;output=embed"></iframe></noscript>
       </div>
     </div>
     <form class="form plan__form" data-form="contact" novalidate data-reveal>

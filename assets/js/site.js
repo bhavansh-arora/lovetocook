@@ -33,6 +33,10 @@
   const icon = (id, cls = "") => `<svg class="${cls}" aria-hidden="true"><use href="#i-${id}"/></svg>`;
   const arrowIcon = () => `<span class="btn__icon">${icon("arrow")}${icon("arrow")}</span>`;
   const catLabel = (id) => (D.categories.find((c) => c.id === id) || {}).label || "";
+  // re-measure scroll positions after a list re-renders; while a page is being built, motion.js
+  // measures once at the end instead (each measure lays out the whole page)
+  let building = false;
+  const refreshST = () => { if (!building && window.ScrollTrigger) ScrollTrigger.refresh(); };
   const store = {
     get(k, f) { try { const v = localStorage.getItem("ltc:" + k); return v ? JSON.parse(v) : f; } catch (e) { return f; } },
     set(k, v) { try { localStorage.setItem("ltc:" + k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } },
@@ -182,17 +186,28 @@
   // Header state: scroll position only (no layout reads); dark sections and the footer are
   // tracked by observers, so nothing is measured while scrolling
   let lastY = 0, ticking = false, dark = false, footerIn = false;
-  const mbar = $(".mbar"), footer = $(".footer");
+  let mbar = $(".mbar");
+  const footer = $(".footer");
   const setCls = (el, c, on) => { if (el && el.classList.contains(c) !== on) el.classList.toggle(c, on); };
+  const under = new Map();
+  let darkIO = null;
   if ("IntersectionObserver" in window) {
-    const under = new Map();
-    const darkIO = new IntersectionObserver((es) => {
-      es.forEach((e) => under.set(e.target, e.isIntersecting));
+    darkIO = new IntersectionObserver((es) => {
+      es.forEach((e) => { if (under.has(e.target)) under.set(e.target, e.isIntersecting); });
       dark = Array.from(under.values()).some(Boolean);
       onScroll();
     }, { rootMargin: "0px 0px -94% 0px" });
-    $$("[data-header-dark]").forEach((el) => darkIO.observe(el));
     if (footer) new IntersectionObserver(([e]) => { footerIn = e.isIntersecting; onScroll(); }).observe(footer);
+  }
+  // dark sections are watched per page (the footer stays watched for good)
+  function watchDark(root) {
+    if (!darkIO) return;
+    $$("[data-header-dark]", root).forEach((el) => { if (!under.has(el)) { under.set(el, false); darkIO.observe(el); } });
+  }
+  function unwatchDark() {
+    if (!darkIO) return;
+    under.forEach((_, el) => { if (el !== footer) { darkIO.unobserve(el); under.delete(el); } });
+    dark = Array.from(under.values()).some(Boolean);
   }
   // scroll position is read in the scroll event (layout is clean then), never inside the frame
   let sy = window.scrollY;
@@ -254,7 +269,7 @@
       const list = allSessions().filter((s) => cat === "all" || s.course.category === cat).slice(0, limit);
       wrap.innerHTML = list.length ? list.map(rowHTML).join("") : `<p class="row-empty">New dates coming soon. Join the list below for first dibs.</p>`;
       if (list[0]) preview.show(list[0].id, true);
-      window.ScrollTrigger && ScrollTrigger.refresh();
+      refreshST();
     };
     chips.forEach((ch) => ch.addEventListener("click", () => { chips.forEach((c) => c.setAttribute("aria-pressed", String(c === ch))); draw(ch.dataset.upFilter); }));
     const pick = (e) => { const r = e.target.closest(".row-class"); if (r) preview.show(r.dataset.sid); };
@@ -264,7 +279,8 @@
   }
 
   /* 3D preview card beside the list: flips to the hovered class, never covers the text */
-  const preview = (() => {
+  let preview = { show() {} };
+  const makePreview = () => {
     const card = $("[data-upv]");
     if (!card) return { show() {} };
     const el = (k) => $(`[data-upv-${k}]`, card);
@@ -299,7 +315,7 @@
       };
     };
     return { show };
-  })();
+  };
 
   /* ---------- Classes catalogue ---------- */
   function cardHTML(s, others = []) {
@@ -351,7 +367,7 @@
       calWrap.classList.toggle("hide", view !== "cal");
       if (view === "list") grid.innerHTML = grouped().map(([s, others]) => cardHTML(s, others)).join("") || `<p class="row-empty">No dates in this category yet.</p>`;
       else drawCal();
-      window.ScrollTrigger && ScrollTrigger.refresh();
+      refreshST();
     }
     // Calendar
     const first = allSessions()[0];
@@ -457,9 +473,11 @@
     }
     draw();
     document.addEventListener("ltc:booked", draw);
+    pageCleanups.push(() => document.removeEventListener("ltc:booked", draw));
     // JSON-LD Event schema for SEO
     const ld = document.createElement("script");
     ld.type = "application/ld+json";
+    ld.setAttribute("data-page-ld", "");
     ld.textContent = JSON.stringify(sessions.map((s) => ({
       "@context": "https://schema.org", "@type": "Event", name: c.title, description: c.overview,
       startDate: `${s.date}T${s.start}`, endDate: `${s.date}T${s.end}`, eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
@@ -575,7 +593,7 @@
         <div class="bake__media"><img src="${sm(b.img)}" alt="${esc(b.name)}" loading="lazy" decoding="async"><span class="tag">${b.cat}</span><div class="bake__add" data-bake-ctrl="${b.id}"></div></div>
         <div class="bake__body"><div><h3>${esc(b.name)}</h3><p>${esc(b.note)}</p></div><span class="bake__price">${money(b.price)}</span></div></article>`).join("");
       renderBakeryQty();
-      window.ScrollTrigger && ScrollTrigger.refresh();
+      refreshST();
     };
     chips.forEach((ch) => ch.addEventListener("click", () => { cat = ch.dataset.bcat; chips.forEach((c) => c.setAttribute("aria-pressed", String(c === ch))); draw(); }));
     draw();
@@ -709,6 +727,7 @@
     track.addEventListener("touchstart", (e) => (sx = e.touches[0].clientX), { passive: true });
     track.addEventListener("touchend", (e) => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 40) go(i + (dx < 0 ? 1 : -1)); sx = null; });
     go(0);
+    pageCleanups.push(() => clearInterval(timer));
   }
 
   /* ---------- FAQ (render + smooth open) ---------- */
@@ -734,25 +753,56 @@
   }
 
   /* ---------- Small bits ---------- */
-  const topic = new URLSearchParams(location.search).get("topic");
-  if (topic && $("#topic")) $("#topic").value = topic;
-  $$("[data-year]").forEach((el) => (el.textContent = new Date().getFullYear()));
+  function smallBits() {
+    const topic = new URLSearchParams(location.search).get("topic");
+    if (topic && $("#topic")) $("#topic").value = topic;
+    $$("[data-year]").forEach((el) => (el.textContent = new Date().getFullYear()));
+    $$("[data-count-sessions]").forEach((el) => (el.textContent = allSessions().length));
+    $$("[data-from-price]").forEach((el) => (el.textContent = money(Math.min(...D.courses.map((c) => c.price)))));
+  }
   $$("[data-to-top]").forEach((el) => el.addEventListener("click", (e) => { e.preventDefault(); window.__lenis ? window.__lenis.scrollTo(0, { duration: 1.6 }) : window.scrollTo({ top: 0, behavior: "smooth" }); }));
-  $$("[data-count-sessions]").forEach((el) => (el.textContent = allSessions().length));
-  $$("[data-from-price]").forEach((el) => (el.textContent = money(Math.min(...D.courses.map((c) => c.price)))));
+
+  /* ---------- Per page ----------
+     Pages change in place (motion.js swaps <main> behind the curtain), so everything that belongs
+     to one page is set up by pageIn() and undone by pageOut(). The header, footer, bag and
+     checkout live outside <main> and are set up once. */
+  let pageCleanups = [];
+  function pageIn(root) {
+    building = true;
+    try {
+      mbar = $(".mbar");
+      watchDark(root || document);
+      preview = makePreview();
+      renderNext();
+      renderUpcoming();
+      renderCatalogue();
+      renderDetail();
+      renderBakery();
+      renderGift();
+      renderEnquiry();
+      renderTestimonials();
+      renderFAQ();
+      smallBits();
+    } finally { building = false; }
+    lastY = 0;
+    sy = window.scrollY;
+    onScroll();
+  }
+  function pageOut() {
+    const list = pageCleanups;
+    pageCleanups = [];
+    list.forEach((fn) => { try { fn(); } catch (e) { /* keep going */ } });
+    $$("script[data-page-ld]").forEach((s) => s.remove());
+    unwatchDark();
+    preview = { show() {} };
+    clearTimeout(toastT);
+    $(".toast")?.classList.remove("is-on");
+  }
+  function closeAll() { closeLayer(); closeMenu(); }
 
   /* ---------- Boot ---------- */
-  renderNext();
-  renderUpcoming();
-  renderCatalogue();
-  renderDetail();
-  renderBakery();
-  renderGift();
-  renderEnquiry();
-  renderTestimonials();
-  renderFAQ();
+  pageIn(document);
   renderBag();
-  onScroll();
 
   /* ---------- Photos load and decode about a screen before they arrive, so the frame they appear in
      is never held up waiting for a big JPEG to be unpacked ---------- */
@@ -774,5 +824,5 @@
     }).observe(document.body, { childList: true, subtree: true });
   }
 
-  window.LTC = { openDrawer, toast, money };
+  window.LTC = { openDrawer, toast, money, pageIn, pageOut, closeAll };
 })();

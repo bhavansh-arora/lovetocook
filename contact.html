@@ -27,8 +27,8 @@
   @font-face { font-family: "Fraunces"; font-style: italic; font-weight: 300 700; font-display: block; src: url("assets/fonts/fraunces-italic-v2.woff2") format("woff2"); }
   @font-face { font-family: "Inter Tight"; font-style: normal; font-weight: 400 700; font-display: swap; src: url("assets/fonts/inter-tight.woff2") format("woff2"); }
 </style>
-<link rel="stylesheet" href="assets/css/main.css?v=202611200720">
-<link rel="stylesheet" href="assets/css/journal.css?v=202611200720">
+<link rel="stylesheet" href="assets/css/main.css?v=202611201337">
+<link rel="stylesheet" href="assets/css/journal.css?v=202611201337">
 <script>
   (function (h) {
     h.classList.remove("no-js"); h.classList.add("js");
@@ -117,12 +117,12 @@
 </div>
 <script>
   (function () {
-    try {
-      var t = sessionStorage.getItem("ltc:to"), el = document.querySelector("[data-curtain-title]");
-      if (el) el.textContent = t || document.title.split("|")[0].trim();
-      var imgs = JSON.parse(sessionStorage.getItem("ltc:imgs") || "null"), cards = document.querySelectorAll("[data-curtain-img]");
-      if (imgs) for (var i = 0; i < cards.length && i < imgs.length; i++) cards[i].src = imgs[i];
-    } catch (e) {}
+    // on a full page load the curtain shows this page's name and photos from the first frame
+    var el = document.querySelector("[data-curtain-title]"), cards = document.querySelectorAll("[data-curtain-img]"), to = null;
+    try { to = JSON.parse(sessionStorage.getItem("ltc:to")); } catch (e) {}
+    if (!to || typeof to !== "object" || to.u !== location.pathname.replace(/index\.html$/, "") + location.search) to = null;
+    if (el) el.textContent = (to && to.t) || document.title.split("|")[0].trim();
+    if (to && to.i) for (var i = 0; i < cards.length && i < to.i.length; i++) cards[i].src = to.i[i];
   })();
 </script>
 <div class="cursor" aria-hidden="true"><div class="cursor__dot"></div><div class="cursor__label"></div></div>
@@ -208,7 +208,9 @@
       <h2 class="h2" data-split>How can Sam <em>help</em>?</h2>
       <p class="muted" data-reveal style="max-width:40ch">Pick a topic so your message lands in the right place. For bookings, the quickest route is always <a class="link" href="classes.html">online</a>.</p>
       <div class="map" style="min-height:320px" data-reveal>
-        <iframe title="Map showing 16 King Street, Crieff" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=16+King+Street,+Crieff,+Scotland&amp;z=16&amp;output=embed"></iframe>
+        <!-- the map loads once the page has finished arriving (its scripts would otherwise compete with the curtain) -->
+        <iframe title="Map showing 16 King Street, Crieff" loading="lazy" referrerpolicy="no-referrer-when-downgrade" data-defer-src="https://www.google.com/maps?q=16+King+Street,+Crieff,+Scotland&amp;z=16&amp;output=embed"></iframe>
+        <noscript><iframe title="Map showing 16 King Street, Crieff" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=16+King+Street,+Crieff,+Scotland&amp;z=16&amp;output=embed"></iframe></noscript>
       </div>
     </div>
     <form class="form plan__form" data-form="contact" novalidate data-reveal>
@@ -342,8 +344,8 @@
 
 <script src="assets/vendor/gsap.min.js" defer></script>
 <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
-<script src="assets/js/data.js?v=202611200720" defer></script>
-<script src="assets/js/site.js?v=202611200720" defer></script>
-<script src="assets/js/motion.js?v=202611200720" defer></script>
+<script src="assets/js/data.js?v=202611201337" defer></script>
+<script src="assets/js/site.js?v=202611201337" defer></script>
+<script src="assets/js/motion.js?v=202611201337" defer></script>
 </body>
 </html>

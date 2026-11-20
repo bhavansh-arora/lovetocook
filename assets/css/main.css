@@ -1348,6 +1348,11 @@ form.is-sent .form-success { display: block; animation: cardIn .8s var(--ease); 
 .no-motion .curtain { visibility: hidden !important; }
 .no-motion .loader { display: none !important; }
 
+/* While the curtain rests over the page (the new page is being swapped in behind it), its cream reaches
+   300px past every edge: a spread shadow, so no layout. If an iOS toolbar resizes the screen in that
+   moment, no strip of the page underneath can show. It goes as the lift starts, off screen. */
+.curtain.is-shut .curtain__main, .ltc-seen .curtain:not(.is-open) .curtain__main { box-shadow: 0 0 0 300px var(--cream); }
+
 /* Private class planner */
 .plan { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); align-items: start; }
 .plan__aside { grid-column: 1 / span 5; position: sticky; top: calc(var(--header-h) + 40px); display: grid; gap: 28px; }
