@@ -185,6 +185,21 @@
     if (t) { e.preventDefault(); window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 90, behavior: "smooth" }); }
   }));
 
+  // Fades and wipes on scroll are Web Animations: the browser runs opacity on its compositor thread, so a
+  // fade never repaints what it fades and keeps going even if the page is busy. Each element is left with
+  // its final style set inline, so it can never end up hidden.
+  const EASE_OUT = "cubic-bezier(.33, 1, .68, 1)";
+  const hide = (els) => els.forEach((el) => (el.style.opacity = "0"));
+  const fadeIn = (els, { stagger = 0.08, duration = 0.9, delay = 0 } = {}) => els.forEach((el, i) => {
+    if (el.animate) el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: duration * 1000, delay: (delay + i * stagger) * 1000, easing: EASE_OUT, fill: "backwards" });
+    el.style.opacity = "1";
+  });
+  const wipeIn = (el, r = "0px") => {
+    const from = `inset(0% 0% 100% 0% round ${r})`, to = `inset(0% 0% 0% 0% round ${r})`;
+    if (el.animate) el.animate([{ clipPath: from }, { clipPath: to }], { duration: 1100, easing: "cubic-bezier(.65, 0, .35, 1)", fill: "backwards" });
+    el.style.clipPath = "";
+  };
+  const once = (trigger, start, fn) => ScrollTrigger.create({ trigger, start, once: true, onEnter: fn });
   // A photo that scales as it arrives is held on its own layer for the move, so it is drawn once, not every frame
   const willOn = function () { this.targets().forEach((t) => (t.style.willChange = "transform")); };
   // Tidy up after an entrance without GSAP's clearProps, which re-reads the computed transform
@@ -251,8 +266,6 @@
     el.classList.add("is-split");
     return $$(".split-line > span", el);
   }
-  // lines rise out of their mask (flat: a 3D flip distorts very wide display type)
-  const lineIn = { yPercent: 118, rotation: 3, transformOrigin: "0% 100%", duration: 1.2, stagger: 0.1, ease: "expo.out", onComplete: unset("transform") };
 
   /* ---------- Intro / preloader ---------- */
   const loader = $(".loader");
@@ -274,10 +287,10 @@
     }
     if (has("[data-deck]")) {
       tl.fromTo("[data-deck] .deck__face", { y: -160, rotationX: -40, rotationZ: (i) => [-14, 12, 0][i % 3], opacity: 0 }, { y: 0, rotationX: 0, rotationZ: 0, opacity: 1, duration: 1.9, stagger: 0.12, ease: "expo.out" }, 0.2);
-      if (has("[data-deck] .deck__chip")) tl.fromTo("[data-deck] .deck__chip", { y: -30, scale: 0.85, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 1.2, ease: "back.out(1.4)" }, 0.9);
+      if (has("[data-deck] .deck__chip")) tl.fromTo("[data-deck] .deck__chip", { y: -30, scale: 0.85, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 1.2, ease: "power3.out" }, 0.9);
     }
     $$("[data-hero-media]:not([data-ring])").forEach((m, k) => tl.fromTo(m, { clipPath: "inset(0% 0% 100% 0% round 32px)", y: -40, opacity: 0 }, { clipPath: "inset(0% 0% 0% 0% round 32px)", y: 0, opacity: 1, duration: 1.6, ease: "expo.inOut", onComplete: unset("clipPath,transform") }, 0.15 + k * 0.1));
-    if (has("[data-hero-pop]")) tl.from("[data-hero-pop]", { scale: 0, rotate: -40, duration: 1.2, stagger: 0.1, ease: "back.out(1.6)" }, 0.9);
+    if (has("[data-hero-pop]")) tl.from("[data-hero-pop]", { scale: 0, rotate: -40, duration: 1.2, stagger: 0.1, ease: "power3.out" }, 0.9);
     return tl;
   }
 
@@ -305,7 +318,7 @@
         .fromTo(".loader__line", { y: -14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease }, 0.15)
         .fromTo(".loader__row", { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease }, 0.2)
         .fromTo(cardsEl, { opacity: 0, scale: 0.7, y: -120, rotation: (i) => (i % 2 ? 16 : -16) }, {
-          opacity: 1, scale: 1, y: 0, rotation: (i) => parseFloat(cardsEl[i].style.getPropertyValue("--r")), duration: 0.95, stagger: 0.2, ease: "back.out(1.4)",
+          opacity: 1, scale: 1, y: 0, rotation: (i) => parseFloat(cardsEl[i].style.getPropertyValue("--r")), duration: 0.95, stagger: 0.2, ease: "power3.out",
         }, 0.35)
         .to(o, { v: 100, duration: 2.1, ease: "power2.inOut", onUpdate: () => (count.textContent = Math.round(o.v)) }, 0.25)
         .to(".loader__bar span", { scaleX: 1, duration: 2.1, ease: "power2.inOut" }, 0.25)
@@ -422,38 +435,27 @@
 
   /* ---------- Reveals ---------- */
   function reveals() {
+    // headings: each line fades in where it stands
     $$("[data-split]").forEach((el) => {
       const lines = splitLines(el);
-      gsap.from(lines, { ...lineIn, scrollTrigger: { trigger: el, start: "top 88%", once: true } });
+      hide(lines);
+      once(el, "top 90%", () => fadeIn(lines));
     });
-    // content rises into place (flat at rest, so waiting blocks are not held on their own layers)
-    gsap.set("[data-reveal]", { y: 30 });
+    // blocks: fade in where they stand (hidden by CSS until then)
     ScrollTrigger.batch("[data-reveal]", {
-      start: "top 92%",
+      start: "top 94%",
       once: true,
-      onEnter: (els) => { gsap.fromTo(els, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.1, ease: "power3.out", stagger: 0.08, overwrite: "auto", onComplete: unset("transform") }); els.forEach((e) => e.classList.add("is-lit")); },
+      onEnter: (els) => { fadeIn(els, { stagger: 0.06 }); els.forEach((e) => e.classList.add("is-lit")); },
     });
+    // photos are unveiled top to bottom (a wipe: the photo itself never moves)
     $$("[data-reveal-img]").forEach((el) => {
-      const img = $("img", el);
-      gsap.fromTo(el, { clipPath: "inset(0% 0% 100% 0% round 32px)" }, { clipPath: "inset(0% 0% 0% 0% round 32px)", duration: 1.4, ease: "expo.inOut", scrollTrigger: { trigger: el, start: "top 88%", once: true }, onComplete: unset("clipPath") });
-      if (img) gsap.fromTo(img, { scale: 1.25, yPercent: -10 }, { scale: 1, yPercent: 0, duration: 1.8, ease: "expo.out", onStart: willOn, onComplete: unset("transform,willChange"), scrollTrigger: { trigger: el, start: "top 88%", once: true } });
-    });
-    $$("[data-parallax]").forEach((el) => {
-      const amt = parseFloat(el.dataset.parallax) || 12;
-      gsap.fromTo(el, { yPercent: -amt }, { yPercent: amt, ease: "none", scrollTrigger: { trigger: el.parentElement, start: "top bottom", end: "bottom top", scrub: 0.5 } });
+      el.style.clipPath = "inset(0% 0% 100% 0% round 32px)";
+      once(el, "top 90%", () => wipeIn(el, "32px"));
     });
     $$("[data-count]").forEach((el) => {
       const end = parseFloat(el.dataset.count);
       const o = { v: 0 };
-      gsap.to(o, { v: end, duration: 2, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 90%", once: true }, onUpdate: () => (el.textContent = Math.round(o.v) + (el.dataset.suffix || "")) });
-    });
-    $$("[data-float]").forEach((el, k) => {
-      gsap.to(el, { y: k % 2 ? -60 : 60, rotate: k % 2 ? 6 : -6, rotationY: k % 2 ? 18 : -18, ease: "none", scrollTrigger: { trigger: el.closest("section"), start: "top bottom", end: "bottom top", scrub: 0.5 } });
-    });
-    // the quote band image sinks back in depth as you pass
-    $$(".quote-band").forEach((q) => {
-      const bg = $(".quote-band__bg", q);
-      gsap.fromTo(bg, { scale: 1.18, rotationX: 8, transformPerspective: 1400 }, { scale: 1, rotationX: -4, ease: "none", scrollTrigger: { trigger: q, start: "top bottom", end: "bottom top", scrub: 0.5 } });
+      gsap.to(o, { v: end, duration: 1.6, ease: "power2.out", scrollTrigger: { trigger: el, start: "top 92%", once: true }, onUpdate: () => (el.textContent = Math.round(o.v) + (el.dataset.suffix || "")) });
     });
   }
 
@@ -510,17 +512,15 @@
     const list = $("[data-fold]");
     if (!list) return;
     const steps = $$(".j-fold__step", list);
-    const tl = gsap.timeline({ scrollTrigger: { trigger: list, start: "top 80%", once: true } });
-    steps.forEach((st, i) => {
-      const media = $(".j-fold__media", st), txt = $(".j-fold__txt", st), stamp = $(".j-fold__stamp", st), num = $(".j-fold__stamp b", st), op = $(".j-fold__op", st);
-      const n = parseInt(num.dataset.n, 10) || 0, o = { v: 0 }, at = i * 0.3;
+    const all = [];
+    steps.forEach((st) => all.push([$(".j-fold__media", st), $(".j-fold__txt", st), $(".j-fold__stamp", st), $(".j-fold__op", st)].filter(Boolean)));
+    all.forEach(hide);
+    once(list, "top 85%", () => steps.forEach((st, i) => {
+      const num = $(".j-fold__stamp b", st), n = parseInt(num.dataset.n, 10) || 0, o = { v: 0 }, at = i * 0.18;
       num.textContent = "0";
-      tl.fromTo(media, { y: -70, rotation: i % 2 ? 8 : -8, opacity: 0 }, { y: 0, rotation: 0, opacity: 1, duration: 1, ease: "power3.out", onComplete: unset("transform,opacity") }, at)
-        .fromTo(txt, { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", onComplete: unset("transform,opacity") }, at + 0.32)
-        .fromTo(stamp, { scale: 0, rotation: -60 }, { scale: 1, rotation: 0, duration: 0.7, ease: "back.out(2.2)", onComplete: unset("transform") }, at + 0.62)
-        .to(o, { v: n, duration: 0.8, ease: "power2.out", onUpdate: () => { num.textContent = Math.round(o.v); } }, at + 0.62);
-      if (op) tl.fromTo(op, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2)", onComplete: unset("transform,opacity") }, at + 0.5);
-    });
+      fadeIn(all[i], { delay: at });
+      gsap.to(o, { v: n, duration: 0.9, delay: at + 0.25, ease: "power2.out", onUpdate: () => { num.textContent = Math.round(o.v); } });
+    }));
   }
 
   /* ---------- Class day: a caramel line runs down the day as you read it ---------- */
@@ -676,16 +676,7 @@
 
   /* ---------- Magnetic ---------- */
   function magnetic() {
-    if (!finePointer) return;
-    $$("[data-magnetic], .btn:not(.btn--block), .icon-btn, .bag-btn, .next-card__go").forEach((el) => {
-      const s = el.matches(".btn") ? 0.25 : 0.4;
-      const xTo = gsap.quickTo(el, "x", { duration: 0.8, ease: "elastic.out(1, 0.4)" });
-      const yTo = gsap.quickTo(el, "y", { duration: 0.8, ease: "elastic.out(1, 0.4)" });
-      let r = null;
-      el.addEventListener("mouseenter", () => (r = null));
-      el.addEventListener("mousemove", (e) => { if (!r) r = el.getBoundingClientRect(); xTo((e.clientX - r.left - r.width / 2) * s); yTo((e.clientY - r.top - r.height / 2) * s); });
-      el.addEventListener("mouseleave", () => { r = null; xTo(0); yTo(0); });
-    });
+    // (removed: buttons that follow the pointer and spring back read as a bounce)
   }
 
   /* ---------- While the page scrolls, hover effects wait: cards sliding under a still pointer
@@ -733,7 +724,7 @@
         gsap.to(el, { rotateY: px * 18, rotateX: -py * 18, duration: 0.6, ease: "power3" });
         el.style.setProperty("--shine", `${(1 - (px + 0.5)) * 100}%`);
       });
-      wrap.addEventListener("mouseleave", () => gsap.to(el, { rotateY: 0, rotateX: 0, duration: 1, ease: "elastic.out(1,0.5)" }));
+      wrap.addEventListener("mouseleave", () => gsap.to(el, { rotateY: 0, rotateX: 0, duration: 0.9, ease: "power3.out" }));
     });
   }
 
@@ -741,8 +732,8 @@
   function footerMega() {
     const m = $(".footer__mega");
     if (!m) return;
-    const chars = splitChars(m);
-    gsap.from(chars, { yPercent: 105, rotation: 8, opacity: 0, duration: 1.1, stagger: 0.05, ease: "expo.out", onComplete: unset("transform,opacity"), scrollTrigger: { trigger: m, start: "top 95%", once: true } });
+    hide([m]);
+    once(m, "top 98%", () => fadeIn([m], { duration: 1.1 }));
   }
 
   /* ---------- Letters: wrap each character (inside any line or em) so it can move on its own ---------- */
@@ -770,14 +761,8 @@
 
   /* ---------- Polaroids are dealt in from above and land at their own tilt ---------- */
   function deal() {
-    $$("[data-deal]").forEach((group) => {
-      const cards = Array.from(group.children);
-      const tilt = (el) => parseFloat(getComputedStyle(el).getPropertyValue("--r")) || 0;
-      gsap.fromTo(cards, { opacity: 0, y: -64, rotation: (i, el) => tilt(el) + (i % 2 ? 8 : -8) }, {
-        opacity: 1, y: 0, rotation: (i, el) => tilt(el), duration: 1.1, stagger: 0.12, ease: "power3.out", onComplete: unset("transform"),
-        scrollTrigger: { trigger: group, start: "top 82%", once: true },
-      });
-    });
+    // polaroids (hidden by CSS until then) fade in at their own tilt
+    $$("[data-deal]").forEach((group) => once(group, "top 88%", () => fadeIn(Array.from(group.children), { stagger: 0.1 })));
   }
 
   /* ---------- Hand-drawn flourish under each heading's italic word ---------- */
@@ -807,13 +792,10 @@
   /* ---------- Photos unveil with a soft wipe, settle from a slight zoom, then drift ---------- */
   function photos() {
     $$(".path__media, .ig-grid a").forEach((wrap) => {
-      const img = $("img", wrap);
-      if (!img) return;
+      if (!$("img", wrap)) return;
       const r = getComputedStyle(wrap).borderTopLeftRadius || "0px";
-      gsap.fromTo(wrap, { clipPath: `inset(0% 0% 100% 0% round ${r})` }, { clipPath: `inset(0% 0% 0% 0% round ${r})`, duration: 1.3, ease: "expo.inOut", scrollTrigger: { trigger: wrap, start: "top 88%", once: true } });
-      const settle = wrap.closest(".ig-grid") ? { onStart: willOn, onComplete: unset("willChange") } : {};
-      gsap.fromTo(img, { scale: 1.35, y: -40 }, { scale: 1.12, y: 0, duration: 1.8, ease: "expo.out", ...settle, scrollTrigger: { trigger: wrap, start: "top 88%", once: true } });
-      if (!wrap.closest(".ig-grid")) gsap.fromTo(img, { yPercent: -5 }, { yPercent: 5, ease: "none", scrollTrigger: { trigger: wrap, start: "top bottom", end: "bottom top", scrub: 0.5 } });
+      wrap.style.clipPath = `inset(0% 0% 100% 0% round ${r})`;
+      once(wrap, "top 90%", () => wipeIn(wrap, r));
     });
   }
 

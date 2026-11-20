@@ -1468,7 +1468,7 @@ form.is-sent .form-success { display: block; animation: cardIn .8s var(--ease); 
 .footer__mega .ch { -webkit-text-fill-color: var(--cream); }
 .footer__mega em .ch { -webkit-text-fill-color: var(--butter); }
 .path__media, .ig-grid a, .split__media .media, .about-hero__img .media { overflow: hidden; }
-.path__media img, .split__media .media img, .about-hero__img .media img { will-change: transform; }
+
 
 /* Booking card: compact enough to sit fully on screen while pinned, and only pinned when it fits */
 .detail__aside { top: calc(var(--header-h) + 16px); }
@@ -1495,10 +1495,10 @@ form.is-sent .form-success { display: block; animation: cardIn .8s var(--ease); 
 .no-motion [data-hero-fade], .no-motion [data-ring], .no-motion [data-deck] .deck__face, .no-motion [data-deck] .deck__chip, .no-motion [data-hero-media] { opacity: 1 !important; }
 
 /* Class and bakery cards: the photo unveils downwards when the card is drawn */
-.ccard, .bake { animation: cardRise .8s var(--ease) both; }
-@keyframes cardRise { from { opacity: 0; transform: translateY(-18px); } }
+.ccard, .bake { animation: cardFade .7s ease-out both; }
+@keyframes cardFade { from { opacity: 0; } }
 .ccard__media, .bake__media { animation: mediaDown 1.2s var(--ease) both; }
-.ccard__media img, .bake__media img { animation: mediaSettle 1.6s var(--ease) both; }
+.ccard__media img, .bake__media img { animation: none; }
 @keyframes mediaDown { from { clip-path: inset(0 0 100% 0 round var(--r-lg)); } to { clip-path: inset(0 0 0 0 round var(--r-lg)); } }
 @keyframes mediaSettle { from { transform: translateY(-8%) scale(1.2); } }
 .reduce-motion .ccard, .reduce-motion .bake, .reduce-motion .ccard__media, .reduce-motion .bake__media, .reduce-motion .ccard__media img, .reduce-motion .bake__media img { animation: none; }

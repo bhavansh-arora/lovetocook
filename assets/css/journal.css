@@ -442,10 +442,6 @@ main > section, main > .marquee, main > div, .footer { overflow-x: clip; }
 /* while the page scrolls, nothing under the pointer starts a hover animation */
 .scroll-shield { position: fixed; inset: 0; z-index: 9999; pointer-events: none; }
 .scroll-shield.is-on { pointer-events: auto; }
-/* the quote photo scales with scroll: keep it on one layer so it is not re-drawn every frame */
-.quote-band__bg { will-change: transform; }
 /* the film grain is invisible on a phone screen but costs a full-screen layer on every frame */
 @media (hover: none) { body::after { display: none; } }
 
-/* polaroids that are dealt in are drawn ahead of time on computers, so their entrance only moves them */
-@media (hover: hover) and (pointer: fine) { .motion-ok [data-deal] > * { will-change: transform; } }
