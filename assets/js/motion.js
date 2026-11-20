@@ -303,8 +303,8 @@
   const cCards = curtain ? $$(".curtain__card", curtain) : [];
   const cImgs = curtain ? $$("[data-curtain-img]", curtain) : [];
   const cap = (host, cls) => { const c = document.createElement("span"); c.className = "cap " + cls; c.setAttribute("aria-hidden", "true"); host.appendChild(c); return c; };
-  const cTop = cMain && cap(cMain, "cap--top"), cBot = cMain && cap(cMain, "cap--bot");
-  const lBot = loader && cap(loader, "cap--bot");
+  // only the rising edge gets a dome; a lifting sheet leaves with a straight edge, so no semicircle is left on screen
+  const cTop = cMain && cap(cMain, "cap--top");
 
   function runIntro() {
     if (loader && firstVisit) {
@@ -330,7 +330,6 @@
         }, "+=0.15")
         .to([".loader__center", ".loader__row", ".loader__bar"], { y: -24, opacity: 0, duration: 0.5, ease: "power2.in" }, "<0.2")
         .to(loader, { yPercent: -100, duration: 1.1, ease: "expo.inOut" }, "-=0.25")
-        .fromTo(lBot, { scaleY: 0 }, { scaleY: 1, duration: 1.1, ease: "expo.inOut" }, "<")
         .add(() => { loader.classList.add("is-done"); }, ">")
         .add(heroIn(), "-=0.7");
       return () => tl.play();
@@ -338,12 +337,11 @@
       if (loader) loader.classList.add("is-done");
       if (curtain) {
         // arriving: the name lifts out, the chocolate curtain rises off the page, then the butter sheet
-        const tl = gsap.timeline({ paused: true, onComplete: () => { gsap.set(curtain, { visibility: "hidden" }); gsap.set([cLead, cMain], { yPercent: 100 }); gsap.set([cTop, cBot], { scaleY: 0 }); gsap.set(cCards, { clearProps: "transform,opacity" }); } });
+        const tl = gsap.timeline({ paused: true, onComplete: () => { gsap.set(curtain, { visibility: "hidden" }); gsap.set([cLead, cMain], { yPercent: 100 }); gsap.set(cTop, { scaleY: 0 }); gsap.set(cCards, { clearProps: "transform,opacity" }); } });
         tl.set(curtain, { visibility: "visible" })
           .to(cCards, { y: () => -window.innerHeight * 0.5, rotation: (i) => [-22, 20, -6][i % 3], opacity: 0, duration: 0.8, ease: "power2.in", stagger: 0.06 }, 0)
           .to([cLabel, cTitle], { yPercent: -110, opacity: 0, duration: 0.6, ease: "power2.in", stagger: 0.05 }, 0.1)
           .to(cMain, { yPercent: -100, duration: 1.2, ease: SHEET }, 0.42)
-          .fromTo(cBot, { scaleY: 0 }, { scaleY: 1, duration: 1.2, ease: SHEET }, 0.42)
           .to(cLead, { yPercent: -100, duration: 1.2, ease: SHEET }, 0.56);
         const hero = heroIn().pause();
         return () => { tl.play(); hero.delay(0.8).restart(true); };
@@ -430,7 +428,7 @@
   document.addEventListener("mouseover", intent, { passive: true });
   document.addEventListener("touchstart", intent, { passive: true });
   window.addEventListener("pageshow", (e) => {
-    if (e.persisted && curtain) { leaving = false; gsap.set(curtain, { visibility: "hidden" }); gsap.set([cLead, cMain], { yPercent: 100 }); gsap.set([cTop, cBot], { scaleY: 0 }); window.dispatchEvent(new Event("ltc:uncovered")); }
+    if (e.persisted && curtain) { leaving = false; gsap.set(curtain, { visibility: "hidden" }); gsap.set([cLead, cMain], { yPercent: 100 }); gsap.set(cTop, { scaleY: 0 }); window.dispatchEvent(new Event("ltc:uncovered")); }
   });
 
   /* ---------- Reveals ---------- */
