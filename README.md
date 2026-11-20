@@ -34,6 +34,7 @@ A premium, multi-page website for **Love to Cook**, the cook school, bakery and 
   - a curved 3D gallery that shows every photo uncropped
   - pointer-tilt cards with glare, 3D headline line-flips, depth parallax on inner-page heroes, and a marquee that leans with scroll speed
 - Motion: preloader, page-transition curtain, Lenis smooth scroll, scroll-scrubbed text, magnetic buttons, a custom cursor and voucher tilt
+- Page changes happen in place: the curtain covers the screen, the next page's `<main>` is fetched and swapped in behind it, and the curtain lifts. No new document loads between pages, so there is no frozen or blank frame (and no iOS toolbar jump). Back and Forward work and return to where you were. Each page's setup lives in `LTC.pageIn` (site.js) and `initPage` (motion.js) and is undone before the next page arrives. If a fetch fails, the link falls back to a normal page load.
 - Accessibility: skip link, focus styles, ARIA on controls, `prefers-reduced-motion` support, and content that stays visible if JavaScript fails
 - Responsive at every width (checked at 390, 834 and 1440px), with a sticky mobile booking bar
 
